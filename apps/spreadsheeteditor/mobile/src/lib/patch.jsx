@@ -33,8 +33,17 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-const EditorUIController = () => null;
+import inventory from '../commands/desktop-command-inventory.json';
+import {
+    createEditorUIControllerFacade,
+    createSpreadsheetCommandProvider,
+} from './commandProvider.mjs';
 
-EditorUIController.isSupportEditFeature = () => false;
+const provider = createSpreadsheetCommandProvider({
+    inventory,
+    getApi: () => Common.EditorApi && Common.EditorApi.get(),
+});
+
+const EditorUIController = createEditorUIControllerFacade(provider);
 
 export default EditorUIController;

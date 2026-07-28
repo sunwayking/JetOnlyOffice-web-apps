@@ -1,0 +1,2231 @@
+{
+  "schemaVersion": 1,
+  "editor": "presentation",
+  "source": {
+    "repository": "sunwayking/JetOnlyOffice-web-apps",
+    "commit": "9c0ca538c3b211052347df09d2a4d6781f023403",
+    "files": [
+      {
+        "path": "apps/presentationeditor/main/app/view/Toolbar.js",
+        "sha256": "ac961fa80b53d7190a54d3c9b9a5080a3c3256c8201449d3b6694e4d3a25334e"
+      },
+      {
+        "path": "apps/presentationeditor/main/app/controller/Toolbar.js",
+        "sha256": "3228b274430673505877bd57967d13d24d6ca0acee0775fdc2e29a6121586b72"
+      }
+    ]
+  },
+  "policy": {
+    "desktopReference": "P1",
+    "mobileReference": "Android ONLYOFFICE 9.4.1 P0",
+    "plannedImplementationIssues": [
+      9
+    ],
+    "excludedFeaturesAdr": "ADR-0040"
+  },
+  "commands": [
+    {
+      "id": "presentation.clipboard.copy",
+      "contexts": [
+        "slide",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "Copy"
+      },
+      "mobilePath": "context.copy",
+      "testIds": [
+        "pe-provider-clipboard-copy"
+      ]
+    },
+    {
+      "id": "presentation.clipboard.cut",
+      "contexts": [
+        "slide",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "Cut"
+      },
+      "mobilePath": "context.cut",
+      "testIds": [
+        "pe-provider-clipboard-cut"
+      ]
+    },
+    {
+      "id": "presentation.clipboard.paste",
+      "contexts": [
+        "slide",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "Paste"
+      },
+      "mobilePath": "context.paste",
+      "testIds": [
+        "pe-provider-clipboard-paste"
+      ]
+    },
+    {
+      "id": "presentation.desktop.add-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.add-slide",
+      "testIds": [
+        "pe-issue-9-desktop-add-slide"
+      ]
+    },
+    {
+      "id": "presentation.desktop.align-horizontal",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-align-horizontal"
+      ]
+    },
+    {
+      "id": "presentation.desktop.align-vertical",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-align-vertical"
+      ]
+    },
+    {
+      "id": "presentation.desktop.case",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-case"
+      ]
+    },
+    {
+      "id": "presentation.desktop.change-case",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-change-case"
+      ]
+    },
+    {
+      "id": "presentation.desktop.change-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-change-slide"
+      ]
+    },
+    {
+      "id": "presentation.desktop.clearstyle",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-clearstyle"
+      ]
+    },
+    {
+      "id": "presentation.desktop.colorschemas",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-colorschemas"
+      ]
+    },
+    {
+      "id": "presentation.desktop.columns",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-columns"
+      ]
+    },
+    {
+      "id": "presentation.desktop.copystyle",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-copystyle"
+      ]
+    },
+    {
+      "id": "presentation.desktop.datetime",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-datetime"
+      ]
+    },
+    {
+      "id": "presentation.desktop.decfont",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-decfont"
+      ]
+    },
+    {
+      "id": "presentation.desktop.decoffset",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-decoffset"
+      ]
+    },
+    {
+      "id": "presentation.desktop.direction",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-direction"
+      ]
+    },
+    {
+      "id": "presentation.desktop.editheader",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-editheader"
+      ]
+    },
+    {
+      "id": "presentation.desktop.fontcolor",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-fontcolor"
+      ]
+    },
+    {
+      "id": "presentation.desktop.halign",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-halign"
+      ]
+    },
+    {
+      "id": "presentation.desktop.highlight",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-highlight"
+      ]
+    },
+    {
+      "id": "presentation.desktop.incfont",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-incfont"
+      ]
+    },
+    {
+      "id": "presentation.desktop.incoffset",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-incoffset"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insaudio",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insaudio",
+      "testIds": [
+        "pe-issue-9-desktop-insaudio"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insert-columns",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-columns",
+      "testIds": [
+        "pe-issue-9-desktop-insert-columns"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insert-equation",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-equation",
+      "testIds": [
+        "pe-issue-9-desktop-insert-equation"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insert-smartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-smartart",
+      "testIds": [
+        "pe-issue-9-desktop-insert-smartart"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insert-symbol",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-symbol",
+      "testIds": [
+        "pe-issue-9-desktop-insert-symbol"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insert-table",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-table",
+      "testIds": [
+        "pe-issue-9-desktop-insert-table"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insert-textart",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-textart",
+      "testIds": [
+        "pe-issue-9-desktop-insert-textart"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insertequation",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertequation",
+      "testIds": [
+        "pe-issue-9-desktop-insertequation"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insertlink",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertlink",
+      "testIds": [
+        "pe-issue-9-desktop-insertlink"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insertshape",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertshape",
+      "testIds": [
+        "pe-issue-9-desktop-insertshape"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insertsmartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertsmartart",
+      "testIds": [
+        "pe-issue-9-desktop-insertsmartart"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insertsymbol",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertsymbol",
+      "testIds": [
+        "pe-issue-9-desktop-insertsymbol"
+      ]
+    },
+    {
+      "id": "presentation.desktop.inserttable",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.inserttable",
+      "testIds": [
+        "pe-issue-9-desktop-inserttable"
+      ]
+    },
+    {
+      "id": "presentation.desktop.inserttextart",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.inserttextart",
+      "testIds": [
+        "pe-issue-9-desktop-inserttextart"
+      ]
+    },
+    {
+      "id": "presentation.desktop.insvideo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insvideo",
+      "testIds": [
+        "pe-issue-9-desktop-insvideo"
+      ]
+    },
+    {
+      "id": "presentation.desktop.line-space",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-line-space"
+      ]
+    },
+    {
+      "id": "presentation.desktop.linespace",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-linespace"
+      ]
+    },
+    {
+      "id": "presentation.desktop.markers",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-markers"
+      ]
+    },
+    {
+      "id": "presentation.desktop.merge-shapes",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-merge-shapes"
+      ]
+    },
+    {
+      "id": "presentation.desktop.numbering",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-numbering"
+      ]
+    },
+    {
+      "id": "presentation.desktop.numbers",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-numbers"
+      ]
+    },
+    {
+      "id": "presentation.desktop.object-align",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-object-align"
+      ]
+    },
+    {
+      "id": "presentation.desktop.object-arrange",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.object",
+      "testIds": [
+        "pe-issue-9-desktop-object-arrange"
+      ]
+    },
+    {
+      "id": "presentation.desktop.object-merge",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-object-merge"
+      ]
+    },
+    {
+      "id": "presentation.desktop.preview",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-preview"
+      ]
+    },
+    {
+      "id": "presentation.desktop.preview-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-preview-slide"
+      ]
+    },
+    {
+      "id": "presentation.desktop.print",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-print"
+      ]
+    },
+    {
+      "id": "presentation.desktop.replace",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-replace"
+      ]
+    },
+    {
+      "id": "presentation.desktop.save",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-save"
+      ]
+    },
+    {
+      "id": "presentation.desktop.select-all",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-select-all"
+      ]
+    },
+    {
+      "id": "presentation.desktop.shape-align",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-shape-align"
+      ]
+    },
+    {
+      "id": "presentation.desktop.shape-arrange",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.object",
+      "testIds": [
+        "pe-issue-9-desktop-shape-arrange"
+      ]
+    },
+    {
+      "id": "presentation.desktop.slide-size",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "pe-issue-9-desktop-slide-size"
+      ]
+    },
+    {
+      "id": "presentation.desktop.slidenum",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-slidenum"
+      ]
+    },
+    {
+      "id": "presentation.desktop.strikeout",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-strikeout"
+      ]
+    },
+    {
+      "id": "presentation.desktop.subscript",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-subscript"
+      ]
+    },
+    {
+      "id": "presentation.desktop.superscript",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "pe-issue-9-desktop-superscript"
+      ]
+    },
+    {
+      "id": "presentation.desktop.text-direction",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-text-direction"
+      ]
+    },
+    {
+      "id": "presentation.desktop.theme-colors",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "pe-issue-9-desktop-theme-colors"
+      ]
+    },
+    {
+      "id": "presentation.desktop.underline",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-underline"
+      ]
+    },
+    {
+      "id": "presentation.desktop.valign",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "pe-issue-9-desktop-valign"
+      ]
+    },
+    {
+      "id": "presentation.history.redo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "Redo"
+      },
+      "mobilePath": "toolbar.redo",
+      "testIds": [
+        "pe-provider-history-redo"
+      ]
+    },
+    {
+      "id": "presentation.history.undo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "Undo"
+      },
+      "mobilePath": "toolbar.undo",
+      "testIds": [
+        "pe-provider-history-undo"
+      ]
+    },
+    {
+      "id": "presentation.insert.chart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertchart",
+      "testIds": [
+        "pe-issue-9-insert-chart"
+      ]
+    },
+    {
+      "id": "presentation.text.bold",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "put_TextPrBold"
+      },
+      "mobilePath": "edit.text.bold",
+      "testIds": [
+        "pe-provider-text-bold"
+      ]
+    },
+    {
+      "id": "presentation.text.italic",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "put_TextPrItalic"
+      },
+      "mobilePath": "edit.text.italic",
+      "testIds": [
+        "pe-provider-text-italic"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "desktopKey": "add-slide",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.add-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.add-slide"
+    },
+    {
+      "desktopKey": "align-horizontal",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.align-horizontal",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "align-vertical",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.align-vertical",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "animate",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "change-case",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.change-case",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "change-slide",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.change-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "design",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "file",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "home",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "id-markers-",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.markers",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-numbers-",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.numbers",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-add-slide",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.add-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.add-slide"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-bold",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.text.bold",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-case",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.case",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-clearstyle",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.clearstyle",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-colorschemas",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.colorschemas",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-columns",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.columns",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-copy",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.clipboard.copy",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-copystyle",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.copystyle",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-cut",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.clipboard.cut",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-datetime",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.datetime",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-decfont",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.decfont",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-decoffset",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.decoffset",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-direction",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.direction",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-editheader",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.editheader",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-fontcolor",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.fontcolor",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-halign",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.halign",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-highlight",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.highlight",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-incfont",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.incfont",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-incoffset",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.incoffset",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-italic",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.text.italic",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-linespace",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.linespace",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-markers",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.markers",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-merge-shapes",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.merge-shapes",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-numbering",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.numbering",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-paste",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.clipboard.paste",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-preview",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.preview",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-print",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.print",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-redo",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.history.redo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-replace",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.replace",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-save",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.save",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-select-all",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.select-all",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-shape-align",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.shape-align",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-shape-arrange",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.shape-arrange",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.object"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-slide-size",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.slide-size",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-slidenum",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.slidenum",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-strikeout",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.strikeout",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-subscript",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.subscript",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-superscript",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.superscript",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-underline",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.underline",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-undo",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.history.undo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-valign",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.valign",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-button-change-slide",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.change-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "ins",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "insert-chart",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.insert.chart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-chart"
+    },
+    {
+      "desktopKey": "insert-columns",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insert-columns",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-columns"
+    },
+    {
+      "desktopKey": "insert-equation",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insert-equation",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-equation"
+    },
+    {
+      "desktopKey": "insert-smartart",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insert-smartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-smartart"
+    },
+    {
+      "desktopKey": "insert-symbol",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insert-symbol",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-symbol"
+    },
+    {
+      "desktopKey": "insert-table",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insert-table",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-table"
+    },
+    {
+      "desktopKey": "insert-textart",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insert-textart",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-textart"
+    },
+    {
+      "desktopKey": "line-space",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.line-space",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "object-align",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.object-align",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "object-arrange",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.object-arrange",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.object"
+    },
+    {
+      "desktopKey": "object-merge",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.object-merge",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "preview-slide",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.preview-slide",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "slide-size",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.slide-size",
+      "contexts": [
+        "slide"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "text-direction",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.text-direction",
+      "contexts": [
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "theme-colors",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.theme-colors",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "tlbtn-insaudio",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insaudio",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insaudio"
+    },
+    {
+      "desktopKey": "tlbtn-insertchart",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.insert.chart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertchart"
+    },
+    {
+      "desktopKey": "tlbtn-insertequation",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insertequation",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertequation"
+    },
+    {
+      "desktopKey": "tlbtn-insertlink",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insertlink",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertlink"
+    },
+    {
+      "desktopKey": "tlbtn-insertshape-",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insertshape",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertshape"
+    },
+    {
+      "desktopKey": "tlbtn-insertsmartart",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insertsmartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertsmartart"
+    },
+    {
+      "desktopKey": "tlbtn-insertsymbol",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insertsymbol",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertsymbol"
+    },
+    {
+      "desktopKey": "tlbtn-inserttable",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.inserttable",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.inserttable"
+    },
+    {
+      "desktopKey": "tlbtn-inserttextart",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.inserttextart",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.inserttextart"
+    },
+    {
+      "desktopKey": "tlbtn-insvideo",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.desktop.insvideo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insvideo"
+    },
+    {
+      "desktopKey": "transit",
+      "desktopSource": "apps/presentationeditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "controller:onUndo",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.history.undo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "controller:onRedo",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.history.redo",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "controller:onCut",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.clipboard.cut",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "controller:onCopy",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.clipboard.copy",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "controller:onPaste",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.clipboard.paste",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "controller:onBold",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.text.bold",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "controller:onItalic",
+      "desktopSource": "apps/presentationeditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "presentation.text.italic",
+      "contexts": [
+        "presentation"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    }
+  ]
+}
