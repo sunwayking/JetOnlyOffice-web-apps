@@ -165,13 +165,24 @@ test('reduces SDK facts without timers or generic action inference', () => {
 
     adapter.emit({type: 'document-open', phase: 'loading', progress: {current: 2, total: 5}});
     adapter.emit({type: 'transport', state: 'reconnecting', attempt: 2});
-    adapter.emit({type: 'server-save', state: 'confirmed', index: 7, time: 42});
+    adapter.emit({
+        type: 'server-save',
+        state: 'accepted',
+        scope: 'coauthoring-server',
+        index: 7,
+        time: 42
+    });
 
     assert.equal(sessions.length, 4);
     assert.deepEqual(runtime.getSession(), {
         open: {phase: 'loading', progress: {current: 2, total: 5}},
         transport: {state: 'reconnecting', attempt: 2},
-        save: {state: 'confirmed', index: 7, time: 42}
+        save: {
+            state: 'accepted',
+            scope: 'coauthoring-server',
+            index: 7,
+            time: 42
+        }
     });
 
     unsubscribe();

@@ -40,6 +40,7 @@ import {observer, inject} from "mobx-react";
 import { withTranslation } from 'react-i18next';
 import AddTable from '../../view/add/AddTable';
 import {executeWordCommand} from '../../lib/wordEditorRuntime.mjs';
+import {WORD_COMMAND_IDS} from '../../lib/wordCommandAdapter.mjs';
 
 class AddTableController extends Component {
     constructor (props) {
@@ -84,7 +85,7 @@ class AddTableController extends Component {
                     onClick: function () {
                         const size = picker.value;
 
-                        executeWordCommand('word.table.insert', {
+                        executeWordCommand(WORD_COMMAND_IDS.TABLE_INSERT, {
                             columns: parseInt(size[0]),
                             rows: parseInt(size[1]),
                             style: type.toString()

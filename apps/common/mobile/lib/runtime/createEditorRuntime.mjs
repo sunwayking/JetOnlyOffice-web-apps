@@ -39,6 +39,12 @@ const initialSession = Object.freeze({
     save: Object.freeze({state: 'idle'})
 });
 
+export const COMMON_COMMAND_IDS = Object.freeze({
+    ADD_COMMENT: 'common.comment.add',
+    COPY_SELECTION: 'common.selection.copy',
+    UNDO: 'common.history.undo'
+});
+
 let activeEditorRuntime = null;
 
 function runtimeError(code, message, details) {

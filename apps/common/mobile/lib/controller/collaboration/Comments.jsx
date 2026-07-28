@@ -39,7 +39,10 @@ import { f7 } from 'framework7-react';
 import {Device} from '../../../../../common/mobile/utils/device';
 import { withTranslation} from 'react-i18next';
 import { LocalStorage } from '../../../utils/LocalStorage.mjs';
-import {getActiveEditorRuntime} from '../../runtime/createEditorRuntime.mjs';
+import {
+    COMMON_COMMAND_IDS,
+    getActiveEditorRuntime
+} from '../../runtime/createEditorRuntime.mjs';
 
 import {AddComment, EditComment, AddReply, EditReply, ViewComments, ViewCurrentComments} from '../../view/collaboration/Comments';
 import { getUserColor } from '../../../utils/getUserColor';
@@ -347,8 +350,8 @@ class AddCommentController extends Component {
             !!comment.asc_putDocumentFlag && comment.asc_putDocumentFlag(documentFlag);
 
             const runtime = getActiveEditorRuntime();
-            if (runtime?.resolve('common.comment.add')) {
-                runtime.execute('common.comment.add', {comment});
+            if (runtime?.resolve(COMMON_COMMAND_IDS.ADD_COMMENT)) {
+                runtime.execute(COMMON_COMMAND_IDS.ADD_COMMENT, {comment});
             } else {
                 api.asc_addComment(comment);
             }

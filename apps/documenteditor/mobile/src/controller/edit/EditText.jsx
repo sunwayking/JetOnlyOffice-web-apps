@@ -37,6 +37,7 @@ import React, {Component} from 'react';
 import { EditText } from '../../view/edit/EditText'
 import { inject, observer } from 'mobx-react';
 import {executeWordCommand} from '../../lib/wordEditorRuntime.mjs';
+import {WORD_COMMAND_IDS} from '../../lib/wordCommandAdapter.mjs';
 
 class EditTextController extends Component {
     constructor(props) {
@@ -106,7 +107,7 @@ class EditTextController extends Component {
     }
 
     toggleBold(value) {
-        executeWordCommand('word.text.bold', {value});
+        executeWordCommand(WORD_COMMAND_IDS.BOLD, {value});
     }
 
     toggleItalic(value) {
@@ -186,25 +187,7 @@ class EditTextController extends Component {
     }
 
     onParagraphAlign(type) {
-        const api = Common.EditorApi.get();
-        if (api) {
-            let value;
-            switch (type) {
-                case 'just':
-                    value = 3;
-                    break;
-                case 'right':
-                    value = 0;
-                    break;
-                case 'center':
-                    value = 2;
-                    break;
-                default:
-                    value = 1;
-                    break;
-            }
-            executeWordCommand('word.paragraph.align', {value});
-        }
+        executeWordCommand(WORD_COMMAND_IDS.PARAGRAPH_ALIGN, {value: type});
     }
 
     onParagraphMove(isLeft) {
