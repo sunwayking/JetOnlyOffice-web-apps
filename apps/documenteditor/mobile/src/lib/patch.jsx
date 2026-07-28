@@ -45,6 +45,9 @@ import IconUndoIos from '@common-ios-icons/icon-undo.svg?ios';
 import IconUndoAndroid from '@common-android-icons/icon-undo.svg';
 import IconRedoIos from '@common-ios-icons/icon-redo.svg?ios';
 import IconRedoAndroid from '@common-android-icons/icon-redo.svg';
+import {getWordGraphicContexts} from './wordSelectionContext.mjs';
+import {getWordEditorRuntime} from './wordEditorRuntime.mjs';
+import {WORD_COMMAND_IDS} from './wordCommandCatalog.mjs';
 
 const apiRegistrations = new WeakMap();
 
@@ -74,34 +77,41 @@ function getFocusValue(store, type) {
     return null;
 }
 
+function getGraphicFocusValue(store, context) {
+    for (const item of store._focusObjects) {
+        if (item.get_ObjectType() === Asc.c_oAscTypeSelectElement.Image &&
+            getWordGraphicContexts(item.get_ObjectValue()).includes(context)) {
+            return item.get_ObjectValue();
+        }
+    }
+    return null;
+}
+
 function createFocusInterface(store) {
     const typeTokens = new Map([
         [Asc.c_oAscTypeSelectElement.Header, ['header']],
         [Asc.c_oAscTypeSelectElement.Paragraph, ['text', 'paragraph']],
         [Asc.c_oAscTypeSelectElement.Text, ['text']],
-        [Asc.c_oAscTypeSelectElement.Image, ['image']],
         [Asc.c_oAscTypeSelectElement.Table, ['table']],
         [Asc.c_oAscTypeSelectElement.Hyperlink, ['hyperlink']],
         [Asc.c_oAscTypeSelectElement.SpellCheck, ['spellcheck']]
     ]);
-    if (Asc.c_oAscTypeSelectElement.Shape !== undefined) {
-        typeTokens.set(Asc.c_oAscTypeSelectElement.Shape, ['shape']);
-    }
-    if (Asc.c_oAscTypeSelectElement.Chart !== undefined) {
-        typeTokens.set(Asc.c_oAscTypeSelectElement.Chart, ['chart']);
-    }
-
     return {
         filterFocusObjects() {
             return Array.from(new Set(store._focusObjects
-                .reduce((tokens, item) => tokens.concat(typeTokens.get(item.get_ObjectType()) || []), [])));
+                .reduce((tokens, item) => {
+                    const type = item.get_ObjectType();
+                    return tokens.concat(type === Asc.c_oAscTypeSelectElement.Image
+                        ? getWordGraphicContexts(item.get_ObjectValue())
+                        : typeTokens.get(type) || []);
+                }, [])));
         },
         getHeaderObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Header),
         getParagraphObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Paragraph),
-        getShapeObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Shape),
-        getImageObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Image),
+        getShapeObject: () => getGraphicFocusValue(store, 'shape'),
+        getImageObject: () => getGraphicFocusValue(store, 'image'),
         getTableObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Table),
-        getChartObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Chart),
+        getChartObject: () => getGraphicFocusValue(store, 'chart'),
         getLinkObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Hyperlink)
     };
 }
@@ -158,6 +168,8 @@ EditorUIController.initFocusObjects = store => {
 EditorUIController.initTableTemplates = store => {
     registerOnce('table-templates', 'asc_onInitTableTemplates', () => {
         const api = Common.EditorApi.get();
+        const runtime = getWordEditorRuntime();
+        const isCommandAvailable = commandId => runtime?.resolve(commandId)?.available === true;
         store.setStyles(api.asc_getTableStylesPreviews(), 'default');
     });
 };
@@ -202,7 +214,10 @@ EditorUIController.ContextMenu = {
         } = controller.props;
         let locked = false;
         let hasText = false;
-        let hasObject = false;
+        let hasImage = false;
+        let hasTable = false;
+        let hasShape = false;
+        let hasChart = false;
         let hasLink = false;
 
         stack.forEach(item => {
@@ -210,29 +225,62 @@ EditorUIController.ContextMenu = {
             const value = item.get_ObjectValue();
             locked = locked || (typeof value?.get_Locked === 'function' && value.get_Locked());
             hasText = hasText || objectType === Asc.c_oAscTypeSelectElement.Paragraph;
-            hasObject = hasObject || objectType === Asc.c_oAscTypeSelectElement.Image ||
-                objectType === Asc.c_oAscTypeSelectElement.Table;
+            if (objectType === Asc.c_oAscTypeSelectElement.Image) {
+                const graphicContexts = getWordGraphicContexts(value);
+                hasImage = hasImage || graphicContexts.includes('image');
+                hasShape = hasShape || graphicContexts.includes('shape');
+                hasChart = hasChart || graphicContexts.includes('chart');
+            }
+            hasTable = hasTable || objectType === Asc.c_oAscTypeSelectElement.Table;
             hasLink = hasLink || objectType === Asc.c_oAscTypeSelectElement.Hyperlink;
         });
+
+        const hasObject = hasImage || hasTable || hasShape || hasChart;
 
         const canEdit = !isProtected || typeProtection === Asc.c_oAscEDocProtect.TrackedChanges;
         const canComment = typeProtection === Asc.c_oAscEDocProtect.Comments;
 
         const items = [];
         const canCopySelection = api.can_CopyCut();
-        if (canCopySelection) {
+        if (canCopySelection && isCommandAvailable(WORD_COMMAND_IDS.COPY)) {
             items.push({event: 'copy', icon: 'icon-copy'});
         }
         if (!isDisconnected && canFillForms && canCopySelection && !locked &&
             (!isViewer || isForm) && canEdit) {
-            items.push({event: 'cut', icon: 'icon-cut'});
-            items.push({event: 'paste', icon: 'icon-paste'});
+            if (isCommandAvailable(WORD_COMMAND_IDS.CUT)) {
+                items.push({event: 'cut', icon: 'icon-cut'});
+            }
+            if (isCommandAvailable(WORD_COMMAND_IDS.PASTE)) {
+                items.push({event: 'paste', icon: 'icon-paste'});
+            }
+        }
+        if (!isDisconnected && !isViewer && !locked && canEdit && (hasText || hasObject) &&
+            isCommandAvailable(WORD_COMMAND_IDS.DELETE)) {
+            items.push({caption: labels.menuDelete, event: 'delete'});
+            items.push({caption: labels.menuEdit, event: 'edit'});
+            if (hasText) {
+                items.push({caption: labels.menuParagraph, event: 'paragraph'});
+                if (!hasLink) {
+                    items.push({caption: labels.menuAddLink, event: 'addlink'});
+                }
+            }
+            if (hasImage && isCommandAvailable(WORD_COMMAND_IDS.IMAGE_REPLACE)) {
+                items.push({caption: labels.menuImage, event: 'image'});
+                items.push({caption: labels.menuReplaceImage, event: 'replaceimage'});
+            }
+            if (hasChart && isCommandAvailable(WORD_COMMAND_IDS.CHART_EDIT_DATA)) {
+                items.push({caption: labels.menuChart, event: 'chart'});
+                if (typeof api.asc_editChartInFrameEditor === 'function') {
+                    items.push({caption: labels.menuEditData, event: 'editdata'});
+                }
+            }
         }
         if (canViewComments && controller.isComments) {
             items.push({caption: labels.menuViewComment, event: 'viewcomment'});
         }
         if (!isDisconnected && api.can_AddQuotedComment() !== false && canCoAuthoring && canComments &&
-            !locked && (hasText || !hasObject) && (!isViewer || canEditComments) && (canEdit || canComment)) {
+            !locked && !hasObject && (hasText || !hasObject) && (!isViewer || canEditComments) &&
+            (canEdit || canComment) && isCommandAvailable(WORD_COMMAND_IDS.COMMENT_ADD)) {
             items.push({caption: labels.menuAddComment, event: 'addcomment'});
         }
         if (hasLink) {

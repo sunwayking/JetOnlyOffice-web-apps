@@ -52,6 +52,7 @@ import {
     initializeWordEditorRuntime,
     updateWordEditorPermissions
 } from '../lib/wordEditorRuntime.mjs';
+import {createWordEditorApiGate} from '../lib/wordEditorApiGate.mjs';
 import {
     resolveMobileForceView,
     resolveWordRuntimePermissions
@@ -1757,7 +1758,8 @@ class MainController extends Component {
     }
 
     componentDidMount() {
-        Common.EditorApi = {get: () => this.api};
+        this.getEditorApi = createWordEditorApiGate({getRawApi: () => this.api});
+        Common.EditorApi = {get: this.getEditorApi};
         this.initSdk();
     }
 

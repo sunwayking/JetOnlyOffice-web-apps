@@ -38,6 +38,136 @@
     --f7-popover-width: 360px;
 }
 
+#add-sheet {
+    height: min(72vh, 680px);
+    width: 100%;
+}
+
+.word-quick-toolbar {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 56px;
+    box-sizing: border-box;
+    padding: 6px max(8px, var(--f7-safe-area-right, 0px)) calc(6px + var(--f7-safe-area-bottom, 0px)) max(8px, var(--f7-safe-area-left, 0px));
+    overflow-x: auto;
+    background: var(--background-primary, #fff);
+    border-top: 1px solid var(--background-menu-divider);
+    box-shadow: 0 -1px 4px rgba(0, 0, 0, 0.08);
+    scrollbar-width: none;
+
+    &::-webkit-scrollbar {
+        display: none;
+    }
+
+    &__button {
+        display: inline-flex;
+        flex: 0 0 44px;
+        align-items: center;
+        justify-content: center;
+        width: 44px;
+        height: 44px;
+        padding: 0;
+        color: var(--text-normal);
+        background: transparent;
+        border: 0;
+        border-radius: 4px;
+
+        &:focus-visible {
+            outline: 2px solid @brandColor;
+            outline-offset: 2px;
+        }
+
+        &.active {
+            color: @brandColor;
+            background: var(--highlight-button-pressed, rgba(55, 99, 163, 0.12));
+        }
+
+        .icon {
+            width: 24px;
+            height: 24px;
+        }
+    }
+}
+
+.word-session-status {
+    position: absolute;
+    right: max(8px, var(--f7-safe-area-right, 0px));
+    bottom: calc(64px + var(--f7-safe-area-bottom, 0px));
+    left: max(8px, var(--f7-safe-area-left, 0px));
+    z-index: 510;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    min-height: 44px;
+    box-sizing: border-box;
+    padding: 8px 12px;
+    color: var(--text-normal);
+    background: var(--background-secondary);
+    border: 1px solid var(--background-menu-divider);
+    border-radius: 4px;
+
+    .button {
+        flex: 0 0 auto;
+        min-width: 44px;
+        min-height: 44px;
+        margin-left: 12px;
+    }
+}
+
+.word-session-recovery {
+    position: fixed;
+    inset: 0;
+    z-index: 13000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+    padding: max(24px, var(--f7-safe-area-top, 0px)) max(24px, var(--f7-safe-area-right, 0px))
+        max(24px, var(--f7-safe-area-bottom, 0px)) max(24px, var(--f7-safe-area-left, 0px));
+    color: var(--text-normal);
+    background: var(--background-primary);
+
+    &__content {
+        width: min(100%, 520px);
+    }
+
+    h2 {
+        margin: 0 0 12px;
+        font-size: 24px;
+        line-height: 1.25;
+        letter-spacing: 0;
+    }
+
+    p {
+        margin: 0 0 24px;
+        font-size: 16px;
+        line-height: 1.5;
+    }
+
+    &__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 12px;
+
+        .button {
+            min-width: 44px;
+            min-height: 44px;
+        }
+    }
+}
+
+@media (orientation: landscape) and (max-height: 599px) {
+    #add-sheet {
+        height: calc(100vh - max(16px, var(--f7-safe-area-top, 0px)));
+    }
+}
+
 // Skeleton of document
 
 .doc-placeholder {

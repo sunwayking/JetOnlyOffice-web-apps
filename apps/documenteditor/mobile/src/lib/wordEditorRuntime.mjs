@@ -48,6 +48,11 @@ const runtimePermissions = {
 };
 
 let wordRuntime = null;
+const runtimeSubscribers = new Set();
+
+function publishRuntime() {
+    runtimeSubscribers.forEach(subscriber => subscriber(wordRuntime));
+}
 
 export function initializeWordEditorRuntime({getApi}) {
     disposeWordEditorRuntime();
@@ -56,6 +61,7 @@ export function initializeWordEditorRuntime({getApi}) {
         permissions: runtimePermissions
     });
     setActiveEditorRuntime(wordRuntime);
+    publishRuntime();
     return wordRuntime;
 }
 
@@ -67,6 +73,15 @@ export function updateWordEditorPermissions(permissions) {
 
 export function getWordEditorRuntime() {
     return wordRuntime;
+}
+
+export function subscribeWordEditorRuntime(subscriber) {
+    if (typeof subscriber !== 'function') {
+        throw new TypeError('Word Runtime subscriber must be a function');
+    }
+    runtimeSubscribers.add(subscriber);
+    subscriber(wordRuntime);
+    return () => runtimeSubscribers.delete(subscriber);
 }
 
 export function executeWordCommand(commandId, payload) {
@@ -86,6 +101,7 @@ export function disposeWordEditorRuntime() {
         }
         wordRuntime.dispose();
         wordRuntime = null;
+        publishRuntime();
     }
     Object.keys(runtimePermissions).forEach(key => {
         runtimePermissions[key] = false;

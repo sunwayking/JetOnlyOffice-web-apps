@@ -33,22 +33,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import {COMMON_COMMAND_IDS} from '../../../../common/mobile/lib/runtime/createEditorRuntime.mjs';
+import {
+    getWordCommandSpecByDescriptorId,
+    WORD_COMMAND_IDS,
+    WORD_COMMAND_SPECS
+} from './wordCommandCatalog.mjs';
 
-export const WORD_COMMAND_IDS = Object.freeze({
-    BOLD: 'word.text.bold',
-    PARAGRAPH_ALIGN: 'word.paragraph.align',
-    TABLE_INSERT: 'word.table.insert'
-});
-
-const commandDescriptors = Object.freeze([
-    Object.freeze({id: WORD_COMMAND_IDS.BOLD, permission: 'edit'}),
-    Object.freeze({id: WORD_COMMAND_IDS.PARAGRAPH_ALIGN, permission: 'edit'}),
-    Object.freeze({id: WORD_COMMAND_IDS.TABLE_INSERT, permission: 'edit'}),
-    Object.freeze({id: COMMON_COMMAND_IDS.ADD_COMMENT, permission: 'comment'}),
-    Object.freeze({id: COMMON_COMMAND_IDS.COPY_SELECTION, permission: 'view', mutates: false}),
-    Object.freeze({id: COMMON_COMMAND_IDS.UNDO, permission: 'edit'})
-]);
+const commandDescriptors = Object.freeze(WORD_COMMAND_SPECS.map(spec => Object.freeze({
+        id: spec.id,
+        ...(spec.permissions.length === 1
+            ? {permission: spec.permissions[0]}
+            : {permissionsAny: spec.permissions}),
+        contexts: spec.contexts,
+        mobilePath: spec.mobilePath,
+        mutates: spec.mutates
+    })));
 
 const alignmentValues = Object.freeze({
     right: 0,
@@ -87,6 +86,22 @@ function normalizeAlignment(value) {
     );
 }
 
+function payloadArguments(payload) {
+    if (payload === undefined) {
+        return [];
+    }
+    if (payload === null) {
+        return [null];
+    }
+    if (Array.isArray(payload)) {
+        return payload;
+    }
+    if (Array.isArray(payload.args)) {
+        return payload.args;
+    }
+    return Object.prototype.hasOwnProperty.call(payload, 'value') ? [payload.value] : [payload];
+}
+
 export function createWordCommandAdapter({getApi, captureViewState, restoreViewState} = {}) {
     if (typeof getApi !== 'function') {
         throw new TypeError('createWordCommandAdapter requires getApi');
@@ -101,35 +116,38 @@ export function createWordCommandAdapter({getApi, captureViewState, restoreViewS
         }
     }
 
-    function execute(commandId, payload = {}) {
+    function execute(commandId, payload) {
         assertActive();
         const api = requireApi(getApi);
 
-        switch (commandId) {
-            case WORD_COMMAND_IDS.BOLD:
-                api.put_TextPrBold(payload.value);
-                return;
-            case WORD_COMMAND_IDS.PARAGRAPH_ALIGN:
-                api.put_PrAlign(normalizeAlignment(payload.value));
-                return;
-            case WORD_COMMAND_IDS.TABLE_INSERT:
-                api.put_Table(payload.columns, payload.rows, String(payload.style ?? 'default'));
-                return;
-            case COMMON_COMMAND_IDS.ADD_COMMENT:
-                api.asc_addComment(payload.comment);
-                return;
-            case COMMON_COMMAND_IDS.COPY_SELECTION:
-                return api.Copy();
-            case COMMON_COMMAND_IDS.UNDO:
-                api.Undo();
-                return;
-            default:
-                throw adapterError(
-                    'MOBILE_COMMAND_NOT_FOUND',
-                    `Unknown Word command: ${commandId}`,
-                    {commandId}
-                );
+        const spec = getWordCommandSpecByDescriptorId(commandId);
+        if (!spec) {
+            throw adapterError(
+                'MOBILE_COMMAND_NOT_FOUND',
+                `Unknown Word command: ${commandId}`,
+                {commandId}
+            );
         }
+
+        const method = spec.binding.method;
+        if (typeof api[method] !== 'function') {
+            throw adapterError(
+                'MOBILE_COMMAND_BINDING_UNAVAILABLE',
+                `Word command binding is unavailable: ${commandId}`,
+                {commandId, method}
+            );
+        }
+
+        if (spec.id === WORD_COMMAND_IDS.PARAGRAPH_ALIGN && !Array.isArray(payload?.args)) {
+            return api[method](normalizeAlignment(payload.value));
+        }
+        if (spec.id === WORD_COMMAND_IDS.TABLE_INSERT && !Array.isArray(payload?.args)) {
+            return api[method](payload.columns, payload.rows, String(payload.style ?? 'default'));
+        }
+        if (spec.id === WORD_COMMAND_IDS.COMMENT_ADD && !Array.isArray(payload?.args)) {
+            return api[method](payload.comment);
+        }
+        return api[method](...payloadArguments(payload));
     }
 
     return {
@@ -194,3 +212,4 @@ export function createWordCommandAdapter({getApi, captureViewState, restoreViewS
 }
 
 export {commandDescriptors as wordCommandDescriptors};
+export {WORD_COMMAND_IDS};

@@ -51,12 +51,17 @@ import FileEncryptionController from '../../controller/settings/FileEncryption';
 import SettingsPage from './SettingsPage';
 import { MainContext } from '../../page/main';
 import VersionHistoryController from '../../../../../common/mobile/lib/controller/VersionHistory';
+import CommandSearch from './CommandSearch';
 
 const routes = [
     {
         path: '/settings/',
         component: SettingsPage,
         keepAlive: true,
+    },
+    {
+        path: '/command-search/',
+        component: CommandSearch,
     },
     {
         path: '/document-settings/',
