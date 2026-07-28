@@ -46,7 +46,8 @@ test('presentation inventory is locked to the audited Desktop sources', async ()
 test('presentation inventory maps every entry to a catalog command or ADR exclusion', () => {
     assert.ok(inventory.entries.length >= 80);
     assert.equal(new Set(inventory.entries.map(entry => `${entry.desktopSource}|${entry.desktopKey}`)).size, inventory.entries.length);
-    const commandIds = new Set(inventory.commands.map(command => command.id));
+    const commandsById = new Map(inventory.commands.map(command => [command.id, command]));
+    const commandIds = new Set(commandsById.keys());
     const permissionProfiles = new Set(['view', 'edit', 'review', 'comment', 'fillForms']);
     assert.equal(commandIds.size, inventory.commands.length);
 
@@ -78,6 +79,10 @@ test('presentation inventory maps every entry to a catalog command or ADR exclus
             assert.ok(entry.permissions.length > 0);
             assert.ok(entry.permissions.every(permission => permissionProfiles.has(permission)));
             assert.ok(entry.mobilePath);
+            const command = commandsById.get(entry.commandId);
+            assert.deepEqual(entry.contexts, command.contexts, entry.commandId);
+            assert.deepEqual(entry.permissions, command.permissions, entry.commandId);
+            assert.equal(entry.mobilePath, command.mobilePath, entry.commandId);
         } else {
             assert.equal(entry.disposition, 'excluded');
             assert.match(entry.adr, /^ADR-\d{4}$/);

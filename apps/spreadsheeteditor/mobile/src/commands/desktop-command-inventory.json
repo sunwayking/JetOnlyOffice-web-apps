@@ -3325,8 +3325,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.halign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -3339,8 +3338,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.halign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -3353,8 +3351,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.halign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -3367,8 +3364,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.halign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -3422,7 +3418,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.clear-style",
       "contexts": [
-        "cell"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4098,8 +4094,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.text-orientation",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4112,8 +4107,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.valign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4126,8 +4120,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.valign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4140,8 +4133,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.valign",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4508,7 +4500,6 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.insert.chart",
       "contexts": [
-        "cell",
         "object"
       ],
       "permissions": [
@@ -4535,8 +4526,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.insert-equation",
       "contexts": [
-        "cell",
-        "text"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4615,7 +4605,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.insert-sparkline",
       "contexts": [
-        "cell"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4654,7 +4644,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.insert-text",
       "contexts": [
-        "object"
+        "workbook"
       ],
       "permissions": [
         "edit"
@@ -4667,7 +4657,7 @@
       "disposition": "catalog",
       "commandId": "spreadsheet.desktop.insert-textart",
       "contexts": [
-        "object"
+        "workbook"
       ],
       "permissions": [
         "edit"

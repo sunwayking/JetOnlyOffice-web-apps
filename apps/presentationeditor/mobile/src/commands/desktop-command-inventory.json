@@ -2344,7 +2344,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "edit.format"
+      "mobilePath": "edit.text.bold"
     },
     {
       "desktopKey": "id-toolbar-btn-case",
@@ -2404,7 +2404,9 @@
       "disposition": "catalog",
       "commandId": "presentation.clipboard.copy",
       "contexts": [
-        "presentation"
+        "slide",
+        "object",
+        "text"
       ],
       "permissions": [
         "view",
@@ -2413,7 +2415,7 @@
         "comment",
         "fillForms"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "context.copy"
     },
     {
       "desktopKey": "id-toolbar-btn-copystyle",
@@ -2434,12 +2436,14 @@
       "disposition": "catalog",
       "commandId": "presentation.clipboard.cut",
       "contexts": [
-        "presentation"
+        "slide",
+        "object",
+        "text"
       ],
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "context.cut"
     },
     {
       "desktopKey": "id-toolbar-btn-datetime",
@@ -2582,7 +2586,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "edit.format"
+      "mobilePath": "edit.text.italic"
     },
     {
       "desktopKey": "id-toolbar-btn-linespace",
@@ -2642,12 +2646,14 @@
       "disposition": "catalog",
       "commandId": "presentation.clipboard.paste",
       "contexts": [
-        "presentation"
+        "slide",
+        "object",
+        "text"
       ],
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "context.paste"
     },
     {
       "desktopKey": "id-toolbar-btn-preview",
@@ -2694,7 +2700,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "toolbar.redo"
     },
     {
       "desktopKey": "id-toolbar-btn-replace",
@@ -2854,7 +2860,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "toolbar.undo"
     },
     {
       "desktopKey": "id-toolbar-btn-valign",
@@ -2900,7 +2906,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "add.insert-chart"
+      "mobilePath": "add.insertchart"
     },
     {
       "desktopKey": "insert-columns",
