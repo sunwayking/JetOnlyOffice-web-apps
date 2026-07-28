@@ -33,12 +33,21 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import {COMMON_COMMAND_IDS} from '../../../../common/mobile/lib/runtime/createEditorRuntime.mjs';
+
+export const WORD_COMMAND_IDS = Object.freeze({
+    BOLD: 'word.text.bold',
+    PARAGRAPH_ALIGN: 'word.paragraph.align',
+    TABLE_INSERT: 'word.table.insert'
+});
+
 const commandDescriptors = Object.freeze([
-    Object.freeze({id: 'word.text.bold', permission: 'edit'}),
-    Object.freeze({id: 'word.paragraph.align', permission: 'edit'}),
-    Object.freeze({id: 'word.table.insert', permission: 'edit'}),
-    Object.freeze({id: 'common.comment.add', permission: 'comment'}),
-    Object.freeze({id: 'common.selection.copy', permission: 'view', mutates: false})
+    Object.freeze({id: WORD_COMMAND_IDS.BOLD, permission: 'edit'}),
+    Object.freeze({id: WORD_COMMAND_IDS.PARAGRAPH_ALIGN, permission: 'edit'}),
+    Object.freeze({id: WORD_COMMAND_IDS.TABLE_INSERT, permission: 'edit'}),
+    Object.freeze({id: COMMON_COMMAND_IDS.ADD_COMMENT, permission: 'comment'}),
+    Object.freeze({id: COMMON_COMMAND_IDS.COPY_SELECTION, permission: 'view', mutates: false}),
+    Object.freeze({id: COMMON_COMMAND_IDS.UNDO, permission: 'edit'})
 ]);
 
 const alignmentValues = Object.freeze({
@@ -97,20 +106,23 @@ export function createWordCommandAdapter({getApi, captureViewState, restoreViewS
         const api = requireApi(getApi);
 
         switch (commandId) {
-            case 'word.text.bold':
+            case WORD_COMMAND_IDS.BOLD:
                 api.put_TextPrBold(payload.value);
                 return;
-            case 'word.paragraph.align':
+            case WORD_COMMAND_IDS.PARAGRAPH_ALIGN:
                 api.put_PrAlign(normalizeAlignment(payload.value));
                 return;
-            case 'word.table.insert':
+            case WORD_COMMAND_IDS.TABLE_INSERT:
                 api.put_Table(payload.columns, payload.rows, String(payload.style ?? 'default'));
                 return;
-            case 'common.comment.add':
+            case COMMON_COMMAND_IDS.ADD_COMMENT:
                 api.asc_addComment(payload.comment);
                 return;
-            case 'common.selection.copy':
+            case COMMON_COMMAND_IDS.COPY_SELECTION:
                 return api.Copy();
+            case COMMON_COMMAND_IDS.UNDO:
+                api.Undo();
+                return;
             default:
                 throw adapterError(
                     'MOBILE_COMMAND_NOT_FOUND',

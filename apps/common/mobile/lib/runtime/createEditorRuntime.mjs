@@ -39,6 +39,12 @@ const initialSession = Object.freeze({
     save: Object.freeze({state: 'idle'})
 });
 
+export const COMMON_COMMAND_IDS = Object.freeze({
+    ADD_COMMENT: 'common.comment.add',
+    COPY_SELECTION: 'common.selection.copy',
+    UNDO: 'common.history.undo'
+});
+
 let activeEditorRuntime = null;
 
 function runtimeError(code, message, details) {
@@ -248,6 +254,17 @@ export function setActiveEditorRuntime(runtime) {
 
 export function getActiveEditorRuntime() {
     return activeEditorRuntime;
+}
+
+export function executeActiveEditorCommand(commandId, payload) {
+    if (!activeEditorRuntime) {
+        throw runtimeError(
+            'MOBILE_RUNTIME_UNAVAILABLE',
+            'An active Editor Runtime is required for shared Mobile commands',
+            {commandId}
+        );
+    }
+    return activeEditorRuntime.execute(commandId, payload);
 }
 
 export default createEditorRuntime;

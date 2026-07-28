@@ -4,34 +4,35 @@
   "source": {
     "repository": "sunwayking/JetOnlyOffice-web-apps",
     "commit": "9c0ca538c3b211052347df09d2a4d6781f023403",
+    "hashNormalization": "text-lf",
     "files": [
       {
         "path": "apps/presentationeditor/main/app/controller/Toolbar.js",
-        "sha256": "3228b274430673505877bd57967d13d24d6ca0acee0775fdc2e29a6121586b72"
+        "sha256": "14354ff25534cd9108a36e71d437dbbf442813e6219a336dc5dd9755927978ea"
       },
       {
         "path": "apps/presentationeditor/main/app/view/Animation.js",
-        "sha256": "546ab19cea0f5363bcb58e20d593bdd69c1e1e58a23db97d232ebc721dc7f16c"
+        "sha256": "80c44ca69f93af02340beeeaf32e2cf235ea99731f7bca517afbb8506f710ff6"
       },
       {
         "path": "apps/presentationeditor/main/app/view/FileMenu.js",
-        "sha256": "9abb3d7a38d5cc3c5e13a5f85a681511ecd89ac5baf01f61b631b8568d072542"
+        "sha256": "05757d15f58fe8dd1a659f06b3f057100299c7ce9573bd5069d428a3fea51a58"
       },
       {
         "path": "apps/presentationeditor/main/app/view/LeftMenu.js",
-        "sha256": "e3536249e703932c78babfaeead7c316ef553232dd469c76068791157624b193"
+        "sha256": "21dc3c7320d52dd2063195c7114eedd13e789f1ebfdd25904fe924e7bca88e3c"
       },
       {
         "path": "apps/presentationeditor/main/app/view/SlideMasterTab.js",
-        "sha256": "ce118c45ba4a58405345d482c8581fef3c7aa55e1bf293a1808ad75c7cc2b20f"
+        "sha256": "cfabee9742cb3ffd1ca476fc159d704a0e1f114ce384f34db84ceeb8c10c3e3b"
       },
       {
         "path": "apps/presentationeditor/main/app/view/Toolbar.js",
-        "sha256": "ac961fa80b53d7190a54d3c9b9a5080a3c3256c8201449d3b6694e4d3a25334e"
+        "sha256": "76614dbbc8687f71ac2d6f4aa9642bc4a457f61cc6fce0ba1675cfece8f6a6fa"
       },
       {
         "path": "apps/presentationeditor/main/app/view/ViewTab.js",
-        "sha256": "034a62787cd8a24fd7ddb36a953bbe46ae9a3e08c0d6e88176e213d21b1bb1ee"
+        "sha256": "7854598d7a512c33af06d5df33cf37320f795f325e0b28d1ca3ed3e5a76855af"
       }
     ]
   },

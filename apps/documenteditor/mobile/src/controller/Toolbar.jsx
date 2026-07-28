@@ -40,6 +40,8 @@ import { f7 } from 'framework7-react';
 import { useTranslation } from 'react-i18next';
 import ToolbarView from "../view/Toolbar";
 import {LocalStorage} from "../../../../common/mobile/utils/LocalStorage.mjs";
+import {COMMON_COMMAND_IDS} from '../../../../common/mobile/lib/runtime/createEditorRuntime.mjs';
+import {executeWordCommand} from '../lib/wordEditorRuntime.mjs';
 
 const ToolbarController = inject('storeAppOptions', 'users', 'storeReview', 'storeFocusObjects', 'storeToolbarSettings','storeDocumentInfo', 'storeVersionHistory')(observer(props => {
     const {t} = useTranslation();
@@ -263,10 +265,7 @@ const ToolbarController = inject('storeAppOptions', 'users', 'storeReview', 'sto
     };
 
     const onUndo = () => {
-        const api = Common.EditorApi.get();
-        if (api) {
-            api.Undo();
-        }
+        executeWordCommand(COMMON_COMMAND_IDS.UNDO);
     };
 
     const onRedo = () => {

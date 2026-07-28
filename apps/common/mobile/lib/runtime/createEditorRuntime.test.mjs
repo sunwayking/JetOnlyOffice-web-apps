@@ -8,6 +8,7 @@ import test from 'node:test';
 
 import {
     createEditorRuntime,
+    executeActiveEditorCommand,
     getActiveEditorRuntime,
     setActiveEditorRuntime
 } from './createEditorRuntime.mjs';
@@ -165,13 +166,24 @@ test('reduces SDK facts without timers or generic action inference', () => {
 
     adapter.emit({type: 'document-open', phase: 'loading', progress: {current: 2, total: 5}});
     adapter.emit({type: 'transport', state: 'reconnecting', attempt: 2});
-    adapter.emit({type: 'server-save', state: 'confirmed', index: 7, time: 42});
+    adapter.emit({
+        type: 'server-save',
+        state: 'accepted',
+        scope: 'coauthoring-server',
+        index: 7,
+        time: 42
+    });
 
     assert.equal(sessions.length, 4);
     assert.deepEqual(runtime.getSession(), {
         open: {phase: 'loading', progress: {current: 2, total: 5}},
         transport: {state: 'reconnecting', attempt: 2},
-        save: {state: 'confirmed', index: 7, time: 42}
+        save: {
+            state: 'accepted',
+            scope: 'coauthoring-server',
+            index: 7,
+            time: 42
+        }
     });
 
     unsubscribe();
@@ -214,4 +226,23 @@ test('publishes one active runtime for shared Mobile controllers', () => {
     assert.equal(getActiveEditorRuntime(), runtime);
     setActiveEditorRuntime(null);
     assert.equal(getActiveEditorRuntime(), null);
+});
+
+test('shared controllers cannot bypass a missing or restricted active runtime', () => {
+    setActiveEditorRuntime(null);
+    assert.throws(
+        () => executeActiveEditorCommand('common.comment.add', {text: 'blocked'}),
+        error => error.code === 'MOBILE_RUNTIME_UNAVAILABLE'
+    );
+
+    const adapter = createAdapter();
+    const runtime = createEditorRuntime({adapter, permissions: {comment: false}});
+    markReady(adapter);
+    setActiveEditorRuntime(runtime);
+
+    assert.throws(
+        () => executeActiveEditorCommand('common.comment.add', {text: 'blocked'}),
+        error => error.code === 'MOBILE_COMMAND_PERMISSION_DENIED'
+    );
+    setActiveEditorRuntime(null);
 });

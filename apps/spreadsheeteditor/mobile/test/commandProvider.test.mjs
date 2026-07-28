@@ -36,9 +36,10 @@ test('spreadsheet inventory is locked to the audited Desktop sources', async () 
     assert.equal(inventory.schemaVersion, 1);
     assert.equal(inventory.editor, 'spreadsheet');
     assert.equal(inventory.source.commit, '9c0ca538c3b211052347df09d2a4d6781f023403');
+    assert.equal(inventory.source.hashNormalization, 'text-lf');
 
     for (const source of inventory.source.files) {
-        const content = await readFile(new URL(source.path, editorRoot));
+        const content = (await readFile(new URL(source.path, editorRoot), 'utf8')).replace(/\r\n?/g, '\n');
         assert.equal(createHash('sha256').update(content).digest('hex'), source.sha256, source.path);
     }
 });

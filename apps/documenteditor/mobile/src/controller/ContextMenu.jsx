@@ -41,6 +41,7 @@ import { LocalStorage } from '../../../../common/mobile/utils/LocalStorage.mjs';
 import ContextMenuController from '../../../../common/mobile/lib/controller/ContextMenu';
 import { idContextMenuElement } from '../../../../common/mobile/lib/view/ContextMenu';
 import EditorUIController from '../lib/patch';
+import {COMMON_COMMAND_IDS} from '../../../../common/mobile/lib/runtime/createEditorRuntime.mjs';
 import {executeWordCommand} from '../lib/wordEditorRuntime.mjs';
 
 @inject(stores => ({
@@ -133,7 +134,7 @@ class ContextMenu extends ContextMenuController {
                     this.showCopyCutPasteModal();
                 break;
             case 'copy':
-                if (!executeWordCommand('common.selection.copy') && !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
+                if (!executeWordCommand(COMMON_COMMAND_IDS.COPY_SELECTION) && !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
                     this.showCopyCutPasteModal();
                 break;
             case 'paste':

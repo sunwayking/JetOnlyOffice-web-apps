@@ -4,50 +4,51 @@
   "source": {
     "repository": "sunwayking/JetOnlyOffice-web-apps",
     "commit": "9c0ca538c3b211052347df09d2a4d6781f023403",
+    "hashNormalization": "text-lf",
     "files": [
       {
         "path": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
-        "sha256": "dd8045d66aa1f82f5c9b36682aba57228b3832cad00983314d23ea9a58879958"
+        "sha256": "aa06a706c2d88dcb3320f8f344d5808f80de148b7063d14adce34e04c7dbd0f6"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/DataTab.js",
-        "sha256": "2cdaa56f6915421215262238f1bcb3ddc02dfe37146f203b387f6f527d0ecf3b"
+        "sha256": "5c1bd17cc7950e8029c91da4a943f4c6e616d4bf1edd7beb7b1012557593ffe6"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
-        "sha256": "89e62d0363b6c0942f14f76eacd85c88271c52e2cd5257855b375d6380e857d6"
+        "sha256": "4d730cef228ea0c742f62876e2ff592d87ce6ed299536a1499b3c13c0ce2363b"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
-        "sha256": "58d445bbf4f67aa59e0fccdf85ba3f72eec507f40d576daff24dccf5b1565a23"
+        "sha256": "61061ec041042367bba4c75ab292ee3b337de1eede395fd0bfd8ce9a05a706c2"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
-        "sha256": "3b7683d942dff7b406b4bf99a58700a7f8633c3bb7946fad16ca3691b8c3b1f0"
+        "sha256": "eb51e091c0aee81651bcc963a7a3e412505d1ec03590466209053824f0322c58"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/LeftMenu.js",
-        "sha256": "5779bc5089cf247a247eb32312ba00267a05400d6d927c1bfecb9ef9e371918b"
+        "sha256": "26f0a883f1a6efeb22c14beadf1b2a6ca31df7a80b892351c555663c5618c204"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
-        "sha256": "e65ab00bdb46e4ecdb27b01afeb22320cd8744903f048e378423b7ea6cded047"
+        "sha256": "b978cccde7e22d73715e67f7c30c4a7cb2da4ef8dd4c0863a980a966d7778d71"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/SparklineTab.js",
-        "sha256": "da532275e2e1237a4de639c856e8fb3527ded2814a52931a8dadc6ef0b81a513"
+        "sha256": "7a91f139752e767245671070ea79fffdef6499d85be342d1bd631aac54ee6610"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/Statusbar.js",
-        "sha256": "18d2f195a90b276bb0fc3de768a9230019f8d8a0be70fef0d550935122a12905"
+        "sha256": "00f34444b18d1a361b2a456857eb87ce8e8009a3affdbb7d6c462e3558f6fa89"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
-        "sha256": "d40e747bf34a318063dcfaf89d86a8bc4d69699632798e6a62a80be5e28fb0d5"
+        "sha256": "bb37a3b866e27de7a1b71ef15a5ec1acc8627599729e0e117541d0f4059f7126"
       },
       {
         "path": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
-        "sha256": "71bac3a162067d31e0b0008e82970b5961602f47b9398586b65d8f861c5aa969"
+        "sha256": "5490a404d2f075ac16897248bf5afbdb7bc4fff9800597c1dc8a65fe6740475e"
       }
     ]
   },

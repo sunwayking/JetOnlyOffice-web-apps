@@ -41,6 +41,9 @@ function createApi() {
         Copy() {
             calls.push(['copy']);
             return true;
+        },
+        Undo() {
+            calls.push(['undo']);
         }
     };
 }
@@ -55,13 +58,15 @@ test('maps the Word tracer commands to real SDK methods', () => {
     adapter.execute('word.table.insert', {columns: 3, rows: 2, style: 'default'});
     adapter.execute('common.comment.add', {comment});
     adapter.execute('common.selection.copy');
+    adapter.execute('common.history.undo');
 
     assert.deepEqual(api.calls, [
         ['bold', true],
         ['align', 2],
         ['table', 3, 2, 'default'],
         ['comment', comment],
-        ['copy']
+        ['copy'],
+        ['undo']
     ]);
     assert.deepEqual(adapter.getSelectionSnapshot(), ['selection']);
 });
@@ -76,7 +81,8 @@ test('describes every tracer command and rejects unknown command ids', () => {
             ['word.paragraph.align', 'edit'],
             ['word.table.insert', 'edit'],
             ['common.comment.add', 'comment'],
-            ['common.selection.copy', 'view']
+            ['common.selection.copy', 'view'],
+            ['common.history.undo', 'edit']
         ]
     );
     assert.throws(
@@ -93,12 +99,21 @@ test('forwards only explicit SDK lifecycle facts and unregisters them', () => {
 
     api.callbacks.get('asc_onDocumentOpenStateChanged')({phase: 'ready'});
     api.callbacks.get('asc_onTransportStateChanged')({state: 'connected'});
-    api.callbacks.get('asc_onServerSaveStateChanged')({state: 'confirmed', changesIndex: 3});
+    api.callbacks.get('asc_onServerSaveStateChanged')({
+        state: 'accepted',
+        scope: 'coauthoring-server',
+        changesIndex: 3
+    });
 
     assert.deepEqual(events, [
         {type: 'document-open', phase: 'ready'},
         {type: 'transport', state: 'connected'},
-        {type: 'server-save', state: 'confirmed', changesIndex: 3}
+        {
+            type: 'server-save',
+            state: 'accepted',
+            scope: 'coauthoring-server',
+            changesIndex: 3
+        }
     ]);
 
     unsubscribe();
