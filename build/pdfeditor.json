@@ -222,10 +222,116 @@
             ]
         }
     },
+    "mobile": {
+        "clean": {
+            "deploy": [
+                "../deploy/web-apps/apps/pdfeditor/mobile"
+            ],
+            "template-backup": [
+                "../apps/pdfeditor/mobile/app/template/backup"
+            ]
+        },
+        "js": {
+            "src": "../apps/pdfeditor/mobile/dist/js/app.js",
+            "dest": "../deploy/web-apps/apps/pdfeditor/mobile/dist/js/app.js"
+        },
+        "css": {
+            "ios": {
+                "src": [],
+                "dist": "../deploy/web-apps/apps/pdfeditor/mobile/resources/css/app-ios.css"
+            },
+            "material": {
+                "src": [],
+                "dist": "../deploy/web-apps/apps/pdfeditor/mobile/resources/css/app-material.css"
+            }
+        },
+        "htmlmin": {
+            "templates": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/app/template/",
+                    "src": "*.template",
+                    "dest": "../apps/pdfeditor/mobile/app/template/"
+                }
+            ]
+        },
+        "jsonmin": {
+            "files": "../deploy/web-apps/apps/pdfeditor/mobile/**/*.json"
+        },
+        "copy": {
+            "template-backup": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/app/template/",
+                    "src": "*.template",
+                    "dest": "../apps/pdfeditor/mobile/app/template/backup/",
+                    "filter": "isFile"
+                }
+            ],
+            "template-restore": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/app/template/backup/",
+                    "src": "*.template",
+                    "dest": "../apps/pdfeditor/mobile/app/template/",
+                    "filter": "isFile"
+                }
+            ],
+            "index-page": {
+                "../deploy/web-apps/apps/pdfeditor/mobile/index.html": "../apps/pdfeditor/mobile/index.html",
+                "../deploy/web-apps/apps/pdfeditor/mobile/index_loader.html": "../apps/pdfeditor/mobile/index.html"
+            },
+            "localization": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/locale/",
+                    "src": "*",
+                    "dest": "../deploy/web-apps/apps/pdfeditor/mobile/locale/"
+                }
+            ],
+            "images-app": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/resources/img/",
+                    "src": "**/*.{png,svg}",
+                    "dest": "../deploy/web-apps/apps/pdfeditor/mobile/resources/img/"
+                }
+            ],
+            "images-common": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/common/mobile/resources/img/",
+                    "src": "**",
+                    "dest": "../deploy/web-apps/apps/pdfeditor/mobile/resources/img/"
+                },
+                {
+                    "expand": true,
+                    "cwd": "../apps/common/main/resources/img/about",
+                    "src": "**",
+                    "dest": "../deploy/web-apps/apps/pdfeditor/mobile/resources/img/about"
+                }
+            ],
+            "assets": [
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/css",
+                    "src": "*.css",
+                    "dest": "../deploy/web-apps/apps/pdfeditor/mobile/css"
+                },
+                {
+                    "expand": true,
+                    "cwd": "../apps/pdfeditor/mobile/dist",
+                    "src": "**",
+                    "dest": "../deploy/web-apps/apps/pdfeditor/mobile/dist"
+                }
+            ]
+        }
+    },
     "tasks": {
         "deploy": [
             "increment-build",
-            "deploy-app-main"
+            "deploy-app-main",
+            "deploy-app-mobile"
         ]
     }
 }

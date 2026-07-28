@@ -22,9 +22,10 @@ apps/**/main/resources/**/iconsbig*.less
 apps/**/main/resources/**/iconshuge*.png
 apps/**/main/resources/**/iconshuge*.less
 apps/**/main/resources/**/iconshuge*.svg
-apps/**/mobile/dist/*.*
+apps/**/mobile/dist/
 apps/**/mobile/hot/*.*
 apps/**/mobile/css/*.*
+apps/**/mobile/index.html
 
 
 # test documents

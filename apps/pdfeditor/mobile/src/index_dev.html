@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="Content-Security-Policy" content="default-src * 'self' 'unsafe-inline' 'unsafe-eval' data: blob:">
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no, viewport-fit=cover, interactive-widget=resizes-content">
+  <meta name="theme-color" content="#126b56">
+  <meta name="format-detection" content="telephone=no">
+  <title>JetOnlyOffice PDF</title>
+  <% if (!htmlWebpackPlugin.options.skeleton.stylesheet) { %>
+    <link rel="stylesheet" href="../../common/mobile/resources/css/skeleton.css">
+  <% } else { %>
+    <style><%= htmlWebpackPlugin.options.skeleton.stylesheet %></style>
+  <% } %>
+</head>
+<body>
+  <script>
+    window.Common = {Locale: {defaultLang: <%= htmlWebpackPlugin.options.system.env.defaultLang %>}};
+  </script>
+  <% if (htmlWebpackPlugin.options.skeleton.htmlscript) { %>
+  <script>
+    window.asceditor = 'pdf';
+    <%= htmlWebpackPlugin.options.skeleton.htmlscript %>
+  </script>
+  <% } %>
+  <% if (htmlWebpackPlugin.options.skeleton.checkerscript) { %>
+  <script><%= htmlWebpackPlugin.options.skeleton.checkerscript %></script>
+  <% } %>
+  <div id="app">
+    <section class="skl-container">
+      <div class="skl-navbar skl-navbar--word pdf-view"></div>
+    </section>
+  </div>
+  <script type="text/javascript" src="../../../vendor/jquery/jquery.min.js"></script>
+</body>
+</html>
