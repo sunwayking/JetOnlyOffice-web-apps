@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 1,
+  "editor": "pdf",
+  "taskSpaces": [
+    { "id": "edit", "label": { "en": "Edit", "zh-CN": "编辑" } },
+    { "id": "insert", "label": { "en": "Insert", "zh-CN": "插入" } },
+    { "id": "comment", "label": { "en": "Comment", "zh-CN": "批注" } },
+    { "id": "pages", "label": { "en": "Pages", "zh-CN": "页面" } },
+    { "id": "forms", "label": { "en": "Forms", "zh-CN": "表单" } },
+    { "id": "signatures", "label": { "en": "Signatures", "zh-CN": "签名" } }
+  ],
+  "commands": [
+    { "id": "pdf.edit.undo", "taskSpace": "edit", "permission": "edit", "binding": { "method": "Undo" }, "testIds": ["pdf-provider-edit-undo"] },
+    { "id": "pdf.edit.redo", "taskSpace": "edit", "permission": "edit", "binding": { "method": "Redo" }, "testIds": ["pdf-provider-edit-redo"] },
+    { "id": "pdf.redaction.mark", "taskSpace": "edit", "permission": "edit", "binding": { "method": "SetRedactTool" }, "testIds": ["pdf-provider-redaction-mark"] },
+    { "id": "pdf.redaction.selection", "taskSpace": "edit", "permission": "edit", "binding": { "method": "AddRedactBySelect" }, "testIds": ["pdf-provider-redaction-selection"] },
+    { "id": "pdf.redaction.current-page", "taskSpace": "edit", "permission": "edit", "binding": { "method": "RedactPages" }, "testIds": ["pdf-provider-redaction-current-page"] },
+    { "id": "pdf.redaction.apply", "taskSpace": "edit", "permission": "edit", "binding": { "method": "ApplyRedact" }, "testIds": ["pdf-provider-redaction-apply"] },
+    { "id": "pdf.redaction.pages", "taskSpace": "edit", "permission": "edit", "binding": { "method": "RedactPages" }, "testIds": ["pdf-provider-redaction-pages"] },
+    { "id": "pdf.redaction.search-all", "taskSpace": "edit", "permission": "edit", "binding": { "method": "asc_RedactAllSearchElements" }, "testIds": ["pdf-provider-redaction-search-all"] },
+    { "id": "pdf.redaction.discard", "taskSpace": "edit", "permission": "edit", "binding": { "method": "RemoveAllRedact" }, "testIds": ["pdf-provider-redaction-discard"] },
+
+    { "id": "pdf.insert.image", "taskSpace": "insert", "permission": "edit", "binding": { "method": "asc_addImage" }, "testIds": ["pdf-provider-insert-image"] },
+    { "id": "pdf.insert.image-url", "taskSpace": "insert", "permission": "edit", "binding": { "method": "AddImageUrl" }, "testIds": ["pdf-provider-insert-image-url"] },
+    { "id": "pdf.insert.shape", "taskSpace": "insert", "permission": "edit", "binding": { "method": "StartAddShape" }, "testIds": ["pdf-provider-insert-shape"] },
+    { "id": "pdf.insert.text-art", "taskSpace": "insert", "permission": "edit", "binding": { "method": "AddTextArt" }, "testIds": ["pdf-provider-insert-text-art"] },
+    { "id": "pdf.insert.table", "taskSpace": "insert", "permission": "edit", "binding": { "method": "put_Table" }, "testIds": ["pdf-provider-insert-table"] },
+
+    { "id": "pdf.comment.add", "taskSpace": "comment", "permission": "comment", "binding": { "method": "asc_addComment" }, "testIds": ["pdf-provider-comment-add"] },
+    { "id": "pdf.annotation.marker", "taskSpace": "comment", "permission": "comment", "binding": { "method": "SetMarkerFormat" }, "testIds": ["pdf-provider-annotation-marker"] },
+    { "id": "pdf.annotation.ink-start", "taskSpace": "comment", "permission": "comment", "binding": { "method": "asc_StartDrawInk" }, "testIds": ["pdf-provider-annotation-ink-start"] },
+    { "id": "pdf.annotation.ink-stop", "taskSpace": "comment", "permission": "comment", "binding": { "method": "asc_StopInkDrawer" }, "testIds": ["pdf-provider-annotation-ink-stop"] },
+
+    { "id": "pdf.pages.add", "taskSpace": "pages", "permission": "edit", "binding": { "method": "asc_AddPage" }, "testIds": ["pdf-provider-pages-add"] },
+    { "id": "pdf.pages.remove", "taskSpace": "pages", "permission": "edit", "binding": { "method": "asc_RemovePage" }, "testIds": ["pdf-provider-pages-remove"] },
+    { "id": "pdf.pages.rotate", "taskSpace": "pages", "permission": "edit", "binding": { "method": "asc_RotatePage" }, "testIds": ["pdf-provider-pages-rotate"] },
+
+    { "id": "pdf.forms.text", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddTextField" }, "testIds": ["pdf-provider-forms-text"] },
+    { "id": "pdf.forms.date", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddDateField" }, "testIds": ["pdf-provider-forms-date"] },
+    { "id": "pdf.forms.image", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddImageField" }, "testIds": ["pdf-provider-forms-image"] },
+    { "id": "pdf.forms.checkbox", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddCheckboxField" }, "testIds": ["pdf-provider-forms-checkbox"] },
+    { "id": "pdf.forms.radio", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddRadiobuttonField" }, "testIds": ["pdf-provider-forms-radio"] },
+    { "id": "pdf.forms.combo", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddComboboxField" }, "testIds": ["pdf-provider-forms-combo"] },
+    { "id": "pdf.forms.dropdown", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddListboxField" }, "testIds": ["pdf-provider-forms-dropdown"] },
+    { "id": "pdf.forms.clear", "taskSpace": "forms", "permission": "edit", "binding": { "method": "asc_ClearAllSpecialForms" }, "testIds": ["pdf-provider-forms-clear"] },
+    { "id": "pdf.forms.signature", "taskSpace": "forms", "permission": "edit", "binding": { "method": "AddSignatureField" }, "testIds": ["pdf-provider-forms-signature"] },
+
+    { "id": "pdf.signatures.apply-appearance", "taskSpace": "signatures", "permission": "fillForms", "binding": { "method": "asc_SetSignatureFieldAppearance" }, "testIds": ["pdf-provider-signature-appearance"] },
+    { "id": "pdf.signatures.certificates", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getSignatures" }, "testIds": ["pdf-provider-signatures-certificates"] },
+    { "id": "pdf.signatures.fields", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getSignatureFields" }, "testIds": ["pdf-provider-signatures-fields"] },
+    { "id": "pdf.signatures.requested", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getRequestSignatures" }, "testIds": ["pdf-provider-signatures-requested"] }
+  ]
+}
