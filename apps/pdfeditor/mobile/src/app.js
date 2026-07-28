@@ -144,6 +144,14 @@ window.JetOnlyOfficePdfMobile = Object.freeze({
     getSelection() {
         return editorRuntime?.getSelection() || [];
     },
+    resolveContextMenu(context) {
+        const provider = getPdfCommandProvider();
+        if (!provider || !editorRuntime) return [];
+        return provider.resolveContextMenu(context).filter(commandId => (
+            editorRuntime.resolve(commandId)?.available === true &&
+            provider.resolveCapability(commandId)?.available !== false
+        ));
+    },
     updateSession(session) {
         mobileState.updateSession(session);
     },

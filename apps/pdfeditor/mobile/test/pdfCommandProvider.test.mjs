@@ -11,6 +11,11 @@ import {
     createPdfCommandProvider,
     PDF_TASK_SPACE_IDS,
 } from '../src/lib/pdfCommandProvider.mjs';
+import {
+    filterPdfCommandSearchResults,
+    normalizePdfParticipants,
+    resolvePdfSelectionContext,
+} from '../src/lib/pdfMobileUiModel.mjs';
 
 const catalogUrl = new URL('../src/commands/mobile-command-catalog.json', import.meta.url);
 const catalog = JSON.parse(await readFile(catalogUrl, 'utf8'));
@@ -51,6 +56,9 @@ const SDK_METHODS = Object.freeze([
     'asc_getSignatureFields',
     'asc_getSignatures',
     'asc_getRequestSignatures',
+    'zoomFitToPage',
+    'zoomFitToWidth',
+    'zoom',
 ]);
 
 function createExplicitApi(calls, callbacks = new Map()) {
@@ -89,7 +97,7 @@ test('PDF catalog exposes the six direct Mobile task spaces', () => {
     const commandIds = new Set();
     for (const command of catalog.commands) {
         assert.match(command.id, /^pdf\./);
-        assert.ok(PDF_TASK_SPACE_IDS.includes(command.taskSpace), command.id);
+        assert.ok(PDF_TASK_SPACE_IDS.includes(command.taskSpace) || command.scope === 'global', command.id);
         assert.ok(['view', 'edit', 'comment', 'fillForms'].includes(command.permission), command.id);
         assert.equal(typeof command.binding.method, 'string', command.id);
         assert.ok(command.testIds.length > 0, command.id);
@@ -98,19 +106,22 @@ test('PDF catalog exposes the six direct Mobile task spaces', () => {
     }
 });
 
-test('PDF provider implements the shared editor adapter contract with real SDK calls', () => {
+test('PDF provider implements the shared editor adapter contract with real SDK calls', async () => {
     const calls = [];
     const callbacks = new Map();
     const api = createExplicitApi(calls, callbacks);
     let hasRedactionMarks = true;
+    let completeSearch;
     api.HasRedact = () => hasRedactionMarks;
     api.ApplyRedact = () => {
         calls.push(['ApplyRedact']);
         hasRedactionMarks = false;
     };
-    api.asc_findText = settings => {
+    api.asc_findText = (settings, isNext, callback) => {
         calls.push(['asc_findText', settings, true]);
-        return 2;
+        assert.equal(isNext, true);
+        completeSearch = callback;
+        return 0;
     };
     api.asc_SetSignatureFieldAppearance = appearance => {
         calls.push(['asc_SetSignatureFieldAppearance', appearance]);
@@ -133,7 +144,10 @@ test('PDF provider implements the shared editor adapter contract with real SDK c
     provider.execute('pdf.redaction.selection');
     provider.execute('pdf.redaction.current-page');
     provider.execute('pdf.redaction.pages', { pages: [0, 2] });
-    provider.execute('pdf.redaction.search-all', {settings: {text: 'secret'}});
+    const redactSearch = provider.execute('pdf.redaction.search-all', {settings: {text: 'secret'}});
+    assert.equal(calls.some(call => call[0] === 'asc_RedactAllSearchElements'), false);
+    completeSearch(2);
+    assert.equal(await redactSearch, 2);
     provider.execute('pdf.redaction.apply', {confirmed: true});
     provider.execute('pdf.insert.image-url', { urls: ['https://example.test/sign.png'] });
     provider.execute('pdf.comment.add', { comment: 'review' });
@@ -164,6 +178,101 @@ test('PDF provider implements the shared editor adapter contract with real SDK c
     ]);
     assert.deepEqual(provider.getSelectionSnapshot(), [{ type: 'pdf-page' }]);
     assert.equal(provider.getCommandDescriptors().length, catalog.commands.length);
+});
+
+test('PDF provider routes view settings through the Runtime command boundary', () => {
+    const calls = [];
+    const api = createExplicitApi(calls);
+    const provider = createPdfCommandProvider({catalog, getApi: () => api});
+
+    provider.execute('pdf.view.fit-page');
+    provider.execute('pdf.view.fit-width');
+    provider.execute('pdf.view.zoom', {value: 125});
+
+    assert.deepEqual(calls, [
+        ['zoomFitToPage'],
+        ['zoomFitToWidth'],
+        ['zoom', 125],
+    ]);
+    assert.throws(
+        () => provider.execute('pdf.view.zoom', {value: Number.POSITIVE_INFINITY}),
+        error => error.code === 'MOBILE_COMMAND_PAYLOAD_INVALID',
+    );
+});
+
+test('PDF provider resolves only catalogued context commands', () => {
+    const provider = createPdfCommandProvider({catalog, getApi: () => createExplicitApi([])});
+
+    assert.deepEqual(provider.resolveContextMenu({commands: [
+        'pdf.pages.rotate',
+        'pdf.unknown',
+        'pdf.pages.rotate',
+        'pdf.pages.remove',
+    ]}), ['pdf.pages.rotate', 'pdf.pages.remove']);
+});
+
+test('PDF Mobile selection, participants and command search derive from live SDK facts', () => {
+    const Asc = {c_oAscTypeSelectElement: {Field: 1, Annot: 2, PdfPage: 3}};
+    const selection = [{get_ObjectType: () => Asc.c_oAscTypeSelectElement.PdfPage}];
+    assert.deepEqual(resolvePdfSelectionContext(selection, Asc), {
+        kind: 'page',
+        commands: [
+            'pdf.redaction.current-page',
+            'pdf.pages.add',
+            'pdf.pages.rotate',
+            'pdf.pages.remove',
+        ],
+    });
+    assert.deepEqual(resolvePdfSelectionContext([{}], {}), {
+        kind: 'selection',
+        commands: ['pdf.redaction.selection', 'pdf.comment.add', 'pdf.annotation.marker'],
+    });
+
+    const participants = normalizePdfParticipants({
+        alice: {
+            asc_getIdOriginal: () => 'alice',
+            asc_getUserName: () => 'Alice',
+            asc_getView: () => false,
+        },
+        guest: {
+            asc_getId: () => 'guest',
+            asc_getUserName: () => '',
+            asc_getView: () => true,
+        },
+    });
+    assert.deepEqual(participants, [
+        {id: 'alice', name: 'Alice', view: false},
+        {id: 'guest', name: 'Guest', view: true},
+    ]);
+
+    const results = filterPdfCommandSearchResults({
+        commands: catalog.commands,
+        query: 'zoom',
+        labelFor: command => command.id === 'pdf.view.zoom' ? 'Zoom' : command.id,
+        resolve: commandId => ({available: commandId === 'pdf.view.zoom'}),
+    });
+    assert.deepEqual(results.map(command => command.id), ['pdf.view.zoom']);
+});
+
+test('PDF redaction search serializes work and is cancelled by provider disposal', async () => {
+    const calls = [];
+    let completeSearch;
+    const api = createExplicitApi(calls);
+    api.asc_findText = (settings, isNext, callback) => {
+        completeSearch = callback;
+        return 0;
+    };
+    const provider = createPdfCommandProvider({catalog, getApi: () => api});
+    const first = provider.execute('pdf.redaction.search-all', {settings: {text: 'first'}});
+
+    assert.throws(
+        () => provider.execute('pdf.redaction.search-all', {settings: {text: 'second'}}),
+        error => error.code === 'MOBILE_COMMAND_BUSY',
+    );
+    provider.dispose();
+    await assert.rejects(first, error => error.code === 'MOBILE_ADAPTER_DISPOSED');
+    completeSearch(1);
+    assert.equal(calls.some(call => call[0] === 'asc_RedactAllSearchElements'), false);
 });
 
 test('PDF provider fails closed for missing SDK bindings and invalid payloads', () => {
@@ -330,5 +439,11 @@ test('PDF Mobile has an independent route and deterministic build entry', async 
     assert.match(appSource, /window\.JetOnlyOfficePdfMobile/);
     assert.match(appSource, /event\.persisted/);
     assert.match(shellSource, /PDF_TASK_SPACE_IDS\.map/);
+    assert.match(appSource, /resolveContextMenu/);
+    assert.match(shellSource, /asc_onAuthParticipantsChanged/);
+    assert.match(shellSource, /asc_onParticipantsChanged/);
+    assert.match(shellSource, /<Search/);
+    assert.match(shellSource, /<Person2/);
+    assert.match(shellSource, /<Gear/);
     assert.doesNotMatch(appSource + shellSource, /setTimeout|setInterval/);
 });

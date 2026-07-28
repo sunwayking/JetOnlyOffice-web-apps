@@ -48,6 +48,10 @@
     { "id": "pdf.signatures.apply-appearance", "taskSpace": "signatures", "permission": "fillForms", "binding": { "method": "asc_SetSignatureFieldAppearance" }, "testIds": ["pdf-provider-signature-appearance"] },
     { "id": "pdf.signatures.certificates", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getSignatures" }, "testIds": ["pdf-provider-signatures-certificates"] },
     { "id": "pdf.signatures.fields", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getSignatureFields" }, "testIds": ["pdf-provider-signatures-fields"] },
-    { "id": "pdf.signatures.requested", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getRequestSignatures" }, "testIds": ["pdf-provider-signatures-requested"] }
+    { "id": "pdf.signatures.requested", "taskSpace": "signatures", "permission": "view", "mutates": false, "binding": { "method": "asc_getRequestSignatures" }, "testIds": ["pdf-provider-signatures-requested"] },
+
+    { "id": "pdf.view.fit-page", "taskSpace": "settings", "scope": "global", "permission": "view", "mutates": false, "binding": { "method": "zoomFitToPage" }, "testIds": ["pdf-provider-view-fit-page"] },
+    { "id": "pdf.view.fit-width", "taskSpace": "settings", "scope": "global", "permission": "view", "mutates": false, "binding": { "method": "zoomFitToWidth" }, "testIds": ["pdf-provider-view-fit-width"] },
+    { "id": "pdf.view.zoom", "taskSpace": "settings", "scope": "global", "permission": "view", "mutates": false, "binding": { "method": "zoom" }, "testIds": ["pdf-provider-view-zoom"] }
   ]
 }

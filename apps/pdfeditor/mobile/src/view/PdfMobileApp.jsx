@@ -21,9 +21,12 @@ import {
     ChatBubble,
     ChevronLeft,
     DocOnDoc,
+    Gear,
     Pencil,
+    Person2,
     Plus,
     RectangleOnRectangle,
+    Search,
     Signature,
     Xmark,
 } from 'framework7-icons/react';
@@ -31,6 +34,11 @@ import {
 import catalog from '../commands/mobile-command-catalog.json';
 import {PDF_TASK_SPACE_IDS} from '../lib/pdfCommandProvider.mjs';
 import {isPdfChineseLocale} from '../lib/pdfLocale.mjs';
+import {
+    filterPdfCommandSearchResults,
+    normalizePdfParticipants,
+    resolvePdfSelectionContext,
+} from '../lib/pdfMobileUiModel.mjs';
 import {parsePdfPageRange} from '../lib/pdfRedactionInput.mjs';
 
 const TASK_ICONS = Object.freeze({
@@ -77,6 +85,9 @@ const COMMAND_LABELS = Object.freeze({
     'pdf.signatures.certificates': ['Certificate signatures', '证书签名'],
     'pdf.signatures.fields': ['Signature fields', '签名字段'],
     'pdf.signatures.requested': ['Pending signatures', '待签名'],
+    'pdf.view.fit-page': ['Fit page', '适合页面'],
+    'pdf.view.fit-width': ['Fit width', '适合宽度'],
+    'pdf.view.zoom': ['Zoom', '缩放'],
 });
 
 const DEFAULT_PAYLOADS = Object.freeze({
@@ -147,6 +158,11 @@ export default function PdfMobileApp({bridge}) {
     const [lastError, setLastError] = useState(null);
     const [lastResult, setLastResult] = useState(null);
     const [selectedSignature, setSelectedSignature] = useState(null);
+    const [participants, setParticipants] = useState([]);
+    const [contextCommands, setContextCommands] = useState([]);
+    const [contextKind, setContextKind] = useState('selection');
+    const [searchQuery, setSearchQuery] = useState('');
+    const [zoomValue, setZoomValue] = useState(100);
     const chinese = isPdfChineseLocale(window.Common?.Locale, navigator.language);
     const activeTask = uiState.activeTask;
 
@@ -172,8 +188,20 @@ export default function PdfMobileApp({bridge}) {
     useEffect(() => {
         if (!api || typeof api.asc_registerCallback !== 'function') return undefined;
         const onSignatureField = (signature, width, height) => setSelectedSignature({signature, width, height});
+        const onParticipants = users => setParticipants(normalizePdfParticipants(users));
+        const onZoom = zoom => {
+            if (Number.isFinite(zoom)) setZoomValue(Math.min(500, Math.max(25, Math.round(zoom))));
+        };
         api.asc_registerCallback('asc_onSignatureFieldClick', onSignatureField);
-        return () => api.asc_unregisterCallback('asc_onSignatureFieldClick', onSignatureField);
+        api.asc_registerCallback('asc_onAuthParticipantsChanged', onParticipants);
+        api.asc_registerCallback('asc_onParticipantsChanged', onParticipants);
+        api.asc_registerCallback('asc_onZoomChange', onZoom);
+        return () => {
+            api.asc_unregisterCallback('asc_onSignatureFieldClick', onSignatureField);
+            api.asc_unregisterCallback('asc_onAuthParticipantsChanged', onParticipants);
+            api.asc_unregisterCallback('asc_onParticipantsChanged', onParticipants);
+            api.asc_unregisterCallback('asc_onZoomChange', onZoom);
+        };
     }, [api]);
 
     useEffect(() => {
@@ -195,13 +223,12 @@ export default function PdfMobileApp({bridge}) {
         const onContextMenu = event => {
             if (/^(INPUT|TEXTAREA|SELECT)$/.test(event.target.tagName) || event.target.isContentEditable) return;
             event.preventDefault();
-            const selected = bridge.getSelection();
-            const types = selected.map(item => item?.get_ObjectType?.());
-            const Asc = window.Asc;
-            if (types.includes(Asc?.c_oAscTypeSelectElement?.Field)) bridge.openTask('forms');
-            else if (types.includes(Asc?.c_oAscTypeSelectElement?.Annot)) bridge.openTask('comment');
-            else if (types.includes(Asc?.c_oAscTypeSelectElement?.PdfPage)) bridge.openTask('pages');
-            else bridge.openTask('edit');
+            const context = resolvePdfSelectionContext(bridge.getSelection(), window.Asc);
+            const resolved = bridge.resolveContextMenu(context);
+            if (!resolved.length) return;
+            setContextKind(context.kind);
+            setContextCommands(resolved);
+            bridge.openOverlay('context-menu');
         };
         editor.addEventListener('contextmenu', onContextMenu);
         return () => editor.removeEventListener('contextmenu', onContextMenu);
@@ -213,11 +240,19 @@ export default function PdfMobileApp({bridge}) {
     );
 
     const commandLabel = commandId => COMMAND_LABELS[commandId]?.[chinese ? 1 : 0] || commandId;
+    const searchResults = useMemo(() => filterPdfCommandSearchResults({
+        commands: catalog.commands,
+        query: searchQuery,
+        labelFor: command => commandLabel(command.id),
+        resolve: bridge.resolveCommand,
+    }), [bridge, chinese, searchQuery, sessionState, uiState]);
 
     const buildPayload = commandId => {
         if (commandId === 'pdf.redaction.pages') {
             const value = window.prompt(chinese ? '页码或范围，例如 1, 3-5' : 'Pages or ranges, for example 1, 3-5');
-            return value === null ? null : {pages: parsePdfPageRange(value)};
+            return value === null ? null : {
+                pages: parsePdfPageRange(value, bridge.getEditorApi()?.getCountPages?.()),
+            };
         }
         if (commandId === 'pdf.redaction.search-all') {
             const value = window.prompt(chinese ? '搜索并标记全部结果' : 'Search and mark all results');
@@ -261,9 +296,16 @@ export default function PdfMobileApp({bridge}) {
         try {
             const payload = explicitPayload === undefined ? buildPayload(commandId) : explicitPayload;
             if (payload === null) return;
+            const reportResult = result => {
+                if (Array.isArray(result)) setLastResult(`${commandLabel(commandId)}: ${result.length}`);
+                else if (Number.isFinite(result)) setLastResult(`${commandLabel(commandId)}: ${result}`);
+            };
             const result = bridge.executeCommand(commandId, payload);
-            if (Array.isArray(result)) setLastResult(`${commandLabel(commandId)}: ${result.length}`);
-            else if (Number.isFinite(result)) setLastResult(`${commandLabel(commandId)}: ${result}`);
+            if (result && typeof result.then === 'function') {
+                result.then(reportResult).catch(error => setLastError(error.code || 'MOBILE_COMMAND_FAILED'));
+            } else {
+                reportResult(result);
+            }
         } catch (error) {
             setLastError(error.code || 'MOBILE_COMMAND_FAILED');
         }
@@ -279,6 +321,24 @@ export default function PdfMobileApp({bridge}) {
 
     const handleBack = () => bridge.handleBack();
     const currentTask = catalog.taskSpaces.find(item => item.id === activeTask);
+    const openGlobalPanel = panelId => {
+        setLastError(null);
+        if (panelId === 'command-search') setSearchQuery('');
+        bridge.openOverlay(panelId);
+    };
+    const navigateToSearchResult = command => {
+        if (command.scope === 'global') bridge.openOverlay(command.taskSpace);
+        else bridge.openTask(command.taskSpace);
+    };
+    const runContextCommand = commandId => {
+        bridge.closeOverlay();
+        executeCommand(commandId);
+    };
+    const setZoom = value => {
+        const next = Number(value);
+        setZoomValue(next);
+        executeCommand('pdf.view.zoom', {value: next});
+    };
 
     return (
         <App name="JetOnlyOffice PDF" theme="auto">
@@ -292,9 +352,35 @@ export default function PdfMobileApp({bridge}) {
                         </NavLeft>
                         <NavTitle>{bridge.getDocumentContext().title || 'JetOnlyOffice PDF'}</NavTitle>
                         <NavRight>
-                            <span className={`pdf-session-state is-${sessionState}`} role="status">
-                                {sessionState}
+                            <span className={`pdf-session-state is-${sessionState}`} role="status" title={sessionState}>
+                                <span className="pdf-session-dot" aria-hidden="true" />
+                                <span className="pdf-session-text">{sessionState}</span>
                             </span>
+                            <Link
+                                className="pdf-global-action"
+                                onClick={() => openGlobalPanel('command-search')}
+                                aria-label={chinese ? '搜索命令' : 'Search commands'}
+                                title={chinese ? '搜索命令' : 'Search commands'}
+                            >
+                                <Search aria-hidden="true" />
+                            </Link>
+                            <Link
+                                className="pdf-global-action"
+                                onClick={() => openGlobalPanel('collaboration')}
+                                aria-label={chinese ? '协作者' : 'Collaborators'}
+                                title={chinese ? '协作者' : 'Collaborators'}
+                            >
+                                <Person2 aria-hidden="true" />
+                                {participants.length > 0 && <span className="pdf-participant-count">{participants.length}</span>}
+                            </Link>
+                            <Link
+                                className="pdf-global-action"
+                                onClick={() => openGlobalPanel('settings')}
+                                aria-label={chinese ? '设置' : 'Settings'}
+                                title={chinese ? '设置' : 'Settings'}
+                            >
+                                <Gear aria-hidden="true" />
+                            </Link>
                         </NavRight>
                     </Navbar>
 
@@ -352,6 +438,126 @@ export default function PdfMobileApp({bridge}) {
                             );
                         })}
                     </Toolbar>
+
+                    {uiState.overlay === 'command-search' && (
+                        <section className="pdf-global-panel" role="dialog" aria-modal="true" aria-labelledby="pdf-search-title">
+                            <header className="pdf-global-header">
+                                <h2 id="pdf-search-title">{chinese ? '搜索命令' : 'Search commands'}</h2>
+                                <Button onClick={() => bridge.closeOverlay()} aria-label={chinese ? '关闭' : 'Close'}>
+                                    <Xmark aria-hidden="true" />
+                                </Button>
+                            </header>
+                            <div className="pdf-search-field">
+                                <Search aria-hidden="true" />
+                                <input
+                                    type="search"
+                                    value={searchQuery}
+                                    onChange={event => setSearchQuery(event.target.value)}
+                                    placeholder={chinese ? '输入命令名称' : 'Enter a command name'}
+                                    autoFocus
+                                />
+                            </div>
+                            <div className="pdf-global-list" role="list">
+                                {searchResults.map(command => (
+                                    <Button key={command.id} onClick={() => navigateToSearchResult(command)} role="listitem">
+                                        <span>{commandLabel(command.id)}</span>
+                                        <small>{command.scope === 'global'
+                                            ? (chinese ? '设置' : 'Settings')
+                                            : catalog.taskSpaces.find(task => task.id === command.taskSpace)?.label[chinese ? 'zh-CN' : 'en']}</small>
+                                    </Button>
+                                ))}
+                                {searchQuery.trim() && searchResults.length === 0 && (
+                                    <p className="pdf-empty-state">{chinese ? '没有可用命令' : 'No available commands'}</p>
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {uiState.overlay === 'collaboration' && (
+                        <section className="pdf-global-panel" role="dialog" aria-modal="true" aria-labelledby="pdf-collaboration-title">
+                            <header className="pdf-global-header">
+                                <h2 id="pdf-collaboration-title">{chinese ? '协作者' : 'Collaborators'}</h2>
+                                <Button onClick={() => bridge.closeOverlay()} aria-label={chinese ? '关闭' : 'Close'}>
+                                    <Xmark aria-hidden="true" />
+                                </Button>
+                            </header>
+                            <div className="pdf-global-list" role="list">
+                                {participants.map(participant => (
+                                    <div className="pdf-participant" key={participant.id} role="listitem">
+                                        <span className="pdf-participant-avatar" aria-hidden="true">
+                                            {participant.name.trim().charAt(0).toLocaleUpperCase() || '?'}
+                                        </span>
+                                        <span>{participant.name}</span>
+                                        <small>{participant.view
+                                            ? (chinese ? '查看' : 'Viewing')
+                                            : (chinese ? '编辑' : 'Editing')}</small>
+                                    </div>
+                                ))}
+                                {participants.length === 0 && (
+                                    <p className="pdf-empty-state">{chinese ? '当前没有其他参与者' : 'No other participants'}</p>
+                                )}
+                            </div>
+                        </section>
+                    )}
+
+                    {uiState.overlay === 'settings' && (
+                        <section className="pdf-global-panel" role="dialog" aria-modal="true" aria-labelledby="pdf-settings-title">
+                            <header className="pdf-global-header">
+                                <h2 id="pdf-settings-title">{chinese ? '设置' : 'Settings'}</h2>
+                                <Button onClick={() => bridge.closeOverlay()} aria-label={chinese ? '关闭' : 'Close'}>
+                                    <Xmark aria-hidden="true" />
+                                </Button>
+                            </header>
+                            <div className="pdf-settings-content">
+                                <div className="pdf-fit-controls" role="group" aria-label={chinese ? '页面适配' : 'Page fitting'}>
+                                    <Button
+                                        disabled={!bridge.resolveCommand('pdf.view.fit-page')?.available}
+                                        onClick={() => executeCommand('pdf.view.fit-page')}
+                                    >{commandLabel('pdf.view.fit-page')}</Button>
+                                    <Button
+                                        disabled={!bridge.resolveCommand('pdf.view.fit-width')?.available}
+                                        onClick={() => executeCommand('pdf.view.fit-width')}
+                                    >{commandLabel('pdf.view.fit-width')}</Button>
+                                </div>
+                                <label className="pdf-zoom-control">
+                                    <span>{commandLabel('pdf.view.zoom')}</span>
+                                    <output>{zoomValue}%</output>
+                                    <input
+                                        type="range"
+                                        min="25"
+                                        max="500"
+                                        step="5"
+                                        value={zoomValue}
+                                        disabled={!bridge.resolveCommand('pdf.view.zoom')?.available}
+                                        onChange={event => setZoom(event.target.value)}
+                                    />
+                                </label>
+                            </div>
+                        </section>
+                    )}
+
+                    {uiState.overlay === 'context-menu' && (
+                        <div className="pdf-modal-backdrop pdf-context-backdrop" role="presentation" onClick={() => bridge.closeOverlay()}>
+                            <section
+                                className="pdf-context-menu"
+                                role="dialog"
+                                aria-modal="true"
+                                aria-labelledby="pdf-context-title"
+                                onClick={event => event.stopPropagation()}
+                            >
+                                <h2 id="pdf-context-title" className="pdf-visually-hidden">
+                                    {chinese ? '所选内容' : 'Selection'} · {contextKind}
+                                </h2>
+                                <div className="pdf-context-command-grid">
+                                    {contextCommands.map(commandId => (
+                                        <Button key={commandId} onClick={() => runContextCommand(commandId)}>
+                                            {commandLabel(commandId)}
+                                        </Button>
+                                    ))}
+                                </div>
+                            </section>
+                        </div>
+                    )}
 
                     {uiState.overlay === 'redaction-confirmation' && (
                         <div className="pdf-modal-backdrop" role="presentation">

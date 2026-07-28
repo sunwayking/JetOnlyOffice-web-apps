@@ -37,7 +37,10 @@ const CALLBACK_FACTORIES = Object.freeze({
 const CAPABILITY_METHODS = Object.freeze({
     'pdf.redaction.apply': Object.freeze(['HasRedact', 'ApplyRedact']),
     'pdf.redaction.current-page': Object.freeze(['getCurrentPage']),
-    'pdf.redaction.search-all': Object.freeze(['asc_findText', 'asc_RedactAllSearchElements']),
+    'pdf.redaction.search-all': Object.freeze([
+        'asc_findText',
+        'asc_RedactAllSearchElements',
+    ]),
 });
 
 const providerError = (code, message, details) => {
@@ -63,6 +66,13 @@ const requireObject = (commandId, payload) => {
 const requireInteger = (commandId, value, label) => {
     if (!Number.isInteger(value)) {
         throw payloadError(commandId, `${label} must be an integer`, value);
+    }
+    return value;
+};
+
+const requireZoom = value => {
+    if (!Number.isFinite(value) || value < 25 || value > 500) {
+        throw payloadError('pdf.view.zoom', 'value must be between 25 and 500 percent', value);
     }
     return value;
 };
@@ -118,15 +128,7 @@ const commandExecutors = Object.freeze({
         return result;
     },
     'pdf.redaction.pages': (api, payload = {}) => api.RedactPages(resolvePages(api, 'pdf.redaction.pages', payload)),
-    'pdf.redaction.search-all': (api, payload) => {
-        const settings = requireObject(
-            'pdf.redaction.search-all',
-            requireObject('pdf.redaction.search-all', payload).settings,
-        );
-        const count = api.asc_findText(settings, true);
-        if (Number.isFinite(count) && count > 0) api.asc_RedactAllSearchElements();
-        return count;
-    },
+    'pdf.redaction.search-all': (api, payload, context) => context.executeSearchRedaction(api, payload),
     'pdf.redaction.discard': api => api.RemoveAllRedact(),
     'pdf.insert.image': (api, payload = {}) => api.asc_addImage(payload.options),
     'pdf.insert.image-url': (api, payload) => {
@@ -208,6 +210,11 @@ const commandExecutors = Object.freeze({
     'pdf.signatures.certificates': api => api.asc_getSignatures(),
     'pdf.signatures.fields': api => api.asc_getSignatureFields(),
     'pdf.signatures.requested': api => api.asc_getRequestSignatures(),
+    'pdf.view.fit-page': api => api.zoomFitToPage(),
+    'pdf.view.fit-width': api => api.zoomFitToWidth(),
+    'pdf.view.zoom': (api, payload) => api.zoom(requireZoom(
+        requireObject('pdf.view.zoom', payload).value,
+    )),
 });
 
 const validateCatalogBindings = commands => {
@@ -251,6 +258,7 @@ export function createPdfCommandProvider({
     })));
     const detachCallbacks = new Set();
     let latestZoom = null;
+    let pendingRedactionSearch = null;
     let disposed = false;
 
     const assertActive = () => {
@@ -264,6 +272,64 @@ export function createPdfCommandProvider({
             throw providerError('MOBILE_EDITOR_API_UNAVAILABLE', 'PDF editor API is not available');
         }
         return api;
+    };
+    const executeSearchRedaction = (api, payload) => {
+        const settings = requireObject(
+            'pdf.redaction.search-all',
+            requireObject('pdf.redaction.search-all', payload).settings,
+        );
+        if (pendingRedactionSearch) {
+            throw providerError(
+                'MOBILE_COMMAND_BUSY',
+                'A PDF redaction search is already in progress',
+                {commandId: 'pdf.redaction.search-all'},
+            );
+        }
+
+        const task = {};
+        task.promise = new Promise((resolve, reject) => {
+            let settled = false;
+            const cleanup = () => {
+                detachCallbacks.delete(cancel);
+                if (pendingRedactionSearch === task) pendingRedactionSearch = null;
+            };
+            const cancel = () => {
+                if (settled) return;
+                settled = true;
+                cleanup();
+                reject(providerError('MOBILE_ADAPTER_DISPOSED', 'PDF command provider has been disposed'));
+            };
+            const onSearchComplete = count => {
+                if (settled) return;
+                settled = true;
+                cleanup();
+                if (!Number.isSafeInteger(count) || count < 0) {
+                    reject(providerError(
+                        'MOBILE_PDF_SEARCH_RESULT_INVALID',
+                        'PDF search did not report a valid completion count',
+                        {count},
+                    ));
+                    return;
+                }
+                try {
+                    if (count > 0) api.asc_RedactAllSearchElements();
+                    resolve(count);
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            pendingRedactionSearch = task;
+            detachCallbacks.add(cancel);
+            try {
+                api.asc_findText(settings, true, onSearchComplete);
+            } catch (error) {
+                settled = true;
+                cleanup();
+                reject(error);
+            }
+        });
+        return task.promise;
     };
 
     return Object.freeze({
@@ -320,7 +386,7 @@ export function createPdfCommandProvider({
                     missingMethods,
                 });
             }
-            return commandExecutors[commandId](api, payload);
+            return commandExecutors[commandId](api, payload, {executeSearchRedaction});
         },
         resolveCapability(commandId) {
             assertActive();
@@ -336,9 +402,13 @@ export function createPdfCommandProvider({
         },
         resolveContextMenu(context) {
             assertActive();
-            return typeof resolveContextMenu === 'function'
+            const resolved = typeof resolveContextMenu === 'function'
                 ? resolveContextMenu(context)
                 : context?.commands ?? [];
+            if (!Array.isArray(resolved)) return [];
+            return resolved.filter((commandId, index, values) => (
+                typeof commandId === 'string' && commands.has(commandId) && values.indexOf(commandId) === index
+            ));
         },
         captureViewState() {
             assertActive();

@@ -10,15 +10,21 @@ const pageRangeError = value => {
     return error;
 };
 
-export function parsePdfPageRange(value) {
-    if (typeof value !== 'string' || !value.trim()) throw pageRangeError(value);
+export function parsePdfPageRange(value, pageCount) {
+    if (typeof value !== 'string' || !value.trim() ||
+        !Number.isSafeInteger(pageCount) || pageCount < 1) {
+        throw pageRangeError(value);
+    }
     const parts = value.split(',').map(part => part.trim());
     if (parts.some(part => !/^\d+(?:\s*-\s*\d+)?$/.test(part))) throw pageRangeError(value);
 
     const pages = new Set();
     for (const part of parts) {
         const [start, end = start] = part.split('-').map(item => Number.parseInt(item.trim(), 10));
-        if (start < 1 || end < start) throw pageRangeError(value);
+        if (!Number.isSafeInteger(start) || !Number.isSafeInteger(end) ||
+            start < 1 || end < start || end > pageCount) {
+            throw pageRangeError(value);
+        }
         for (let page = start; page <= end; page += 1) pages.add(page - 1);
     }
     return Array.from(pages).sort((left, right) => left - right);
