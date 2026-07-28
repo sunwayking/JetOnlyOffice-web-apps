@@ -574,8 +574,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_decreaseFontSize"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-decrease-font"
@@ -892,8 +894,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_setCellAlign"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-halign"
@@ -1043,8 +1047,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_increaseFontSize"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-increase-font"
@@ -2047,8 +2053,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_setCellStrikeout"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-strikeout"
@@ -2063,8 +2071,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_setCellSubscript"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-subscript"
@@ -2185,8 +2195,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_setCellUnderline"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-underline"
@@ -2200,8 +2212,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_setCellVertAlign"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-valign"
@@ -2261,8 +2275,10 @@
       "permissions": [
         "edit"
       ],
-      "implementation": "planned",
-      "binding": null,
+      "implementation": "implemented",
+      "binding": {
+        "method": "asc_setCellTextWrap"
+      },
       "mobilePath": "edit.format",
       "testIds": [
         "sse-issue-8-desktop-wrap-text"

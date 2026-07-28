@@ -4,7 +4,6 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
-    createEditorUIControllerFacade,
     createSpreadsheetCommandProvider,
 } from '../src/lib/commandProvider.mjs';
 import {
@@ -24,6 +23,14 @@ const implementedBindingTestIds = new Set([
     'sse-provider-history-undo',
     'sse-provider-text-bold',
     'sse-provider-text-italic',
+    'sse-issue-8-desktop-decrease-font',
+    'sse-issue-8-desktop-halign',
+    'sse-issue-8-desktop-increase-font',
+    'sse-issue-8-desktop-strikeout',
+    'sse-issue-8-desktop-subscript',
+    'sse-issue-8-desktop-underline',
+    'sse-issue-8-desktop-valign',
+    'sse-issue-8-desktop-wrap-text',
 ]);
 
 const extractDesktopSurfaceKeys = source => {
@@ -48,7 +55,6 @@ test('spreadsheet inventory is locked to the audited Desktop sources', async () 
         assert.equal(createHash('sha256').update(content).digest('hex'), source.sha256, source.path);
     }
 });
-
 test('spreadsheet inventory maps every entry to a catalog command or ADR exclusion', () => {
     assert.ok(inventory.entries.length >= 60);
     assert.equal(new Set(inventory.entries.map(entry => `${entry.desktopSource}|${entry.desktopKey}`)).size, inventory.entries.length);
@@ -120,6 +126,14 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
         asc_Paste: (...args) => calls.push(['asc_Paste', ...args]),
         asc_setCellBold: (...args) => calls.push(['asc_setCellBold', ...args]),
         asc_setCellItalic: (...args) => calls.push(['asc_setCellItalic', ...args]),
+        asc_decreaseFontSize: (...args) => calls.push(['asc_decreaseFontSize', ...args]),
+        asc_increaseFontSize: (...args) => calls.push(['asc_increaseFontSize', ...args]),
+        asc_setCellAlign: (...args) => calls.push(['asc_setCellAlign', ...args]),
+        asc_setCellStrikeout: (...args) => calls.push(['asc_setCellStrikeout', ...args]),
+        asc_setCellSubscript: (...args) => calls.push(['asc_setCellSubscript', ...args]),
+        asc_setCellTextWrap: (...args) => calls.push(['asc_setCellTextWrap', ...args]),
+        asc_setCellUnderline: (...args) => calls.push(['asc_setCellUnderline', ...args]),
+        asc_setCellVertAlign: (...args) => calls.push(['asc_setCellVertAlign', ...args]),
         asc_addComment: (...args) => calls.push(['asc_addComment', ...args]),
         asc_registerCallback() {},
         asc_unregisterCallback() {},
@@ -143,8 +157,16 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
     assert.equal(provider.execute('spreadsheet.clipboard.paste'), 5);
     assert.equal(provider.execute('spreadsheet.text.bold', { value: true }), 6);
     assert.equal(provider.execute('spreadsheet.text.italic', { value: false }), 7);
+    assert.equal(provider.execute('spreadsheet.desktop.decrease-font'), 8);
+    assert.equal(provider.execute('spreadsheet.desktop.halign', {value: 2}), 9);
+    assert.equal(provider.execute('spreadsheet.desktop.increase-font'), 10);
+    assert.equal(provider.execute('spreadsheet.desktop.strikeout', {value: true}), 11);
+    assert.equal(provider.execute('spreadsheet.desktop.subscript', {value: false}), 12);
+    assert.equal(provider.execute('spreadsheet.desktop.underline', {value: true}), 13);
+    assert.equal(provider.execute('spreadsheet.desktop.valign', {value: 1}), 14);
+    assert.equal(provider.execute('spreadsheet.desktop.wrap-text', {value: true}), 15);
     const comment = { text: 'runtime comment' };
-    assert.equal(provider.execute('common.comment.add', { comment }), 8);
+    assert.equal(provider.execute('common.comment.add', { comment }), 16);
     assert.deepEqual(calls, [
         ['asc_Undo'],
         ['asc_Redo'],
@@ -153,6 +175,14 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
         ['asc_Paste'],
         ['asc_setCellBold', true],
         ['asc_setCellItalic', false],
+        ['asc_decreaseFontSize'],
+        ['asc_setCellAlign', 2],
+        ['asc_increaseFontSize'],
+        ['asc_setCellStrikeout', true],
+        ['asc_setCellSubscript', false],
+        ['asc_setCellUnderline', true],
+        ['asc_setCellVertAlign', 1],
+        ['asc_setCellTextWrap', true],
         ['asc_addComment', comment],
     ]);
     assert.deepEqual(
@@ -167,7 +197,7 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
     assert.doesNotThrow(() => provider.restoreViewState({ scrollTop: 20 }));
 
     const descriptors = provider.getCommandDescriptors();
-    assert.equal(descriptors.length, 8);
+    assert.equal(descriptors.length, 16);
     assert.equal(descriptors.find(command => command.id === 'spreadsheet.clipboard.copy').permission, 'view');
     assert.equal(descriptors.find(command => command.id === 'common.comment.add').permission, 'comment');
     assert.throws(
@@ -224,20 +254,4 @@ test('spreadsheet Runtime owns lifecycle callbacks, permissions, and disposal', 
         () => runtime.getSession(),
         error => error.code === 'MOBILE_RUNTIME_DISPOSED',
     );
-});
-
-test('spreadsheet EditorUIController facade preserves the current Mobile contract', () => {
-    const provider = createSpreadsheetCommandProvider({ inventory, getApi: () => null });
-    const facade = createEditorUIControllerFacade(provider);
-
-    assert.equal(facade.isSupportEditFeature(), false);
-    assert.equal(facade.getCommandProvider(), provider);
-    assert.equal(typeof facade.initCellInfo, 'function');
-    assert.equal(typeof facade.initEditorStyles, 'function');
-    assert.equal(typeof facade.initFonts, 'function');
-    assert.equal(typeof facade.initThemeColors, 'function');
-    assert.equal(typeof facade.toolbarOptions.getUndoRedo, 'function');
-    assert.equal(typeof facade.toolbarOptions.getEditOptions, 'function');
-    assert.equal(typeof facade.ContextMenu.mapMenuItems, 'function');
-    assert.equal(typeof facade.ContextMenu.handleMenuItemClick, 'function');
 });

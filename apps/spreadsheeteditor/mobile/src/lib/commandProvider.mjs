@@ -12,7 +12,6 @@ const payloadArguments = payload => {
     if (Array.isArray(payload.args)) return payload.args;
     return Object.prototype.hasOwnProperty.call(payload, 'value') ? [payload.value] : [payload];
 };
-
 const providerError = (code, message, details) => {
     const error = new Error(message);
     error.code = code;
@@ -180,25 +179,4 @@ export const createSpreadsheetCommandProvider = ({
             handlers.clear();
         },
     });
-};
-
-const noop = () => null;
-
-export const createEditorUIControllerFacade = provider => {
-    const EditorUIController = () => null;
-    EditorUIController.isSupportEditFeature = () => false;
-    EditorUIController.getCommandProvider = () => provider;
-    EditorUIController.initCellInfo = noop;
-    EditorUIController.initEditorStyles = noop;
-    EditorUIController.initFonts = noop;
-    EditorUIController.initThemeColors = noop;
-    EditorUIController.toolbarOptions = {
-        getUndoRedo: noop,
-        getEditOptions: noop,
-    };
-    EditorUIController.ContextMenu = {
-        mapMenuItems: () => [],
-        handleMenuItemClick: () => false,
-    };
-    return EditorUIController;
 };

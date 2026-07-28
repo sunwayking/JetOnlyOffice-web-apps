@@ -1461,6 +1461,7 @@ class MainController extends Component {
     }
 
     componentWillUnmount() {
+        EditorUIController.dispose && EditorUIController.dispose();
         disposeSpreadsheetEditorRuntime();
     }
 }

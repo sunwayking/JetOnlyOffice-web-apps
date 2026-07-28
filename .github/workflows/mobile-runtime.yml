@@ -33,4 +33,5 @@ jobs:
             apps/documenteditor/mobile/src/lib/wordCommandAdapter.test.mjs \
             apps/documenteditor/mobile/src/lib/wordEditorRuntime.test.mjs \
             apps/spreadsheeteditor/mobile/test/commandProvider.test.mjs \
+            apps/spreadsheeteditor/mobile/test/spreadsheetUiModel.test.mjs \
             apps/presentationeditor/mobile/test/commandProvider.test.mjs
