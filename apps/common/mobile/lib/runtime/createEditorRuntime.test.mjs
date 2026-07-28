@@ -17,6 +17,7 @@ function createAdapter(overrides = {}) {
     const listeners = new Set();
     const commands = [
         {id: 'word.text.bold', permission: 'edit'},
+        {id: 'word.review.track', permissionsAny: ['edit', 'review']},
         {id: 'common.comment.add', permission: 'comment'},
         {id: 'common.selection.copy', permission: 'view', mutates: false}
     ];
@@ -93,11 +94,11 @@ test('rejects restricted commands in the shared layer', () => {
 
 test('enforces the five permission profiles instead of relying on hidden buttons', () => {
     const profiles = [
-        {name: 'full-edit', permissions: {edit: true, comment: true}, bold: true, comment: true},
-        {name: 'review-only', permissions: {review: true}, bold: false, comment: false},
-        {name: 'comment-only', permissions: {comment: true}, bold: false, comment: true},
-        {name: 'fill-forms-only', permissions: {fillForms: true}, bold: false, comment: false},
-        {name: 'view-only', permissions: {}, bold: false, comment: false}
+        {name: 'full-edit', permissions: {edit: true, comment: true}, bold: true, review: true, comment: true},
+        {name: 'review-only', permissions: {review: true}, bold: false, review: true, comment: false},
+        {name: 'comment-only', permissions: {comment: true}, bold: false, review: false, comment: true},
+        {name: 'fill-forms-only', permissions: {fillForms: true}, bold: false, review: false, comment: false},
+        {name: 'view-only', permissions: {}, bold: false, review: false, comment: false}
     ];
 
     profiles.forEach(profile => {
@@ -108,8 +109,57 @@ test('enforces the five permission profiles instead of relying on hidden buttons
         });
         markReady(adapter);
         assert.equal(runtime.resolve('word.text.bold').available, profile.bold, profile.name);
+        assert.equal(runtime.resolve('word.review.track').available, profile.review, profile.name);
         assert.equal(runtime.resolve('common.comment.add').available, profile.comment, profile.name);
     });
+});
+
+test('permissionsAny remains fail-closed unless at least one declared permission is granted', () => {
+    const deniedAdapter = createAdapter();
+    const deniedRuntime = createEditorRuntime({
+        adapter: deniedAdapter,
+        permissions: {comment: true}
+    });
+    markReady(deniedAdapter);
+
+    assert.deepEqual(deniedRuntime.resolve('word.review.track'), {
+        id: 'word.review.track',
+        permissionsAny: ['edit', 'review'],
+        available: false,
+        reason: 'permission-denied'
+    });
+    assert.throws(
+        () => deniedRuntime.execute('word.review.track'),
+        error => error.code === 'MOBILE_COMMAND_PERMISSION_DENIED' &&
+            error.details.permission === undefined &&
+            error.details.permissionsAny.join(',') === 'edit,review'
+    );
+});
+
+test('rejects malformed composite permission descriptors instead of allowing them by default', () => {
+    for (const permissionsAny of [[], ['edit', 'edit'], ['edit', '']]) {
+        assert.throws(
+            () => createEditorRuntime({
+                adapter: createAdapter({
+                    getCommandDescriptors: () => [{id: 'word.invalid', permissionsAny}]
+                })
+            }),
+            error => error.code === 'MOBILE_COMMAND_DESCRIPTOR_INVALID'
+        );
+    }
+
+    assert.throws(
+        () => createEditorRuntime({
+            adapter: createAdapter({
+                getCommandDescriptors: () => [{
+                    id: 'word.ambiguous',
+                    permission: 'edit',
+                    permissionsAny: ['review']
+                }]
+            })
+        }),
+        error => error.code === 'MOBILE_COMMAND_DESCRIPTOR_INVALID'
+    );
 });
 
 test('freezes mutations until transport reconciliation while keeping safe commands available', () => {
