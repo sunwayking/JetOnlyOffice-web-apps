@@ -1095,8 +1095,15 @@
         }
     }
 
+    const TABLET_MIN_SHORT_EDGE = 600;
+
     function correct_app_type(config) {
         if ( config.type == 'mobile' ) {
+            const viewportShortEdge = Math.min(window.innerWidth, window.innerHeight);
+            if ( Number.isFinite(viewportShortEdge) && viewportShortEdge >= TABLET_MIN_SHORT_EDGE ) {
+                config.editorConfig.forceDesktop = true;
+                return 'desktop';
+            }
             if ( !config.editorConfig.customization || !config.editorConfig.customization.mobile ||
                     config.editorConfig.customization.mobile.disableForceDesktop !== true )
             {
@@ -1146,9 +1153,11 @@
             appType = corrected_type === 'mobile' || corrected_type === 'embedded' ? 'word' : 'pdf';
         } else if (type && typeof type[1] === 'string') { // pdf - need check
             isForm = config.document ? config.document.isForm : undefined;
-            if (corrected_type === 'embedded')
+            if (corrected_type === 'mobile')
+                appType = 'pdf';
+            else if (corrected_type === 'embedded')
                 appType = fillForms && isForm===undefined ? 'common' : 'word';
-            else if (corrected_type !== 'mobile')
+            else
                 appType = isForm===undefined ? 'common' : isForm ? 'word' : 'pdf';
         } else if (type && typeof type[5] === 'string') { // oform|docxf
             appType = 'word';

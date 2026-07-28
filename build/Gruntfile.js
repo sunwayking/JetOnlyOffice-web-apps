@@ -667,6 +667,7 @@ module.exports = function(grunt) {
                     cmd: function() {
                         const editor = packageFile.name == 'presentationeditor' ? 'slide' :
                                         packageFile.name == 'spreadsheeteditor' ? 'cell' :
+                                        packageFile.name == 'pdfeditor' ? 'pdf' :
                                         packageFile.name == 'visioeditor' ? 'visio' : 'word';
                         return `npm run deploy-${editor}`;
 

@@ -19,6 +19,7 @@ const env = process.env.NODE_ENV || 'development';
 const target = process.env.TARGET || 'web';
 const editor = process.env.TARGET_EDITOR === 'cell' ? 'spreadsheeteditor' :
                 process.env.TARGET_EDITOR === 'slide' ? 'presentationeditor' :
+                process.env.TARGET_EDITOR === 'pdf' ? 'pdfeditor' :
                 process.env.TARGET_EDITOR === 'visio' ? 'visioeditor' : 'documenteditor';
 
 const config = {
