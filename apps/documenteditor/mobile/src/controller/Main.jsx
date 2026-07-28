@@ -47,6 +47,15 @@ import {
 } from "../../../../common/mobile/lib/controller/collaboration/Comments";
 import About from '../../../../common/mobile/lib/view/About';
 import EditorUIController from '../lib/patch';
+import {
+    disposeWordEditorRuntime,
+    initializeWordEditorRuntime,
+    updateWordEditorPermissions
+} from '../lib/wordEditorRuntime.mjs';
+import {
+    resolveMobileForceView,
+    resolveWordRuntimePermissions
+} from '../lib/mobilePermissionPolicy.mjs';
 import ErrorController from "./Error";
 import LongActionsController from "./LongActions";
 import PluginsController from '../../../../common/mobile/lib/controller/Plugins.jsx';
@@ -347,13 +356,7 @@ class MainController extends Component {
                 const editorConfig = window.native?.editorConfig;
                 const config = storeAppOptions.config;
                 const customization = config.customization;
-                let isMobileForceView = undefined;
-                if ( customization && customization.mobileForceView !== undefined )
-                    isMobileForceView = customization.mobileForceView;
-                else if ( editorConfig && editorConfig.mobileForceView !== undefined )
-                    isMobileForceView = editorConfig.mobileForceView;
-
-                const isForceView = isMobileForceView ?? customization?.mobile?.forceView ?? true;
+                const isForceView = resolveMobileForceView(customization, editorConfig);
 
                 if(customization?.mobileForceView !== undefined && customization?.mobileForceView !== null) {
                     console.warn("Obsolete: The mobileForceView parameter is deprecated. Please use the forceView parameter from customization.mobile block");
@@ -373,6 +376,12 @@ class MainController extends Component {
                         storeAppOptions.changeViewerMode(false);
                     }
                 }
+
+                updateWordEditorPermissions(resolveWordRuntimePermissions({
+                    storeAppOptions,
+                    permissions: this.permissions,
+                    forceView: isForceView
+                }));
 
                 this.api.asc_LoadDocument();
                 this.api.Resize();
@@ -515,6 +524,12 @@ class MainController extends Component {
                     let hcolor = (/(?:&|^)headingsColor=([^&]+)&?/i).exec(window.location.search.substring(1));
                     hcolor && (config['headings-color'] = '#' + hcolor[1]);
                     this.api = isPDF ? new Asc.PDFEditorApi(config) : new Asc.asc_docs_api(config);
+
+                    if (isPDF) {
+                        disposeWordEditorRuntime();
+                    } else {
+                        initializeWordEditorRuntime({getApi: () => this.api});
+                    }
 
                     Common.Notifications.trigger('engineCreated', this.api);
                     // Common.EditorApi = {get: () => this.api};
@@ -1744,6 +1759,11 @@ class MainController extends Component {
     componentDidMount() {
         Common.EditorApi = {get: () => this.api};
         this.initSdk();
+    }
+
+    componentWillUnmount() {
+        EditorUIController.dispose();
+        disposeWordEditorRuntime();
     }
 }
 

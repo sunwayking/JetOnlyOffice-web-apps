@@ -132,12 +132,6 @@ module.exports = function(grunt) {
                 }];
 
     let path = require('path');
-    let addons = grunt.option('addon') || [];
-    if (!Array.isArray(addons))
-        addons = [addons];
-
-    addons.forEach((element,index,self) => self[index] = path.join('../..', element, '/build'));
-    addons = addons.filter(element => grunt.file.isDir(element));
 
     require('./appforms')(grunt);
 
@@ -228,14 +222,6 @@ module.exports = function(grunt) {
 
             if (packageFile) {
                 grunt.log.ok(appName + ' config loaded successfully'.green);
-
-                addons.forEach(element => {
-                    let _path = path.join(element,configFile);
-                    if (grunt.file.exists(_path)) {
-                        _merge(packageFile, require(_path));
-                        grunt.log.ok('addon '.green + element + ' is merged successfully'.green);
-                    }
-                });
 
                 if ( !!_extConfig && _extConfig.name == packageFile.name ) {
                     _merge(packageFile, _extConfig);
@@ -676,7 +662,7 @@ module.exports = function(grunt) {
                 webpack_app_build: {
                     options: {
                         cwd: '../vendor/framework7-react',
-                        env: {...process.env, ...{addon: grunt.option('addon')}},
+                        env: process.env,
                     },
                     cmd: function() {
                         const editor = packageFile.name == 'presentationeditor' ? 'slide' :
@@ -684,8 +670,7 @@ module.exports = function(grunt) {
                                         packageFile.name == 'visioeditor' ? 'visio' : 'word';
                         return `npm run deploy-${editor}`;
 
-                        // const addon_path = `${packageFile.mobile.js.reactjs && !!packageFile.mobile.js.reactjs.features ? `ADDON_ENV=${packageFile.mobile.js.reactjs.features}` : ''}`;
-                        // return `npx cross-env TARGET_EDITOR=${editor} NODE_ENV=production ${addon_path} node ./build/build.js`;
+                        // return `npx cross-env TARGET_EDITOR=${editor} NODE_ENV=production node ./build/build.js`;
                     },
                 },
                 webpack_install: {

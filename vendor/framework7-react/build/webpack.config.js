@@ -20,8 +20,6 @@ const target = process.env.TARGET || 'web';
 const editor = process.env.TARGET_EDITOR === 'cell' ? 'spreadsheeteditor' :
                 process.env.TARGET_EDITOR === 'slide' ? 'presentationeditor' :
                 process.env.TARGET_EDITOR === 'visio' ? 'visioeditor' : 'documenteditor';
-const targetPatch = process.env.TARGET_EDITOR || 'word';
-const addonPath = process.env.ADDON_ENV || 'path';
 
 const config = {
   mode: env,
@@ -117,11 +115,7 @@ const config = {
           resolvePath('node_modules/framework7-react'),
           resolvePath('node_modules/template7'),
           resolvePath('node_modules/dom7'),
-          resolvePath('node_modules/ssr-window'),
-          resolvePath('../../../web-apps-mobile/word'),
-          resolvePath('../../../web-apps-mobile/slide'),
-          resolvePath('../../../web-apps-mobile/visio'),
-          resolvePath('../../../web-apps-mobile/cell')
+          resolvePath('node_modules/ssr-window')
         ],
       },
       {
@@ -289,12 +283,6 @@ const config = {
         },
       ],
     }),
-    new webpack.NormalModuleReplacementPlugin(
-      /\.{2}\/lib\/patch/,
-      resource => (env === 'development' || /web-apps-mobile/.test(process.env.addon)) &&
-        fs.existsSync(`../../../web-apps-mobile/${targetPatch}/patch.jsx`) ?
-        resource.request = `../../../../../../web-apps-mobile/${targetPatch}/patch.jsx` : resource
-    ),
     // new BundleAnalyzerPlugin({
     //   analyzerMode: env === 'development' ? 'server' : 'disabled',
     // }),

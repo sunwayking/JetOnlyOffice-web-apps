@@ -33,25 +33,221 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-const EditorUIController = () => {
-    return null
+import React from 'react';
+import {Link} from 'framework7-react';
+import {Device} from '../../../../common/mobile/utils/device';
+import SvgIcon from '../../../../common/mobile/lib/component/SvgIcon';
+import IconEditIos from '@common-ios-icons/icon-edit.svg?ios';
+import IconEditAndroid from '@common-android-icons/icon-edit.svg';
+import IconPlusIos from '@common-ios-icons/icon-plus.svg?ios';
+import IconPlusAndroid from '@common-android-icons/icon-plus.svg';
+import IconUndoIos from '@common-ios-icons/icon-undo.svg?ios';
+import IconUndoAndroid from '@common-android-icons/icon-undo.svg';
+import IconRedoIos from '@common-ios-icons/icon-redo.svg?ios';
+import IconRedoAndroid from '@common-android-icons/icon-redo.svg';
+
+const apiRegistrations = new WeakMap();
+
+function registerOnce(key, eventName, handler) {
+    const api = Common.EditorApi.get();
+    if (!api) {
+        return;
+    }
+    let registrations = apiRegistrations.get(api);
+    if (!registrations) {
+        registrations = new Map();
+        apiRegistrations.set(api, registrations);
+    }
+    if (registrations.has(key)) {
+        return;
+    }
+    api.asc_registerCallback(eventName, handler);
+    registrations.set(key, {eventName, handler});
+}
+
+function getFocusValue(store, type) {
+    for (const item of store._focusObjects) {
+        if (item.get_ObjectType() === type) {
+            return item.get_ObjectValue();
+        }
+    }
+    return null;
+}
+
+function createFocusInterface(store) {
+    const typeTokens = new Map([
+        [Asc.c_oAscTypeSelectElement.Header, ['header']],
+        [Asc.c_oAscTypeSelectElement.Paragraph, ['text', 'paragraph']],
+        [Asc.c_oAscTypeSelectElement.Text, ['text']],
+        [Asc.c_oAscTypeSelectElement.Image, ['image']],
+        [Asc.c_oAscTypeSelectElement.Table, ['table']],
+        [Asc.c_oAscTypeSelectElement.Hyperlink, ['hyperlink']],
+        [Asc.c_oAscTypeSelectElement.SpellCheck, ['spellcheck']]
+    ]);
+    if (Asc.c_oAscTypeSelectElement.Shape !== undefined) {
+        typeTokens.set(Asc.c_oAscTypeSelectElement.Shape, ['shape']);
+    }
+    if (Asc.c_oAscTypeSelectElement.Chart !== undefined) {
+        typeTokens.set(Asc.c_oAscTypeSelectElement.Chart, ['chart']);
+    }
+
+    return {
+        filterFocusObjects() {
+            return Array.from(new Set(store._focusObjects
+                .reduce((tokens, item) => tokens.concat(typeTokens.get(item.get_ObjectType()) || []), [])));
+        },
+        getHeaderObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Header),
+        getParagraphObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Paragraph),
+        getShapeObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Shape),
+        getImageObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Image),
+        getTableObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Table),
+        getChartObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Chart),
+        getLinkObject: () => getFocusValue(store, Asc.c_oAscTypeSelectElement.Hyperlink)
+    };
+}
+
+const EditorUIController = () => null;
+
+EditorUIController.isSupportEditFeature = () => true;
+
+EditorUIController.getToolbarOptions = ({disabledEdit, disabledAdd, onEditClick, onAddClick}) => [
+    <Link iconOnly key='edit-options' className={disabledEdit ? 'disabled' : ''} href={false} onClick={onEditClick}>
+        <SvgIcon symbolId={(Device.ios ? IconEditIos : IconEditAndroid).id} className='icon icon-svg' />
+    </Link>,
+    <Link iconOnly key='add-options' className={disabledAdd ? 'disabled' : ''} href={false} onClick={onAddClick}>
+        <SvgIcon symbolId={(Device.ios ? IconPlusIos : IconPlusAndroid).id} className='icon icon-svg' />
+    </Link>
+];
+
+EditorUIController.getUndoRedo = ({disabledUndo, disabledRedo, onUndoClick, onRedoClick}) => [
+    <Link iconOnly key='undo' className={disabledUndo ? 'disabled' : ''} href={false} onClick={onUndoClick}>
+        <SvgIcon symbolId={(Device.ios ? IconUndoIos : IconUndoAndroid).id} className='icon icon-svg' />
+    </Link>,
+    <Link iconOnly key='redo' className={disabledRedo ? 'disabled' : ''} href={false} onClick={onRedoClick}>
+        <SvgIcon symbolId={(Device.ios ? IconRedoIos : IconRedoAndroid).id} className='icon icon-svg' />
+    </Link>
+];
+
+EditorUIController.initThemeColors = () => {
+    registerOnce('theme-colors', 'asc_onSendThemeColors', (colors, standardColors) => {
+        Common.Utils.ThemeColor.setColors(colors, standardColors);
+    });
 };
 
-EditorUIController.isSupportEditFeature = () => {
-    return false
+EditorUIController.initFonts = store => {
+    registerOnce('editor-fonts', 'asc_onInitEditorFonts', (fonts, select) => {
+        store.initEditorFonts(fonts, select);
+    });
 };
 
-EditorUIController.getToolbarOptions = () => {
-    return null
+EditorUIController.initEditorStyles = store => {
+    registerOnce('editor-styles', 'asc_onInitEditorStyles', styles => {
+        store.initEditorStyles(styles);
+    });
 };
 
-EditorUIController.initFonts = () => null;
-EditorUIController.initEditorStyles = () => null;
-EditorUIController.initFocusObjects = () => null;
-EditorUIController.initTableTemplates = () => null;
+EditorUIController.initFocusObjects = store => {
+    if (!store.intf) {
+        store.intf = createFocusInterface(store);
+    }
+    registerOnce('focus-objects', 'asc_onFocusObject', objects => {
+        store.resetFocusObjects(objects || []);
+    });
+};
+
+EditorUIController.initTableTemplates = store => {
+    registerOnce('table-templates', 'asc_onInitTableTemplates', () => {
+        const api = Common.EditorApi.get();
+        store.setStyles(api.asc_getTableStylesPreviews(), 'default');
+    });
+};
+
+EditorUIController.updateChartStyles = store => {
+    registerOnce('chart-styles', 'asc_onUpdateChartStyles', type => {
+        const api = Common.EditorApi.get();
+        store.updateChartStyles(api.asc_getChartPreviews(type));
+    });
+};
+
+EditorUIController.dispose = () => {
+    const api = Common.EditorApi?.get();
+    const registrations = api && apiRegistrations.get(api);
+    if (!registrations) {
+        return;
+    }
+    registrations.forEach(({eventName, handler}) => {
+        api.asc_unregisterCallback(eventName, handler);
+    });
+    registrations.clear();
+    apiRegistrations.delete(api);
+};
+
 EditorUIController.ContextMenu = {
-    mapMenuItems: () => [],
-    handleMenuItemClick: () => true,
+    mapMenuItems(controller) {
+        const {t} = controller.props;
+        const labels = t('ContextMenu', {returnObjects: true});
+        const api = Common.EditorApi.get();
+        const stack = api.getSelectedElements();
+        const {
+            canComments,
+            canCoAuthoring,
+            canFillForms,
+            canEditComments,
+            canViewComments,
+            isDisconnected,
+            isForm,
+            isProtected,
+            isViewer,
+            typeProtection
+        } = controller.props;
+        let locked = false;
+        let hasText = false;
+        let hasObject = false;
+        let hasLink = false;
+
+        stack.forEach(item => {
+            const objectType = item.get_ObjectType();
+            const value = item.get_ObjectValue();
+            locked = locked || (typeof value?.get_Locked === 'function' && value.get_Locked());
+            hasText = hasText || objectType === Asc.c_oAscTypeSelectElement.Paragraph;
+            hasObject = hasObject || objectType === Asc.c_oAscTypeSelectElement.Image ||
+                objectType === Asc.c_oAscTypeSelectElement.Table;
+            hasLink = hasLink || objectType === Asc.c_oAscTypeSelectElement.Hyperlink;
+        });
+
+        const canEdit = !isProtected || typeProtection === Asc.c_oAscEDocProtect.TrackedChanges;
+        const canComment = typeProtection === Asc.c_oAscEDocProtect.Comments;
+
+        const items = [];
+        const canCopySelection = api.can_CopyCut();
+        if (canCopySelection) {
+            items.push({event: 'copy', icon: 'icon-copy'});
+        }
+        if (!isDisconnected && canFillForms && canCopySelection && !locked &&
+            (!isViewer || isForm) && canEdit) {
+            items.push({event: 'cut', icon: 'icon-cut'});
+            items.push({event: 'paste', icon: 'icon-paste'});
+        }
+        if (canViewComments && controller.isComments) {
+            items.push({caption: labels.menuViewComment, event: 'viewcomment'});
+        }
+        if (!isDisconnected && api.can_AddQuotedComment() !== false && canCoAuthoring && canComments &&
+            !locked && (hasText || !hasObject) && (!isViewer || canEditComments) && (canEdit || canComment)) {
+            items.push({caption: labels.menuAddComment, event: 'addcomment'});
+        }
+        if (hasLink) {
+            items.push({caption: labels.menuOpenLink, event: 'openlink'});
+        }
+        return items;
+    },
+
+    handleMenuItemClick(controller, action) {
+        if (action !== 'addcomment') {
+            return false;
+        }
+        Common.Notifications.trigger('addcomment');
+        return true;
+    }
 };
 
 export default EditorUIController;

@@ -41,6 +41,7 @@ import { LocalStorage } from '../../../../common/mobile/utils/LocalStorage.mjs';
 import ContextMenuController from '../../../../common/mobile/lib/controller/ContextMenu';
 import { idContextMenuElement } from '../../../../common/mobile/lib/view/ContextMenu';
 import EditorUIController from '../lib/patch';
+import {executeWordCommand} from '../lib/wordEditorRuntime.mjs';
 
 @inject(stores => ({
     isEdit: stores.storeAppOptions.isEdit,
@@ -132,7 +133,7 @@ class ContextMenu extends ContextMenuController {
                     this.showCopyCutPasteModal();
                 break;
             case 'copy':
-                if (!api.Copy() && !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
+                if (!executeWordCommand('common.selection.copy') && !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
                     this.showCopyCutPasteModal();
                 break;
             case 'paste':
