@@ -14,6 +14,7 @@ import {
 import {
     filterPdfCommandSearchResults,
     normalizePdfParticipants,
+    resolvePdfCommandInput,
     resolvePdfSelectionContext,
 } from '../src/lib/pdfMobileUiModel.mjs';
 
@@ -252,6 +253,24 @@ test('PDF Mobile selection, participants and command search derive from live SDK
         resolve: commandId => ({available: commandId === 'pdf.view.zoom'}),
     });
     assert.deepEqual(results.map(command => command.id), ['pdf.view.zoom']);
+
+    assert.deepEqual(resolvePdfCommandInput('pdf.redaction.pages', true), {
+        commandId: 'pdf.redaction.pages',
+        inputMode: 'text',
+        label: '页码或范围',
+        multiline: false,
+        placeholder: '例如 1, 3-5',
+        type: 'text',
+    });
+    assert.deepEqual(resolvePdfCommandInput('pdf.comment.add', false), {
+        commandId: 'pdf.comment.add',
+        inputMode: 'text',
+        label: 'Comment',
+        multiline: true,
+        placeholder: 'Enter a comment',
+        type: 'text',
+    });
+    assert.equal(resolvePdfCommandInput('pdf.edit.undo', true), null);
 });
 
 test('PDF redaction search serializes work and is cancelled by provider disposal', async () => {

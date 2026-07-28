@@ -461,6 +461,131 @@
     background: transparent;
 }
 
+.pdf-modal-backdrop.pdf-input-backdrop {
+    place-items: end stretch;
+    padding: var(--f7-navbar-height) 0 var(--f7-toolbar-height);
+}
+
+.pdf-input-sheet {
+    width: 100%;
+    max-height: calc(100vh - var(--f7-navbar-height) - var(--f7-toolbar-height));
+    overflow: auto;
+    border-top: 1px solid var(--pdf-divider);
+    border-radius: 8px 8px 0 0;
+    color: var(--pdf-text);
+    background: var(--pdf-panel);
+    box-shadow: 0 -8px 28px rgba(0, 0, 0, 0.2);
+}
+
+.pdf-input-sheet form {
+    display: grid;
+}
+
+.pdf-input-header {
+    display: flex;
+    min-height: 48px;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 8px 0 16px;
+    border-bottom: 1px solid var(--pdf-divider);
+}
+
+.pdf-input-header h2 {
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 22px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.pdf-input-close {
+    width: 44px;
+    min-width: 44px;
+    height: 44px;
+    padding: 10px;
+    border: 0;
+    color: var(--pdf-muted);
+    background: transparent;
+}
+
+.pdf-input-close svg {
+    width: 22px;
+    height: 22px;
+}
+
+.pdf-input-content {
+    display: grid;
+    gap: 8px;
+    padding: 14px 16px;
+}
+
+.pdf-input-content label {
+    font-size: 13px;
+    font-weight: 600;
+    line-height: 18px;
+}
+
+.pdf-input-content input,
+.pdf-input-content textarea {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    min-height: 46px;
+    padding: 10px 12px;
+    resize: vertical;
+    border: 1px solid var(--pdf-divider);
+    border-radius: 6px;
+    outline: 0;
+    color: var(--pdf-text);
+    background: var(--pdf-panel);
+    font: inherit;
+    line-height: 22px;
+}
+
+.pdf-input-content input:focus,
+.pdf-input-content textarea:focus {
+    border-color: var(--pdf-accent);
+    box-shadow: 0 0 0 2px rgba(18, 107, 86, 0.18);
+}
+
+.pdf-input-error {
+    margin: 0;
+    color: var(--pdf-danger);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.pdf-input-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+    padding: 10px 16px max(10px, env(safe-area-inset-bottom));
+    border-top: 1px solid var(--pdf-divider);
+}
+
+.pdf-input-actions .button {
+    min-width: 0;
+    min-height: 44px;
+    height: 44px;
+    border: 1px solid var(--pdf-divider);
+    border-radius: 6px;
+    color: var(--pdf-text);
+    background: transparent;
+}
+
+.pdf-input-actions .button.is-primary {
+    color: #ffffff;
+    border-color: var(--pdf-accent);
+    background: var(--pdf-accent);
+}
+
+.pdf-input-actions .button:disabled {
+    opacity: 0.45;
+}
+
 .pdf-confirm-dialog {
     width: min(100%, 360px);
     padding: 20px;
@@ -525,23 +650,37 @@
 
 @media (orientation: landscape) and (max-height: 600px) {
     .pdf-editor-canvas.has-command-panel {
-        right: min(42vw, 420px);
-        bottom: var(--f7-toolbar-height);
+        right: 0;
+        bottom: calc(var(--f7-toolbar-height) + min(160px, 44vh));
     }
 
     .pdf-command-panel {
-        top: var(--f7-navbar-height);
+        top: auto;
         right: 0;
         bottom: var(--f7-toolbar-height);
-        left: auto;
-        width: min(42vw, 420px);
-        height: auto;
-        max-height: none;
-        border-top: 0;
-        border-left: 1px solid var(--pdf-divider);
+        left: 0;
+        width: 100%;
+        height: min(160px, 44vh);
+        max-height: min(160px, 44vh);
+        border-top: 1px solid var(--pdf-divider);
+        border-left: 0;
     }
 
     .pdf-command-grid {
-        grid-template-columns: repeat(2, minmax(0, 1fr));
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+    }
+
+    .pdf-input-sheet form {
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: end;
+    }
+
+    .pdf-input-header {
+        grid-column: 1 / -1;
+    }
+
+    .pdf-input-actions {
+        width: 260px;
+        border-top: 0;
     }
 }

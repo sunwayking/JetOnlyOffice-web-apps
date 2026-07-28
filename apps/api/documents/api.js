@@ -1097,6 +1097,11 @@
 
     function correct_app_type(config) {
         if ( config.type == 'mobile' ) {
+            const viewportShortEdge = Math.min(window.innerWidth, window.innerHeight);
+            if ( Number.isFinite(viewportShortEdge) && viewportShortEdge >= 600 ) {
+                config.editorConfig.forceDesktop = true;
+                return 'desktop';
+            }
             if ( !config.editorConfig.customization || !config.editorConfig.customization.mobile ||
                     config.editorConfig.customization.mobile.disableForceDesktop !== true )
             {

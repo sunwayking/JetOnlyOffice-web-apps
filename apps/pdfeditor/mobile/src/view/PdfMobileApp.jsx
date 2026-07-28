@@ -37,6 +37,7 @@ import {isPdfChineseLocale} from '../lib/pdfLocale.mjs';
 import {
     filterPdfCommandSearchResults,
     normalizePdfParticipants,
+    resolvePdfCommandInput,
     resolvePdfSelectionContext,
 } from '../lib/pdfMobileUiModel.mjs';
 import {parsePdfPageRange} from '../lib/pdfRedactionInput.mjs';
@@ -163,6 +164,9 @@ export default function PdfMobileApp({bridge}) {
     const [contextKind, setContextKind] = useState('selection');
     const [searchQuery, setSearchQuery] = useState('');
     const [zoomValue, setZoomValue] = useState(100);
+    const [commandInput, setCommandInput] = useState(null);
+    const [commandInputValue, setCommandInputValue] = useState('');
+    const [commandInputError, setCommandInputError] = useState(null);
     const chinese = isPdfChineseLocale(window.Common?.Locale, navigator.language);
     const activeTask = uiState.activeTask;
 
@@ -247,16 +251,15 @@ export default function PdfMobileApp({bridge}) {
         resolve: bridge.resolveCommand,
     }), [bridge, chinese, searchQuery, sessionState, uiState]);
 
-    const buildPayload = commandId => {
+    const buildPayload = (commandId, inputValue = '') => {
         if (commandId === 'pdf.redaction.pages') {
-            const value = window.prompt(chinese ? '页码或范围，例如 1, 3-5' : 'Pages or ranges, for example 1, 3-5');
-            return value === null ? null : {
-                pages: parsePdfPageRange(value, bridge.getEditorApi()?.getCountPages?.()),
+            return {
+                pages: parsePdfPageRange(inputValue, bridge.getEditorApi()?.getCountPages?.()),
             };
         }
         if (commandId === 'pdf.redaction.search-all') {
-            const value = window.prompt(chinese ? '搜索并标记全部结果' : 'Search and mark all results');
-            if (!value?.trim()) return null;
+            const value = inputValue.trim();
+            if (!value) return null;
             const SearchSettings = window.AscCommon?.CSearchSettings;
             if (typeof SearchSettings !== 'function') {
                 throw uiError('MOBILE_PDF_SEARCH_UNAVAILABLE', 'PDF search settings are unavailable');
@@ -268,12 +271,12 @@ export default function PdfMobileApp({bridge}) {
             return {settings};
         }
         if (commandId === 'pdf.insert.image-url') {
-            const value = window.prompt(chinese ? '图片链接' : 'Image link');
-            return value?.trim() ? {urls: [value.trim()]} : null;
+            const value = inputValue.trim();
+            return value ? {urls: [value]} : null;
         }
         if (commandId === 'pdf.comment.add') {
-            const value = window.prompt(chinese ? '评论' : 'Comment');
-            return value?.trim() ? {comment: createComment(value.trim())} : null;
+            const value = inputValue.trim();
+            return value ? {comment: createComment(value)} : null;
         }
         if (commandId === 'pdf.annotation.marker') {
             const type = window.AscPDF?.ANNOTATIONS_TYPES?.Highlight;
@@ -284,8 +287,8 @@ export default function PdfMobileApp({bridge}) {
         if (commandId === 'pdf.signatures.apply-appearance') {
             const fieldId = signatureFieldId(selectedSignature?.signature);
             if (!fieldId) throw uiError('MOBILE_SIGNATURE_FIELD_REQUIRED', 'Select a PDF signature field first');
-            const text = window.prompt(chinese ? '签名文字' : 'Signature text');
-            return text?.trim() ? {appearance: {fieldId, mode: 'typed', text: text.trim()}} : null;
+            const text = inputValue.trim();
+            return text ? {appearance: {fieldId, mode: 'typed', text}} : null;
         }
         return DEFAULT_PAYLOADS[commandId];
     };
@@ -311,11 +314,53 @@ export default function PdfMobileApp({bridge}) {
         }
     };
 
+    const closeCommandInput = () => {
+        setCommandInput(null);
+        setCommandInputValue('');
+        setCommandInputError(null);
+        bridge.closeOverlay();
+    };
+
+    const openCommandInput = commandId => {
+        const descriptor = resolvePdfCommandInput(commandId, chinese);
+        if (!descriptor) return false;
+        if (commandId === 'pdf.signatures.apply-appearance' && !signatureFieldId(selectedSignature?.signature)) {
+            setLastError('MOBILE_SIGNATURE_FIELD_REQUIRED');
+            return true;
+        }
+        setCommandInput(descriptor);
+        setCommandInputValue('');
+        setCommandInputError(null);
+        bridge.openOverlay('command-input');
+        return true;
+    };
+
+    const submitCommandInput = event => {
+        event.preventDefault();
+        if (!commandInput) return;
+        try {
+            const payload = buildPayload(commandInput.commandId, commandInputValue);
+            if (payload === null) {
+                setCommandInputError(chinese ? '请输入内容。' : 'Enter a value.');
+                return;
+            }
+            const commandId = commandInput.commandId;
+            closeCommandInput();
+            executeCommand(commandId, payload);
+        } catch (error) {
+            const message = error.code === 'MOBILE_PDF_PAGE_RANGE_INVALID'
+                ? (chinese ? '请输入文档范围内的有效升序页码。' : 'Enter valid ascending pages within this document.')
+                : (error.message || error.code || 'MOBILE_COMMAND_INPUT_INVALID');
+            setCommandInputError(message);
+        }
+    };
+
     const runCommand = commandId => {
         if (commandId === 'pdf.redaction.apply') {
             bridge.openOverlay('redaction-confirmation');
             return;
         }
+        if (openCommandInput(commandId)) return;
         executeCommand(commandId);
     };
 
@@ -332,7 +377,7 @@ export default function PdfMobileApp({bridge}) {
     };
     const runContextCommand = commandId => {
         bridge.closeOverlay();
-        executeCommand(commandId);
+        runCommand(commandId);
     };
     const setZoom = value => {
         const next = Number(value);
@@ -555,6 +600,65 @@ export default function PdfMobileApp({bridge}) {
                                         </Button>
                                     ))}
                                 </div>
+                            </section>
+                        </div>
+                    )}
+
+                    {uiState.overlay === 'command-input' && commandInput && (
+                        <div className="pdf-modal-backdrop pdf-input-backdrop" role="presentation" onClick={closeCommandInput}>
+                            <section
+                                className="pdf-input-sheet"
+                                role="dialog"
+                                aria-modal="true"
+                                aria-labelledby="pdf-command-input-title"
+                                onClick={event => event.stopPropagation()}
+                            >
+                                <form onSubmit={submitCommandInput}>
+                                    <header className="pdf-input-header">
+                                        <h2 id="pdf-command-input-title">{commandLabel(commandInput.commandId)}</h2>
+                                        <button
+                                            className="button pdf-input-close"
+                                            type="button"
+                                            onClick={closeCommandInput}
+                                            aria-label={chinese ? '关闭' : 'Close'}
+                                        >
+                                            <Xmark aria-hidden="true" />
+                                        </button>
+                                    </header>
+                                    <div className="pdf-input-content">
+                                        <label htmlFor="pdf-command-input-value">{commandInput.label}</label>
+                                        {commandInput.multiline ? (
+                                            <textarea
+                                                id="pdf-command-input-value"
+                                                value={commandInputValue}
+                                                onChange={event => setCommandInputValue(event.target.value)}
+                                                placeholder={commandInput.placeholder}
+                                                rows="3"
+                                                autoFocus
+                                            />
+                                        ) : (
+                                            <input
+                                                id="pdf-command-input-value"
+                                                type={commandInput.type}
+                                                inputMode={commandInput.inputMode}
+                                                value={commandInputValue}
+                                                onChange={event => setCommandInputValue(event.target.value)}
+                                                placeholder={commandInput.placeholder}
+                                                autoComplete="off"
+                                                autoFocus
+                                            />
+                                        )}
+                                        {commandInputError && <p className="pdf-input-error" role="alert">{commandInputError}</p>}
+                                    </div>
+                                    <div className="pdf-input-actions">
+                                        <button className="button" type="button" onClick={closeCommandInput}>
+                                            {chinese ? '取消' : 'Cancel'}
+                                        </button>
+                                        <button className="button is-primary" type="submit" disabled={!commandInputValue.trim()}>
+                                            {chinese ? '确定' : 'Apply'}
+                                        </button>
+                                    </div>
+                                </form>
                             </section>
                         </div>
                     )}

@@ -28,6 +28,44 @@ const CONTEXT_COMMANDS = Object.freeze({
     ]),
 });
 
+const COMMAND_INPUTS = Object.freeze({
+    'pdf.redaction.pages': Object.freeze({
+        inputMode: 'text',
+        label: Object.freeze(['Page or range', '页码或范围']),
+        multiline: false,
+        placeholder: Object.freeze(['For example 1, 3-5', '例如 1, 3-5']),
+        type: 'text',
+    }),
+    'pdf.redaction.search-all': Object.freeze({
+        inputMode: 'search',
+        label: Object.freeze(['Search results', '搜索结果']),
+        multiline: false,
+        placeholder: Object.freeze(['Enter text to find', '输入要查找的文字']),
+        type: 'search',
+    }),
+    'pdf.insert.image-url': Object.freeze({
+        inputMode: 'url',
+        label: Object.freeze(['Image link', '图片链接']),
+        multiline: false,
+        placeholder: Object.freeze(['https://example.com/image.png', 'https://example.com/image.png']),
+        type: 'url',
+    }),
+    'pdf.comment.add': Object.freeze({
+        inputMode: 'text',
+        label: Object.freeze(['Comment', '评论']),
+        multiline: true,
+        placeholder: Object.freeze(['Enter a comment', '输入评论']),
+        type: 'text',
+    }),
+    'pdf.signatures.apply-appearance': Object.freeze({
+        inputMode: 'text',
+        label: Object.freeze(['Signature text', '签名文字']),
+        multiline: false,
+        placeholder: Object.freeze(['Enter signature text', '输入签名文字']),
+        type: 'text',
+    }),
+});
+
 const callFirst = (value, methods) => {
     for (const method of methods) {
         if (typeof value?.[method] !== 'function') continue;
@@ -83,4 +121,18 @@ export function filterPdfCommandSearchResults({commands, query, labelFor, resolv
         const label = typeof labelFor === 'function' ? labelFor(command) : command.id;
         return `${label} ${command.id}`.toLocaleLowerCase().includes(needle);
     });
+}
+
+export function resolvePdfCommandInput(commandId, chinese = false) {
+    const descriptor = COMMAND_INPUTS[commandId];
+    if (!descriptor) return null;
+    const localeIndex = chinese ? 1 : 0;
+    return {
+        commandId,
+        inputMode: descriptor.inputMode,
+        label: descriptor.label[localeIndex],
+        multiline: descriptor.multiline,
+        placeholder: descriptor.placeholder[localeIndex],
+        type: descriptor.type,
+    };
 }
