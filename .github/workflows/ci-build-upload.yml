@@ -15,10 +15,8 @@ jobs:
         steps:
 
           - name: Checkout Web-Apps
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
             with:
-                repository: onlyoffice/web-apps
-                ref: ${{github.ref}}
                 path: 'web-apps'
 
           - name: Path filter for help
@@ -43,10 +41,9 @@ jobs:
               fi
 
           - name: Checkout SDKJS
-            uses: actions/checkout@v3
+            uses: actions/checkout@v4
             with:
-                repository: onlyoffice/sdkjs
-                token: ${{ secrets.READ_PAT }}
+                repository: sunwayking/JetOnlyOffice-sdkjs
                 ref: ${{env.REF}}
                 path: 'sdkjs'
                 fetch-depth: '1'

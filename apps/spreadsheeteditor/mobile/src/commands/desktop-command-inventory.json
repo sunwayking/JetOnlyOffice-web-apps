@@ -1,0 +1,4837 @@
+{
+  "schemaVersion": 1,
+  "editor": "spreadsheet",
+  "source": {
+    "repository": "sunwayking/JetOnlyOffice-web-apps",
+    "commit": "9c0ca538c3b211052347df09d2a4d6781f023403",
+    "files": [
+      {
+        "path": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+        "sha256": "dd8045d66aa1f82f5c9b36682aba57228b3832cad00983314d23ea9a58879958"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/DataTab.js",
+        "sha256": "2cdaa56f6915421215262238f1bcb3ddc02dfe37146f203b387f6f527d0ecf3b"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+        "sha256": "89e62d0363b6c0942f14f76eacd85c88271c52e2cd5257855b375d6380e857d6"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+        "sha256": "58d445bbf4f67aa59e0fccdf85ba3f72eec507f40d576daff24dccf5b1565a23"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+        "sha256": "3b7683d942dff7b406b4bf99a58700a7f8633c3bb7946fad16ca3691b8c3b1f0"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/LeftMenu.js",
+        "sha256": "5779bc5089cf247a247eb32312ba00267a05400d6d927c1bfecb9ef9e371918b"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
+        "sha256": "e65ab00bdb46e4ecdb27b01afeb22320cd8744903f048e378423b7ea6cded047"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/SparklineTab.js",
+        "sha256": "da532275e2e1237a4de639c856e8fb3527ded2814a52931a8dadc6ef0b81a513"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/Statusbar.js",
+        "sha256": "18d2f195a90b276bb0fc3de768a9230019f8d8a0be70fef0d550935122a12905"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+        "sha256": "d40e747bf34a318063dcfaf89d86a8bc4d69699632798e6a62a80be5e28fb0d5"
+      },
+      {
+        "path": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
+        "sha256": "71bac3a162067d31e0b0008e82970b5961602f47b9398586b65d8f861c5aa969"
+      }
+    ]
+  },
+  "policy": {
+    "desktopReference": "P1",
+    "mobileReference": "Android ONLYOFFICE 9.4.1 P0",
+    "plannedImplementationIssues": [
+      8
+    ],
+    "excludedFeaturesAdr": "ADR-0040"
+  },
+  "commands": [
+    {
+      "id": "spreadsheet.clipboard.copy",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_Copy"
+      },
+      "mobilePath": "context.copy",
+      "testIds": [
+        "sse-provider-clipboard-copy"
+      ]
+    },
+    {
+      "id": "spreadsheet.clipboard.cut",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_Cut"
+      },
+      "mobilePath": "context.cut",
+      "testIds": [
+        "sse-provider-clipboard-cut"
+      ]
+    },
+    {
+      "id": "spreadsheet.clipboard.paste",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_Paste"
+      },
+      "mobilePath": "context.paste",
+      "testIds": [
+        "sse-provider-clipboard-paste"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.about",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-about"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.accounting-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-accounting-style"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.add-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.add-cell",
+      "testIds": [
+        "sse-issue-8-desktop-add-cell"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.advancedsearch",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-advancedsearch"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.auto-bordercolor",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-auto-bordercolor"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.auto-filter",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-auto-filter"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.autosum",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-autosum"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.back",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-back"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.calculate",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-calculate"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cancel",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-cancel"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.case",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-case"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cell-borders",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-cell-borders"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cell-group",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-cell-group"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cell-merge",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-cell-merge"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cell-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-cell-style"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cell-ungroup",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-cell-ungroup"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.change-case",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-change-case"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.chart-data",
+      "contexts": [
+        "chart"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.object",
+      "testIds": [
+        "sse-issue-8-desktop-chart-data"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.charttab",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-charttab"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.clear-filter",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-clear-filter"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.clear-style",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-clear-style"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.close-editor",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-close-editor"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.comma-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-comma-style"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.conditional-format",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-conditional-format"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.copy-style",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-copy-style"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.custom-border-color",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-custom-border-color"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.custom-color",
+      "contexts": [
+        "cell",
+        "worksheet"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-custom-color"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.cut",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-cut"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.decrease-decimal",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-decrease-decimal"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.decrease-font",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-decrease-font"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.delete-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-delete-cell"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.direction",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-direction"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.draw",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-draw"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.edit",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-edit"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.exit",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-exit"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.export-pdf",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-export-pdf"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.file-exit",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-file-exit"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.file-open",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-file-open"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.fill-color",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-fill-color"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.font-color",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-font-color"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.format-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-format-cell"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-datetime",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-datetime"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-financial",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-financial"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-logical",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-logical"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-math",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-math"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-more",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-more"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-recent",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-recent"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-reference",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-reference"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.formula-textdata",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-formula-textdata"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.freeze-panes",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-freeze-panes"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.halign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-halign"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.help",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-help"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.history",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-history"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.id-context-menu-item-add-comment",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-id-context-menu-item-add-comment"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.id-context-menu-item-add-named-range",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-id-context-menu-item-add-named-range"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.id-context-menu-item-view-add-comment",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-id-context-menu-item-view-add-comment"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.id-toolbar-btn-closeview",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-id-toolbar-btn-closeview"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.id-toolbar-btn-createview",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-id-toolbar-btn-createview"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.import-data",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-import-data"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.increase-decimal",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-increase-decimal"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.increase-font",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-increase-font"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.info",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-info"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-equation",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-equation",
+      "testIds": [
+        "sse-issue-8-desktop-insert-equation"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-formula",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-formula",
+      "testIds": [
+        "sse-issue-8-desktop-insert-formula"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-image",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-image",
+      "testIds": [
+        "sse-issue-8-desktop-insert-image"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-link",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-link",
+      "testIds": [
+        "sse-issue-8-desktop-insert-link"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-shape",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-shape",
+      "testIds": [
+        "sse-issue-8-desktop-insert-shape"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-smartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-smartart",
+      "testIds": [
+        "sse-issue-8-desktop-insert-smartart"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-sparkline",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-sparkline",
+      "testIds": [
+        "sse-issue-8-desktop-insert-sparkline"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-symbol",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-symbol",
+      "testIds": [
+        "sse-issue-8-desktop-insert-symbol"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-table",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-table",
+      "testIds": [
+        "sse-issue-8-desktop-insert-table"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-text",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-text",
+      "testIds": [
+        "sse-issue-8-desktop-insert-text"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insert-textart",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-textart",
+      "testIds": [
+        "sse-issue-8-desktop-insert-textart"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insertslicer",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertslicer",
+      "testIds": [
+        "sse-issue-8-desktop-insertslicer"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insertsmartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertsmartart",
+      "testIds": [
+        "sse-issue-8-desktop-insertsmartart"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.insertsymbol",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insertsymbol",
+      "testIds": [
+        "sse-issue-8-desktop-insertsymbol"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.interface-theme",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-interface-theme"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.named-ranges",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-named-ranges"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.new",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-new"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.number-fill",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-number-fill"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.object-align",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-object-align"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.object-backward",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.object",
+      "testIds": [
+        "sse-issue-8-desktop-object-backward"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.object-forward",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.object",
+      "testIds": [
+        "sse-issue-8-desktop-object-forward"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.object-group",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.object",
+      "testIds": [
+        "sse-issue-8-desktop-object-group"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.opts",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-opts"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.page-break",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-page-break"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.page-margins",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-page-margins"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.page-orient",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-page-orient"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.page-scale",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-page-scale"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.page-size",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-page-size"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pagebreak",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-pagebreak"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pagemargins",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-pagemargins"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pageorient",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-pageorient"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pagesize",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-pagesize"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.percent-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-percent-style"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pivot",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-pivot"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pivot-blank-rows",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-pivot-blank-rows"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pivot-grand-totals",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-pivot-grand-totals"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pivot-layout",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-pivot-layout"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pivot-refresh",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-pivot-refresh"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.pivot-subtotals",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-pivot-subtotals"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.print",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-print"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.print-area",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-print-area"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.printarea",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-printarea"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.printpreview",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-printpreview"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.printtitles",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-printtitles"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.protect",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-protect"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.recent",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-recent"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.recommended-chart",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-chart",
+      "testIds": [
+        "sse-issue-8-desktop-recommended-chart"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.rename",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-rename"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.replace",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-replace"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.review",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-review"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.rights",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-rights"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.save",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-save"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.save-2",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-save"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.save-copy",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-save-copy"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.save-desktop",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-save-desktop"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.saveas",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-saveas"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.scale",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-scale"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.search",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-search"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.select-all",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-select-all"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.shapes-merge",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-shapes-merge"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.sheet-view",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-sheet-view"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.sort-ascending",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-sort-ascending"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.sort-descending",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-sort-descending"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.sparklinetab",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-sparklinetab"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.strikeout",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-strikeout"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.subscript",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-subscript"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.suggest",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-suggest"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.support",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-support"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.table-template",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-table-template"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.tabledesign",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-tabledesign"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.text-direction",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-text-direction"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.text-orientation",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-text-orientation"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.theme-colors",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.layout",
+      "testIds": [
+        "sse-issue-8-desktop-theme-colors"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.underline",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-underline"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.valign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-valign"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.view",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "more.command-search",
+      "testIds": [
+        "sse-issue-8-desktop-view"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.visible-area",
+      "contexts": [
+        "worksheet"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.view",
+      "testIds": [
+        "sse-issue-8-desktop-visible-area"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.visible-area-close",
+      "contexts": [
+        "worksheet"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "settings.view",
+      "testIds": [
+        "sse-issue-8-desktop-visible-area-close"
+      ]
+    },
+    {
+      "id": "spreadsheet.desktop.wrap-text",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "edit.format",
+      "testIds": [
+        "sse-issue-8-desktop-wrap-text"
+      ]
+    },
+    {
+      "id": "spreadsheet.history.redo",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_Redo"
+      },
+      "mobilePath": "toolbar.redo",
+      "testIds": [
+        "sse-provider-history-redo"
+      ]
+    },
+    {
+      "id": "spreadsheet.history.undo",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_Undo"
+      },
+      "mobilePath": "toolbar.undo",
+      "testIds": [
+        "sse-provider-history-undo"
+      ]
+    },
+    {
+      "id": "spreadsheet.insert.chart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "planned",
+      "binding": null,
+      "mobilePath": "add.insert-chart",
+      "testIds": [
+        "sse-issue-8-insert-chart"
+      ]
+    },
+    {
+      "id": "spreadsheet.text.bold",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_setCellBold"
+      },
+      "mobilePath": "edit.text.bold",
+      "testIds": [
+        "sse-provider-text-bold"
+      ]
+    },
+    {
+      "id": "spreadsheet.text.italic",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdkjs",
+        "method": "asc_setCellItalic"
+      },
+      "mobilePath": "edit.text.italic",
+      "testIds": [
+        "sse-provider-text-italic"
+      ]
+    }
+  ],
+  "entries": [
+    {
+      "desktopKey": "cancel",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cancel",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "charttab",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.charttab",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "draw",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.draw",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "pivot",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pivot",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "protect",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.protect",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "review",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.review",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "sparklinetab",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.sparklinetab",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "tabledesign",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.tabledesign",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "view",
+      "desktopSource": "apps/spreadsheeteditor/main/app/controller/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.view",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "cell-group",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DataTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-group",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "cell-ungroup",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DataTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-ungroup",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "import-data",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DataTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.import-data",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-context-menu-cell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop navigation, layout, or selection-marker surface is represented by the Mobile task shell rather than an editor command."
+    },
+    {
+      "desktopKey": "id-context-menu-item-add-comment",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.id-context-menu-item-add-comment",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-context-menu-item-add-named-range",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.id-context-menu-item-add-named-range",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-context-menu-item-view-add-comment",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.id-context-menu-item-view-add-comment",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-markers-",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop navigation, layout, or selection-marker surface is represented by the Mobile task shell rather than an editor command."
+    },
+    {
+      "desktopKey": "id-numbers-",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/DocumentHolderExt.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop navigation, layout, or selection-marker surface is represented by the Mobile task shell rather than an editor command."
+    },
+    {
+      "desktopKey": "back",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.back",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "close-editor",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.close-editor",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "edit",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.edit",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "exit",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.exit",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "export-pdf",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.export-pdf",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "file:exit",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.file-exit",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "file:open",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.file-open",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "help",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.help",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "history",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.history",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "info",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.info",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "new",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.new",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "opts",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.opts",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "printpreview",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.printpreview",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "protect",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.protect",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "recent",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.recent",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "rename",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.rename",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "rights",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.rights",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "save",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.save-2",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "save-copy",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.save-copy",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "save-desktop",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.save-desktop",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "saveas",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.saveas",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "suggest",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.suggest",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "switch:mobile",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FileMenu.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop navigation, layout, or selection-marker surface is represented by the Mobile task shell rather than an editor command."
+    },
+    {
+      "desktopKey": "autosum",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.autosum",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "calculate",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.calculate",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-datetime",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-datetime",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-financial",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-financial",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-logical",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-logical",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-math",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-math",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-more",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-more",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-recent",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-recent",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-reference",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-reference",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "formula-textdata",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.formula-textdata",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "named-ranges",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/FormulaTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.named-ranges",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "about",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/LeftMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.about",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "advancedsearch",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/LeftMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.advancedsearch",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "support",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/LeftMenu.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.support",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "pivot-blank-rows",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pivot-blank-rows",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "pivot-grand-totals",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pivot-grand-totals",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "pivot-layout",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pivot-layout",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "pivot-refresh",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pivot-refresh",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "pivot-subtotals",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/PivotTable.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pivot-subtotals",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "sheet-view",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/SparklineTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.sheet-view",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-tab-menu-new-color",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Statusbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop navigation, layout, or selection-marker surface is represented by the Mobile task shell rather than an editor command."
+    },
+    {
+      "desktopKey": "accounting-style",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.accounting-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "add-cell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.add-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.add-cell"
+    },
+    {
+      "desktopKey": "autosum",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.autosum",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "cell-borders",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-borders",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "cell-merge",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-merge",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "change-case",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.change-case",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "clear-style",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.clear-style",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "conditional-format",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.conditional-format",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "data",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "delete-cell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.delete-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "file",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "format-cell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.format-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "formula",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "home",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "id-toolbar-btn-accounting-style",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.accounting-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-addcell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.add-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.add-cell"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-align-center",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.halign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-align-just",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.halign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-align-left",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.halign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-align-right",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.halign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-bold",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.text.bold",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.text.bold"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-borders",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-borders",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-case",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.case",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-clear",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.clear-style",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-clearfilter",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.clear-filter",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-colorschemas",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.theme-colors",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-comma-style",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.comma-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-condformat",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.conditional-format",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-copy",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.clipboard.copy",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "context.copy"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-copystyle",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.copy-style",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-cstyle",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-cut",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cut",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-decdecimal",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.decrease-decimal",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-decfont",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.decrease-font",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-delcell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.delete-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-direction",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.direction",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-fill-num",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.number-fill",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-fillparag",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.fill-color",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-fontcolor",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.font-color",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-formatcell",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.format-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-formatting",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop toolbar overflow container is represented by the Mobile edit panel and is not an editor command."
+    },
+    {
+      "desktopKey": "id-toolbar-btn-halign",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.halign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-incdecimal",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.increase-decimal",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-incfont",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.increase-font",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-insertformula",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-formula",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-formula"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-insertrange",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.add-cell",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.add-cell"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-italic",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.text.italic",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.text.italic"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-paste",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.clipboard.paste",
+      "contexts": [
+        "cell",
+        "object",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "context.paste"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-percent-style",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.percent-style",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-print",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.print",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-redo",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.history.redo",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "toolbar.redo"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-replace",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.replace",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-save",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.save",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-search",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.search",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-select-all",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.select-all",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "view",
+        "edit",
+        "review",
+        "comment",
+        "fillForms"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-setautofilter",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.auto-filter",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-sort-down",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.sort-descending",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-sort-up",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.sort-ascending",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-strikeout",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.strikeout",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-subscript",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.subscript",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-ttempl",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.table-template",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-underline",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.underline",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-undo",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.history.undo",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "toolbar.undo"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-valign",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.valign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-visible-area",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.visible-area",
+      "contexts": [
+        "worksheet"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.view"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-visible-area-close",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.visible-area-close",
+      "contexts": [
+        "worksheet"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.view"
+    },
+    {
+      "desktopKey": "id-toolbar-menu-auto-bordercolor",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.auto-bordercolor",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-menu-new-bordercolor",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.custom-border-color",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-menu-new-color",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.custom-color",
+      "contexts": [
+        "cell",
+        "worksheet"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-mnu-item-border-color",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.custom-border-color",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-mnu-item-border-width",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-borders",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-edit-chart-data",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.chart-data",
+      "contexts": [
+        "chart"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.object"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-merge",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-merge",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-textorient",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.text-orientation",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-valign-bottom",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.valign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-valign-middle",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.valign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-valign-top",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.valign",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "id-toolbar-rtn-wrap",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.wrap-text",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "ins",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "insert-chart",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.insert.chart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-chart"
+    },
+    {
+      "desktopKey": "insert-equation",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-equation",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-equation"
+    },
+    {
+      "desktopKey": "insert-image",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-image",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-image"
+    },
+    {
+      "desktopKey": "insert-shape",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-shape",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-shape"
+    },
+    {
+      "desktopKey": "insert-smartart",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-smartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-smartart"
+    },
+    {
+      "desktopKey": "insert-sparkline",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-sparkline",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-sparkline"
+    },
+    {
+      "desktopKey": "insert-symbol",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-symbol",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-symbol"
+    },
+    {
+      "desktopKey": "insert-text",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-text",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-text"
+    },
+    {
+      "desktopKey": "insert-textart",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-textart",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-textart"
+    },
+    {
+      "desktopKey": "layout",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "excluded",
+      "adr": "ADR-0008",
+      "reason": "Desktop ribbon navigation is layout-specific and is represented by Mobile task panels rather than an editor command."
+    },
+    {
+      "desktopKey": "named-ranges",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.named-ranges",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "number-fill",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.number-fill",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "object-align",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.object-align",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "object-backward",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.object-backward",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.object"
+    },
+    {
+      "desktopKey": "object-forward",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.object-forward",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.object"
+    },
+    {
+      "desktopKey": "object-group",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.object-group",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.object"
+    },
+    {
+      "desktopKey": "page-break",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.page-break",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "page-margins",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.page-margins",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "page-orient",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.page-orient",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "page-scale",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.page-scale",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "page-size",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.page-size",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "print-area",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.print-area",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "shapes-merge",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.shapes-merge",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "text-direction",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.text-direction",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "text-orientation",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.text-orientation",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "theme-colors",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.theme-colors",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "tlbtn-insertchart",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.insert.chart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-chart"
+    },
+    {
+      "desktopKey": "tlbtn-insertchartrecommend",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.recommended-chart",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-chart"
+    },
+    {
+      "desktopKey": "tlbtn-insertequation",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-equation",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-equation"
+    },
+    {
+      "desktopKey": "tlbtn-insertimage",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-image",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-image"
+    },
+    {
+      "desktopKey": "tlbtn-insertlink",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-link",
+      "contexts": [
+        "cell",
+        "text"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-link"
+    },
+    {
+      "desktopKey": "tlbtn-insertshape",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-shape",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-shape"
+    },
+    {
+      "desktopKey": "tlbtn-insertslicer",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insertslicer",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertslicer"
+    },
+    {
+      "desktopKey": "tlbtn-insertsmartart",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insertsmartart",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertsmartart"
+    },
+    {
+      "desktopKey": "tlbtn-insertsparkline",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-sparkline",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-sparkline"
+    },
+    {
+      "desktopKey": "tlbtn-insertsymbol",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insertsymbol",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insertsymbol"
+    },
+    {
+      "desktopKey": "tlbtn-inserttable",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-table",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-table"
+    },
+    {
+      "desktopKey": "tlbtn-inserttext",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-text",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-text"
+    },
+    {
+      "desktopKey": "tlbtn-inserttextart",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.insert-textart",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "add.insert-textart"
+    },
+    {
+      "desktopKey": "tlbtn-pagebreak",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pagebreak",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "tlbtn-pagemargins",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pagemargins",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "tlbtn-pageorient",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pageorient",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "tlbtn-pagesize",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.pagesize",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "settings.layout"
+    },
+    {
+      "desktopKey": "tlbtn-printarea",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.printarea",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "tlbtn-printtitles",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.printtitles",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "tlbtn-scale",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.scale",
+      "contexts": [
+        "workbook"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "toolbar-menu-borders-width",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/Toolbar.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.cell-borders",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "edit.format"
+    },
+    {
+      "desktopKey": "freeze-panes",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.freeze-panes",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-closeview",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.id-toolbar-btn-closeview",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "id-toolbar-btn-createview",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.id-toolbar-btn-createview",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "interface-theme",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.interface-theme",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    },
+    {
+      "desktopKey": "sheet-view",
+      "desktopSource": "apps/spreadsheeteditor/main/app/view/ViewTab.js",
+      "disposition": "catalog",
+      "commandId": "spreadsheet.desktop.sheet-view",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "mobilePath": "more.command-search"
+    }
+  ]
+}
