@@ -84,6 +84,8 @@ test('Mobile editor routing keeps phones on Mobile and sends 600px-short-edge ta
     const viewports = [
         {height: 844, pathType: 'mobile', width: 390},
         {height: 390, pathType: 'mobile', width: 844},
+        {height: 960, pathType: 'mobile', width: 599},
+        {height: 599, pathType: 'mobile', width: 960},
         {height: 960, pathType: 'main', width: 600},
         {height: 600, pathType: 'main', width: 960},
     ];

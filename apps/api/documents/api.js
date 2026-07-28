@@ -1095,10 +1095,12 @@
         }
     }
 
+    const TABLET_MIN_SHORT_EDGE = 600;
+
     function correct_app_type(config) {
         if ( config.type == 'mobile' ) {
             const viewportShortEdge = Math.min(window.innerWidth, window.innerHeight);
-            if ( Number.isFinite(viewportShortEdge) && viewportShortEdge >= 600 ) {
+            if ( Number.isFinite(viewportShortEdge) && viewportShortEdge >= TABLET_MIN_SHORT_EDGE ) {
                 config.editorConfig.forceDesktop = true;
                 return 'desktop';
             }
