@@ -256,4 +256,15 @@ export function getActiveEditorRuntime() {
     return activeEditorRuntime;
 }
 
+export function executeActiveEditorCommand(commandId, payload) {
+    if (!activeEditorRuntime) {
+        throw runtimeError(
+            'MOBILE_RUNTIME_UNAVAILABLE',
+            'An active Editor Runtime is required for shared Mobile commands',
+            {commandId}
+        );
+    }
+    return activeEditorRuntime.execute(commandId, payload);
+}
+
 export default createEditorRuntime;

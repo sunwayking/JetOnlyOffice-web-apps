@@ -41,7 +41,7 @@ import { withTranslation} from 'react-i18next';
 import { LocalStorage } from '../../../utils/LocalStorage.mjs';
 import {
     COMMON_COMMAND_IDS,
-    getActiveEditorRuntime
+    executeActiveEditorCommand
 } from '../../runtime/createEditorRuntime.mjs';
 
 import {AddComment, EditComment, AddReply, EditReply, ViewComments, ViewCurrentComments} from '../../view/collaboration/Comments';
@@ -332,7 +332,6 @@ class AddCommentController extends Component {
         };
     }
     onAddNewComment (commentText, documentFlag) {
-        const api = Common.EditorApi.get();
         let comment;
         if (typeof Asc.asc_CCommentDataWord !== 'undefined') {
             comment = new Asc.asc_CCommentDataWord(null);
@@ -349,12 +348,7 @@ class AddCommentController extends Component {
 
             !!comment.asc_putDocumentFlag && comment.asc_putDocumentFlag(documentFlag);
 
-            const runtime = getActiveEditorRuntime();
-            if (runtime?.resolve(COMMON_COMMAND_IDS.ADD_COMMENT)) {
-                runtime.execute(COMMON_COMMAND_IDS.ADD_COMMENT, {comment});
-            } else {
-                api.asc_addComment(comment);
-            }
+            executeActiveEditorCommand(COMMON_COMMAND_IDS.ADD_COMMENT, {comment});
             Common.Notifications.trigger('viewcomment');
         }
     }

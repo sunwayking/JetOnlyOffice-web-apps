@@ -8,6 +8,7 @@ import test from 'node:test';
 
 import {
     createEditorRuntime,
+    executeActiveEditorCommand,
     getActiveEditorRuntime,
     setActiveEditorRuntime
 } from './createEditorRuntime.mjs';
@@ -225,4 +226,23 @@ test('publishes one active runtime for shared Mobile controllers', () => {
     assert.equal(getActiveEditorRuntime(), runtime);
     setActiveEditorRuntime(null);
     assert.equal(getActiveEditorRuntime(), null);
+});
+
+test('shared controllers cannot bypass a missing or restricted active runtime', () => {
+    setActiveEditorRuntime(null);
+    assert.throws(
+        () => executeActiveEditorCommand('common.comment.add', {text: 'blocked'}),
+        error => error.code === 'MOBILE_RUNTIME_UNAVAILABLE'
+    );
+
+    const adapter = createAdapter();
+    const runtime = createEditorRuntime({adapter, permissions: {comment: false}});
+    markReady(adapter);
+    setActiveEditorRuntime(runtime);
+
+    assert.throws(
+        () => executeActiveEditorCommand('common.comment.add', {text: 'blocked'}),
+        error => error.code === 'MOBILE_COMMAND_PERMISSION_DENIED'
+    );
+    setActiveEditorRuntime(null);
 });
