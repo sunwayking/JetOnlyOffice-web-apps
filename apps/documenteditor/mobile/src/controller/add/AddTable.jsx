@@ -39,6 +39,7 @@ import {Device} from '../../../../../common/mobile/utils/device';
 import {observer, inject} from "mobx-react";
 import { withTranslation } from 'react-i18next';
 import AddTable from '../../view/add/AddTable';
+import {executeWordCommand} from '../../lib/wordEditorRuntime.mjs';
 
 class AddTableController extends Component {
     constructor (props) {
@@ -55,8 +56,6 @@ class AddTableController extends Component {
     }
 
     onStyleClick (type) {
-        const api = Common.EditorApi.get();
-
         this.closeModal();
 
         const { t } = this.props;
@@ -85,7 +84,11 @@ class AddTableController extends Component {
                     onClick: function () {
                         const size = picker.value;
 
-                        api.put_Table(parseInt(size[0]), parseInt(size[1]), type.toString());
+                        executeWordCommand('word.table.insert', {
+                            columns: parseInt(size[0]),
+                            rows: parseInt(size[1]),
+                            style: type.toString()
+                        });
                     }
                 }
             ],
