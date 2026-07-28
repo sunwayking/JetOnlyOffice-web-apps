@@ -11,6 +11,15 @@ import {
 const inventoryUrl = new URL('../src/commands/desktop-command-inventory.json', import.meta.url);
 const inventory = JSON.parse(await readFile(inventoryUrl, 'utf8'));
 const editorRoot = new URL('../../../../', import.meta.url);
+const implementedBindingTestIds = new Set([
+    'sse-provider-clipboard-copy',
+    'sse-provider-clipboard-cut',
+    'sse-provider-clipboard-paste',
+    'sse-provider-history-redo',
+    'sse-provider-history-undo',
+    'sse-provider-text-bold',
+    'sse-provider-text-italic',
+]);
 
 const extractDesktopSurfaceKeys = source => {
     const keys = new Set();
@@ -36,7 +45,7 @@ test('spreadsheet inventory is locked to the audited Desktop sources', async () 
 
 test('spreadsheet inventory maps every entry to a catalog command or ADR exclusion', () => {
     assert.ok(inventory.entries.length >= 60);
-    assert.equal(new Set(inventory.entries.map(entry => entry.desktopKey)).size, inventory.entries.length);
+    assert.equal(new Set(inventory.entries.map(entry => `${entry.desktopSource}|${entry.desktopKey}`)).size, inventory.entries.length);
     const commandIds = new Set(inventory.commands.map(command => command.id));
     const permissionProfiles = new Set(['view', 'edit', 'review', 'comment', 'fillForms']);
     assert.equal(commandIds.size, inventory.commands.length);
@@ -49,6 +58,11 @@ test('spreadsheet inventory maps every entry to a catalog command or ADR exclusi
         assert.ok(command.mobilePath);
         assert.ok(command.testIds.length > 0, command.id);
         assert.ok(command.testIds.every(testId => typeof testId === 'string' && testId.length > 0));
+        if (command.implementation === 'implemented') {
+            assert.ok(command.testIds.every(testId => implementedBindingTestIds.has(testId)), command.id);
+        } else {
+            assert.ok(command.testIds.every(testId => /^sse-issue-8-(?:desktop-)?[a-z0-9-]+$/.test(testId)), command.id);
+        }
         assert.ok(['implemented', 'planned'].includes(command.implementation));
         if (command.implementation === 'implemented') assert.ok(command.binding && command.binding.method);
         else assert.equal(command.binding, null);
@@ -72,15 +86,15 @@ test('spreadsheet inventory maps every entry to a catalog command or ADR exclusi
     }
 });
 
-test('spreadsheet inventory covers every locked Desktop toolbar surface', async () => {
-    const viewSource = inventory.source.files.find(source => source.path.endsWith('/view/Toolbar.js'));
-    const source = await readFile(new URL(viewSource.path, editorRoot), 'utf8');
-    const inventoryKeys = inventory.entries
-        .filter(entry => entry.desktopSource === viewSource.path)
-        .map(entry => entry.desktopKey)
-        .sort();
-
-    assert.deepEqual(inventoryKeys, extractDesktopSurfaceKeys(source));
+test('spreadsheet inventory covers every locked Desktop command surface', async () => {
+    for (const sourceFile of inventory.source.files) {
+        const source = await readFile(new URL(sourceFile.path, editorRoot), 'utf8');
+        const inventoryKeys = inventory.entries
+            .filter(entry => entry.desktopSource === sourceFile.path)
+            .map(entry => entry.desktopKey)
+            .sort();
+        assert.deepEqual(inventoryKeys, extractDesktopSurfaceKeys(source), sourceFile.path);
+    }
 });
 
 test('spreadsheet provider implements the shared Runtime adapter contract and first SDKJS bindings', () => {
@@ -109,11 +123,25 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
     ]) assert.equal(typeof provider[method], 'function', method);
 
     assert.equal(provider.execute('spreadsheet.history.undo'), 1);
-    assert.equal(provider.execute('spreadsheet.text.bold', { value: true }), 2);
+    assert.equal(provider.execute('spreadsheet.history.redo'), 2);
+    assert.equal(provider.execute('spreadsheet.clipboard.copy'), 3);
+    assert.equal(provider.execute('spreadsheet.clipboard.cut'), 4);
+    assert.equal(provider.execute('spreadsheet.clipboard.paste'), 5);
+    assert.equal(provider.execute('spreadsheet.text.bold', { value: true }), 6);
+    assert.equal(provider.execute('spreadsheet.text.italic', { value: false }), 7);
     assert.deepEqual(calls, [
         ['asc_Undo'],
+        ['asc_Redo'],
+        ['asc_Copy'],
+        ['asc_Cut'],
+        ['asc_Paste'],
         ['asc_setCellBold', true],
+        ['asc_setCellItalic', false],
     ]);
+    assert.deepEqual(
+        new Set(inventory.commands.filter(command => command.implementation === 'implemented').flatMap(command => command.testIds)),
+        implementedBindingTestIds,
+    );
 
     assert.equal(provider.getSelectionSnapshot(), selection);
     assert.deepEqual(provider.resolveContextMenu({ commands: ['copy'] }), ['copy']);
