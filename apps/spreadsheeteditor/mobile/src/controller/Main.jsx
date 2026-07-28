@@ -58,6 +58,11 @@ import { StatusbarController } from "./Statusbar";
 import { Device } from '../../../../common/mobile/utils/device';
 import { Themes } from '../../../../common/mobile/lib/controller/Themes.jsx';
 import { processArrayScripts } from '../../../../common/mobile/utils/processArrayScripts.js';
+import {
+    disposeSpreadsheetEditorRuntime,
+    initializeSpreadsheetEditorRuntime,
+    updateSpreadsheetEditorPermissions,
+} from '../lib/spreadsheetEditorRuntime.mjs';
 import '../../../../common/main/lib/util/LanguageInfo.js'
 
 @inject(
@@ -369,6 +374,12 @@ class MainController extends Component {
                 appOptions.setPermissionOptions(this.document, licType, params, this.permissions, EditorUIController.isSupportEditFeature());
 
                 this.applyMode(appOptions);
+                updateSpreadsheetEditorPermissions({
+                    edit: appOptions.isEdit,
+                    review: appOptions.canReview,
+                    comment: appOptions.canComments,
+                    fillForms: appOptions.canFillForms,
+                });
 
                 this._isPermissionsInited = true;
 
@@ -395,6 +406,10 @@ class MainController extends Component {
                         'mobile': true,
                         'translate': _translate,
                         'isRtlInterface': Common.Locale.isCurrentLangRtl
+                    });
+                    initializeSpreadsheetEditorRuntime({
+                        inventory: EditorUIController.getCommandProvider().inventory,
+                        getApi: () => this.api,
                     });
 
                     Common.Notifications.trigger('engineCreated', this.api);
@@ -1443,6 +1458,10 @@ class MainController extends Component {
     componentDidMount() {
         Common.EditorApi = {get: () => this.api};
         this.initSdk();
+    }
+
+    componentWillUnmount() {
+        disposeSpreadsheetEditorRuntime();
     }
 }
 

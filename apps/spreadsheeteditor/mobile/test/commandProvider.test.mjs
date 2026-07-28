@@ -7,6 +7,11 @@ import {
     createEditorUIControllerFacade,
     createSpreadsheetCommandProvider,
 } from '../src/lib/commandProvider.mjs';
+import {
+    disposeSpreadsheetEditorRuntime,
+    initializeSpreadsheetEditorRuntime,
+    updateSpreadsheetEditorPermissions,
+} from '../src/lib/spreadsheetEditorRuntime.mjs';
 
 const inventoryUrl = new URL('../src/commands/desktop-command-inventory.json', import.meta.url);
 const inventory = JSON.parse(await readFile(inventoryUrl, 'utf8'));
@@ -115,6 +120,9 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
         asc_Paste: (...args) => calls.push(['asc_Paste', ...args]),
         asc_setCellBold: (...args) => calls.push(['asc_setCellBold', ...args]),
         asc_setCellItalic: (...args) => calls.push(['asc_setCellItalic', ...args]),
+        asc_addComment: (...args) => calls.push(['asc_addComment', ...args]),
+        asc_registerCallback() {},
+        asc_unregisterCallback() {},
     };
     const provider = createSpreadsheetCommandProvider({ inventory, getApi: () => api });
 
@@ -135,6 +143,8 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
     assert.equal(provider.execute('spreadsheet.clipboard.paste'), 5);
     assert.equal(provider.execute('spreadsheet.text.bold', { value: true }), 6);
     assert.equal(provider.execute('spreadsheet.text.italic', { value: false }), 7);
+    const comment = { text: 'runtime comment' };
+    assert.equal(provider.execute('common.comment.add', { comment }), 8);
     assert.deepEqual(calls, [
         ['asc_Undo'],
         ['asc_Redo'],
@@ -143,6 +153,7 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
         ['asc_Paste'],
         ['asc_setCellBold', true],
         ['asc_setCellItalic', false],
+        ['asc_addComment', comment],
     ]);
     assert.deepEqual(
         new Set(inventory.commands.filter(command => command.implementation === 'implemented').flatMap(command => command.testIds)),
@@ -156,8 +167,9 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
     assert.doesNotThrow(() => provider.restoreViewState({ scrollTop: 20 }));
 
     const descriptors = provider.getCommandDescriptors();
-    assert.equal(descriptors.length, 7);
+    assert.equal(descriptors.length, 8);
     assert.equal(descriptors.find(command => command.id === 'spreadsheet.clipboard.copy').permission, 'view');
+    assert.equal(descriptors.find(command => command.id === 'common.comment.add').permission, 'comment');
     assert.throws(
         () => provider.execute('spreadsheet.insert.chart'),
         error => error.code === 'MOBILE_COMMAND_NOT_IMPLEMENTED',
@@ -165,6 +177,52 @@ test('spreadsheet provider implements the shared Runtime adapter contract and fi
     assert.throws(
         () => provider.execute('spreadsheet.missing'),
         error => error.code === 'MOBILE_COMMAND_NOT_FOUND',
+    );
+});
+
+test('spreadsheet Runtime owns lifecycle callbacks, permissions, and disposal', () => {
+    const callbacks = new Map();
+    const comments = [];
+    const api = {
+        asc_registerCallback(name, callback) {
+            callbacks.set(name, callback);
+        },
+        asc_unregisterCallback(name, callback) {
+            if (callbacks.get(name) === callback) callbacks.delete(name);
+        },
+        asc_addComment(comment) {
+            comments.push(comment);
+        },
+    };
+
+    const runtime = initializeSpreadsheetEditorRuntime({ inventory, getApi: () => api });
+    assert.deepEqual([...callbacks.keys()].sort(), [
+        'asc_onDocumentOpenStateChanged',
+        'asc_onServerSaveStateChanged',
+        'asc_onTransportStateChanged',
+    ]);
+
+    callbacks.get('asc_onTransportStateChanged')({ state: 'connected' });
+    callbacks.get('asc_onDocumentOpenStateChanged')({ phase: 'ready' });
+    assert.equal(runtime.resolve('common.comment.add').reason, 'permission-denied');
+
+    updateSpreadsheetEditorPermissions({ edit: true, comment: true });
+    const comment = { text: 'allowed' };
+    runtime.execute('common.comment.add', { comment });
+    callbacks.get('asc_onServerSaveStateChanged')({ state: 'accepted', scope: 'coauthoring-server' });
+
+    assert.deepEqual(comments, [comment]);
+    assert.deepEqual(runtime.getSession(), {
+        open: { phase: 'ready' },
+        transport: { state: 'connected' },
+        save: { state: 'accepted', scope: 'coauthoring-server' },
+    });
+
+    disposeSpreadsheetEditorRuntime();
+    assert.equal(callbacks.size, 0);
+    assert.throws(
+        () => runtime.getSession(),
+        error => error.code === 'MOBILE_RUNTIME_DISPOSED',
     );
 });
 

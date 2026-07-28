@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import { COMMON_COMMAND_IDS } from '../../../../common/mobile/lib/runtime/createEditorRuntime.mjs';
+
 const payloadArguments = payload => {
     if (payload === undefined) return [];
     if (payload === null) return [null];
@@ -45,7 +47,12 @@ export const createSpreadsheetCommandProvider = ({
             permission: command.permissions.includes('view') ? 'view' : command.permissions[0],
             contexts: Object.freeze(command.contexts.slice()),
             mobilePath: command.mobilePath,
+        }))
+        .concat(Object.freeze({
+            id: COMMON_COMMAND_IDS.ADD_COMMENT,
+            permission: 'comment',
         })));
+    const detachSubscriptions = new Set();
     let disposed = false;
 
     const assertActive = () => {
@@ -66,6 +73,9 @@ export const createSpreadsheetCommandProvider = ({
 
     const execute = (id, payload) => {
         assertActive();
+        if (id === COMMON_COMMAND_IDS.ADD_COMMENT) {
+            return requireApi().asc_addComment(payload?.comment);
+        }
         const command = getCommand(id);
         if (!command) {
             throw providerError('MOBILE_COMMAND_NOT_FOUND', `Unknown Spreadsheet command: ${id}`, { commandId: id });
@@ -113,8 +123,30 @@ export const createSpreadsheetCommandProvider = ({
         subscribeState(sink) {
             assertActive();
             if (typeof sink !== 'function') throw new TypeError('Spreadsheet adapter state sink must be a function');
-            if (typeof subscribeState === 'function') return subscribeState(sink);
-            return () => {};
+            if (typeof subscribeState === 'function') {
+                const detach = subscribeState(sink);
+                if (typeof detach !== 'function') return () => {};
+                const trackedDetach = () => {
+                    detachSubscriptions.delete(trackedDetach);
+                    detach();
+                };
+                detachSubscriptions.add(trackedDetach);
+                return trackedDetach;
+            }
+
+            const api = requireApi();
+            const callbacks = [
+                ['asc_onDocumentOpenStateChanged', fact => sink({ type: 'document-open', ...fact })],
+                ['asc_onTransportStateChanged', fact => sink({ type: 'transport', ...fact })],
+                ['asc_onServerSaveStateChanged', fact => sink({ type: 'server-save', ...fact })],
+            ];
+            callbacks.forEach(([name, callback]) => api.asc_registerCallback(name, callback));
+            const detach = () => {
+                callbacks.forEach(([name, callback]) => api.asc_unregisterCallback(name, callback));
+                detachSubscriptions.delete(detach);
+            };
+            detachSubscriptions.add(detach);
+            return detach;
         },
 
         getCommandDescriptors() {
@@ -144,6 +176,7 @@ export const createSpreadsheetCommandProvider = ({
         dispose() {
             if (disposed) return;
             disposed = true;
+            Array.from(detachSubscriptions).forEach(detach => detach());
             handlers.clear();
         },
     });

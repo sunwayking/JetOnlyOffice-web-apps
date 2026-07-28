@@ -7,6 +7,11 @@ import {
     createEditorUIControllerFacade,
     createPresentationCommandProvider,
 } from '../src/lib/commandProvider.mjs';
+import {
+    disposePresentationEditorRuntime,
+    initializePresentationEditorRuntime,
+    updatePresentationEditorPermissions,
+} from '../src/lib/presentationEditorRuntime.mjs';
 
 const inventoryUrl = new URL('../src/commands/desktop-command-inventory.json', import.meta.url);
 const inventory = JSON.parse(await readFile(inventoryUrl, 'utf8'));
@@ -115,6 +120,9 @@ test('presentation provider implements the shared Runtime adapter contract and f
         Paste: (...args) => calls.push(['Paste', ...args]),
         put_TextPrBold: (...args) => calls.push(['put_TextPrBold', ...args]),
         put_TextPrItalic: (...args) => calls.push(['put_TextPrItalic', ...args]),
+        asc_addComment: (...args) => calls.push(['asc_addComment', ...args]),
+        asc_registerCallback() {},
+        asc_unregisterCallback() {},
     };
     const provider = createPresentationCommandProvider({ inventory, getApi: () => api });
 
@@ -135,6 +143,8 @@ test('presentation provider implements the shared Runtime adapter contract and f
     assert.equal(provider.execute('presentation.clipboard.paste'), 5);
     assert.equal(provider.execute('presentation.text.bold', { value: true }), 6);
     assert.equal(provider.execute('presentation.text.italic', { value: false }), 7);
+    const comment = { text: 'runtime comment' };
+    assert.equal(provider.execute('common.comment.add', { comment }), 8);
     assert.deepEqual(calls, [
         ['Undo'],
         ['Redo'],
@@ -143,6 +153,7 @@ test('presentation provider implements the shared Runtime adapter contract and f
         ['Paste'],
         ['put_TextPrBold', true],
         ['put_TextPrItalic', false],
+        ['asc_addComment', comment],
     ]);
     assert.deepEqual(
         new Set(inventory.commands.filter(command => command.implementation === 'implemented').flatMap(command => command.testIds)),
@@ -156,8 +167,9 @@ test('presentation provider implements the shared Runtime adapter contract and f
     assert.doesNotThrow(() => provider.restoreViewState({ slide: 4 }));
 
     const descriptors = provider.getCommandDescriptors();
-    assert.equal(descriptors.length, 7);
+    assert.equal(descriptors.length, 8);
     assert.equal(descriptors.find(command => command.id === 'presentation.clipboard.copy').permission, 'view');
+    assert.equal(descriptors.find(command => command.id === 'common.comment.add').permission, 'comment');
     assert.throws(
         () => provider.execute('presentation.insert.chart'),
         error => error.code === 'MOBILE_COMMAND_NOT_IMPLEMENTED',
@@ -165,6 +177,52 @@ test('presentation provider implements the shared Runtime adapter contract and f
     assert.throws(
         () => provider.execute('presentation.missing'),
         error => error.code === 'MOBILE_COMMAND_NOT_FOUND',
+    );
+});
+
+test('presentation Runtime owns lifecycle callbacks, permissions, and disposal', () => {
+    const callbacks = new Map();
+    const comments = [];
+    const api = {
+        asc_registerCallback(name, callback) {
+            callbacks.set(name, callback);
+        },
+        asc_unregisterCallback(name, callback) {
+            if (callbacks.get(name) === callback) callbacks.delete(name);
+        },
+        asc_addComment(comment) {
+            comments.push(comment);
+        },
+    };
+
+    const runtime = initializePresentationEditorRuntime({ inventory, getApi: () => api });
+    assert.deepEqual([...callbacks.keys()].sort(), [
+        'asc_onDocumentOpenStateChanged',
+        'asc_onServerSaveStateChanged',
+        'asc_onTransportStateChanged',
+    ]);
+
+    callbacks.get('asc_onTransportStateChanged')({ state: 'connected' });
+    callbacks.get('asc_onDocumentOpenStateChanged')({ phase: 'ready' });
+    assert.equal(runtime.resolve('common.comment.add').reason, 'permission-denied');
+
+    updatePresentationEditorPermissions({ edit: true, comment: true });
+    const comment = { text: 'allowed' };
+    runtime.execute('common.comment.add', { comment });
+    callbacks.get('asc_onServerSaveStateChanged')({ state: 'accepted', scope: 'coauthoring-server' });
+
+    assert.deepEqual(comments, [comment]);
+    assert.deepEqual(runtime.getSession(), {
+        open: { phase: 'ready' },
+        transport: { state: 'connected' },
+        save: { state: 'accepted', scope: 'coauthoring-server' },
+    });
+
+    disposePresentationEditorRuntime();
+    assert.equal(callbacks.size, 0);
+    assert.throws(
+        () => runtime.getSession(),
+        error => error.code === 'MOBILE_RUNTIME_DISPOSED',
     );
 });
 

@@ -51,6 +51,11 @@ import PluginsController from '../../../../common/mobile/lib/controller/Plugins.
 import { Device } from '../../../../common/mobile/utils/device';
 import { Themes } from '../../../../common/mobile/lib/controller/Themes.jsx';
 import { processArrayScripts } from '../../../../common/mobile/utils/processArrayScripts.js';
+import {
+    disposePresentationEditorRuntime,
+    initializePresentationEditorRuntime,
+    updatePresentationEditorPermissions,
+} from '../lib/presentationEditorRuntime.mjs';
 import '../../../../common/main/lib/util/LanguageInfo.js'
 
 @inject(
@@ -270,6 +275,12 @@ class MainController extends Component {
                 const storeAppOptions = this.props.storeAppOptions;
                 storeAppOptions.setPermissionOptions(this.document, licType, params, this.permissions, EditorUIController.isSupportEditFeature());
                 this.applyMode(storeAppOptions);
+                updatePresentationEditorPermissions({
+                    edit: storeAppOptions.isEdit,
+                    review: storeAppOptions.canReview,
+                    comment: storeAppOptions.canComments,
+                    fillForms: storeAppOptions.canFillForms,
+                });
 
                 this._isPermissionsInited = true;
 
@@ -292,6 +303,10 @@ class MainController extends Component {
                         'translate': _translate,
                         'isRtlInterface': Common.Locale.isCurrentLangRtl,
                         'thumbnails-position': 'bottom'
+                    });
+                    initializePresentationEditorRuntime({
+                        inventory: EditorUIController.getCommandProvider().inventory,
+                        getApi: () => this.api,
                     });
 
                     Common.Notifications.trigger('engineCreated', this.api);
@@ -1275,6 +1290,10 @@ class MainController extends Component {
     componentDidMount () {
         Common.EditorApi = {get: () => this.api};
         this.initSdk();
+    }
+
+    componentWillUnmount () {
+        disposePresentationEditorRuntime();
     }
 }
 
