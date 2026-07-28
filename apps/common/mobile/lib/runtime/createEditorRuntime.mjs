@@ -101,10 +101,37 @@ function validateAdapter(adapter) {
 }
 
 function isAllowed(descriptor, permissions) {
+    if (Array.isArray(descriptor.permissionsAny) && descriptor.permissionsAny.length) {
+        return descriptor.permissionsAny.some(permission => permissions[permission] === true);
+    }
     if (!descriptor.permission || descriptor.permission === 'view') {
         return true;
     }
     return permissions[descriptor.permission] === true;
+}
+
+function normalizeDescriptor(descriptor) {
+    if (Object.prototype.hasOwnProperty.call(descriptor, 'permissionsAny')) {
+        const permissionsAny = descriptor.permissionsAny;
+        if (
+            !Array.isArray(permissionsAny) ||
+            permissionsAny.length === 0 ||
+            permissionsAny.some(permission => typeof permission !== 'string' || !permission) ||
+            new Set(permissionsAny).size !== permissionsAny.length ||
+            descriptor.permission
+        ) {
+            throw runtimeError(
+                'MOBILE_COMMAND_DESCRIPTOR_INVALID',
+                'permissionsAny must contain unique permission names and cannot be combined with permission',
+                {descriptor}
+            );
+        }
+        return Object.freeze({
+            ...descriptor,
+            permissionsAny: Object.freeze([...permissionsAny])
+        });
+    }
+    return Object.freeze({...descriptor});
 }
 
 function getMutationFreezeReason(descriptor, session) {
@@ -143,7 +170,7 @@ export function createEditorRuntime({adapter, permissions = {}}) {
                 {descriptor}
             );
         }
-        descriptors.set(descriptor.id, Object.freeze({...descriptor}));
+        descriptors.set(descriptor.id, normalizeDescriptor(descriptor));
     });
 
     const detachAdapter = adapter.subscribeState(event => {
@@ -204,7 +231,12 @@ export function createEditorRuntime({adapter, permissions = {}}) {
                 throw runtimeError(
                     'MOBILE_COMMAND_PERMISSION_DENIED',
                     `Mobile command is not allowed: ${commandId}`,
-                    {commandId, permission: resolved.permission}
+                    {
+                        commandId,
+                        ...(resolved.permissionsAny
+                            ? {permissionsAny: resolved.permissionsAny}
+                            : {permission: resolved.permission})
+                    }
                 );
             }
             return adapter.execute(commandId, payload);
