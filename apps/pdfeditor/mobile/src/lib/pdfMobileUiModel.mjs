@@ -5,26 +5,41 @@
 
 const CONTEXT_COMMANDS = Object.freeze({
     page: Object.freeze([
+        'pdf.clipboard.copy',
+        'pdf.pages.cut',
+        'pdf.pages.paste-before',
+        'pdf.pages.paste-after',
         'pdf.redaction.current-page',
         'pdf.pages.add',
         'pdf.pages.rotate',
         'pdf.pages.remove',
     ]),
     annotation: Object.freeze([
+        'pdf.clipboard.copy',
+        'pdf.clipboard.cut',
+        'pdf.clipboard.paste',
         'pdf.comment.add',
         'pdf.annotation.marker',
         'pdf.annotation.ink-start',
         'pdf.annotation.ink-stop',
+        'pdf.annotation.remove-selected',
     ]),
     field: Object.freeze([
+        'pdf.clipboard.copy',
+        'pdf.clipboard.cut',
+        'pdf.clipboard.paste',
         'pdf.forms.clear',
         'pdf.signatures.fields',
         'pdf.signatures.requested',
     ]),
     selection: Object.freeze([
+        'pdf.clipboard.copy',
+        'pdf.clipboard.cut',
+        'pdf.clipboard.paste',
         'pdf.redaction.selection',
         'pdf.comment.add',
         'pdf.annotation.marker',
+        'pdf.annotation.remove-selected',
     ]),
 });
 
