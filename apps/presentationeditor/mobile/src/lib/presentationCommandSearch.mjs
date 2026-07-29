@@ -5,8 +5,10 @@
 
 const targetByRoot = Object.freeze({
     add: Object.freeze({kind: 'panel', panel: 'add', route: '/adding-page/'}),
+    coauth: Object.freeze({kind: 'panel', panel: 'coauth', route: null}),
     context: Object.freeze({kind: 'editor', panel: null, route: null}),
     edit: Object.freeze({kind: 'panel', panel: 'edit', route: '/editing-page/'}),
+    history: Object.freeze({kind: 'panel', panel: 'history', route: null}),
     toolbar: Object.freeze({kind: 'editor', panel: null, route: null}),
 });
 

@@ -90,6 +90,12 @@ test('Presentation command targets resolve only to real editor panels and routes
     assert.deepEqual(resolvePresentationCommandTarget('toolbar.undo'), {
         kind: 'editor', panel: null, route: null,
     });
+    assert.deepEqual(resolvePresentationCommandTarget('coauth.review'), {
+        kind: 'panel', panel: 'coauth', route: null,
+    });
+    assert.deepEqual(resolvePresentationCommandTarget('history.version'), {
+        kind: 'panel', panel: 'history', route: null,
+    });
 });
 
 test('implemented Presentation commands never use command search as their own destination', () => {
@@ -97,6 +103,13 @@ test('implemented Presentation commands never use command search as their own de
         inventory.commands
             .filter(command => command.implementation === 'implemented')
             .filter(command => command.mobilePath === 'more.command-search')
+            .map(command => command.id),
+        [],
+    );
+    assert.deepEqual(
+        inventory.commands
+            .filter(command => command.implementation === 'implemented')
+            .filter(command => resolvePresentationCommandTarget(command.mobilePath) === null)
             .map(command => command.id),
         [],
     );
