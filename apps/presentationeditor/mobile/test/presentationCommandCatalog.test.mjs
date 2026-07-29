@@ -114,6 +114,16 @@ test('presentation Mobile API calls are classified as commands or read-only infr
     );
 });
 
+test('Main routes every classified mutation through the Mobile API gate', async () => {
+    const source = await readFile(new URL('../src/controller/Main.jsx', import.meta.url), 'utf8');
+    const rawApiCallPattern = /\bthis\.api\.([A-Za-z_$][A-Za-z0-9_$]*)\s*\(/g;
+    const bypassedMutations = [...source.matchAll(rawApiCallPattern)]
+        .map(match => match[1])
+        .filter(method => getPresentationCommandSpecByMethod(method)?.mutates === true);
+
+    assert.deepEqual(bypassedMutations, []);
+});
+
 test('presentation API gate routes catalog mutations and preserves read-only SDK calls', () => {
     const calls = [];
     const rawApi = {

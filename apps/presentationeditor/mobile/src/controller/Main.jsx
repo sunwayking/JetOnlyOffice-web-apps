@@ -607,7 +607,7 @@ class MainController extends Component {
 
     insertImageFromStorage(data) {
         if (data && data._urls && (!data.c || data.c === 'add') && data._urls.length > 0) {
-            this.api.AddImageUrl(data._urls, undefined, data.token);
+            Common.EditorApi.get().AddImageUrl(data._urls, undefined, data.token);
         }
     }
 
@@ -1198,7 +1198,7 @@ class MainController extends Component {
                     {
                         text: _t.leaveButtonText,
                         onClick: () => {
-                            this.api.asc_undoAllChanges();
+                            Common.EditorApi.get().asc_undoAllChanges();
                             this.api.asc_continueSaving();
                             Common.Gateway.requestClose();
                         }
