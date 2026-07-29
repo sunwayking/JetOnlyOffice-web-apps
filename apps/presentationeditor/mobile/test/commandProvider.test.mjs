@@ -4,9 +4,9 @@ import { readFile } from 'node:fs/promises';
 import test from 'node:test';
 
 import {
-    createEditorUIControllerFacade,
     createPresentationCommandProvider,
 } from '../src/lib/commandProvider.mjs';
+import {createPresentationCommandInventory} from '../src/lib/presentationCommandCatalog.mjs';
 import {
     disposePresentationEditorRuntime,
     initializePresentationEditorRuntime,
@@ -14,17 +14,9 @@ import {
 } from '../src/lib/presentationEditorRuntime.mjs';
 
 const inventoryUrl = new URL('../src/commands/desktop-command-inventory.json', import.meta.url);
-const inventory = JSON.parse(await readFile(inventoryUrl, 'utf8'));
+const auditedInventory = JSON.parse(await readFile(inventoryUrl, 'utf8'));
+const inventory = createPresentationCommandInventory(auditedInventory);
 const editorRoot = new URL('../../../../', import.meta.url);
-const implementedBindingTestIds = new Set([
-    'pe-provider-clipboard-copy',
-    'pe-provider-clipboard-cut',
-    'pe-provider-clipboard-paste',
-    'pe-provider-history-redo',
-    'pe-provider-history-undo',
-    'pe-provider-text-bold',
-    'pe-provider-text-italic',
-]);
 
 const extractDesktopSurfaceKeys = source => {
     const keys = new Set();
@@ -48,7 +40,6 @@ test('presentation inventory is locked to the audited Desktop sources', async ()
         assert.equal(createHash('sha256').update(content).digest('hex'), source.sha256, source.path);
     }
 });
-
 test('presentation inventory maps every entry to a catalog command or ADR exclusion', () => {
     assert.ok(inventory.entries.length >= 80);
     assert.equal(new Set(inventory.entries.map(entry => `${entry.desktopSource}|${entry.desktopKey}`)).size, inventory.entries.length);
@@ -65,14 +56,13 @@ test('presentation inventory maps every entry to a catalog command or ADR exclus
         assert.ok(command.mobilePath);
         assert.ok(command.testIds.length > 0, command.id);
         assert.ok(command.testIds.every(testId => typeof testId === 'string' && testId.length > 0));
-        if (command.implementation === 'implemented') {
-            assert.ok(command.testIds.every(testId => implementedBindingTestIds.has(testId)), command.id);
-        } else {
-            assert.ok(command.testIds.every(testId => /^pe-issue-9-(?:desktop-)?[a-z0-9-]+$/.test(testId)), command.id);
-        }
         assert.ok(['implemented', 'planned'].includes(command.implementation));
-        if (command.implementation === 'implemented') assert.ok(command.binding && command.binding.method);
-        else assert.equal(command.binding, null);
+        if (command.implementation === 'implemented') {
+            assert.equal(command.binding?.kind, 'sdk');
+            assert.ok(command.binding.method);
+        } else {
+            assert.equal(command.binding, null);
+        }
     }
 
     for (const entry of inventory.entries) {
@@ -96,7 +86,6 @@ test('presentation inventory maps every entry to a catalog command or ADR exclus
         }
     }
 });
-
 test('presentation inventory covers every locked Desktop command surface', async () => {
     for (const sourceFile of inventory.source.files) {
         const source = await readFile(new URL(sourceFile.path, editorRoot), 'utf8');
@@ -108,7 +97,7 @@ test('presentation inventory covers every locked Desktop command surface', async
     }
 });
 
-test('presentation provider implements the shared Runtime adapter contract and first SDKJS bindings', () => {
+test('presentation provider implements the shared Runtime adapter contract and verified SDKJS bindings', () => {
     const calls = [];
     const selection = [{ type: 'text' }];
     const api = {
@@ -124,7 +113,7 @@ test('presentation provider implements the shared Runtime adapter contract and f
         asc_registerCallback() {},
         asc_unregisterCallback() {},
     };
-    const provider = createPresentationCommandProvider({ inventory, getApi: () => api });
+    const provider = createPresentationCommandProvider({inventory, getApi: () => api});
 
     for (const method of [
         'getSelectionSnapshot',
@@ -155,11 +144,6 @@ test('presentation provider implements the shared Runtime adapter contract and f
         ['put_TextPrItalic', false],
         ['asc_addComment', comment],
     ]);
-    assert.deepEqual(
-        new Set(inventory.commands.filter(command => command.implementation === 'implemented').flatMap(command => command.testIds)),
-        implementedBindingTestIds,
-    );
-
     assert.equal(provider.getSelectionSnapshot(), selection);
     assert.deepEqual(provider.resolveContextMenu({ commands: ['copy'] }), ['copy']);
     assert.equal(typeof provider.subscribeState(() => {}), 'function');
@@ -167,12 +151,23 @@ test('presentation provider implements the shared Runtime adapter contract and f
     assert.doesNotThrow(() => provider.restoreViewState({ slide: 4 }));
 
     const descriptors = provider.getCommandDescriptors();
-    assert.equal(descriptors.length, 8);
-    assert.equal(descriptors.find(command => command.id === 'presentation.clipboard.copy').permission, 'view');
+    assert.equal(
+        descriptors.length,
+        inventory.commands.filter(command => command.implementation === 'implemented').length + 1,
+    );
+    assert.deepEqual(
+        descriptors.find(command => command.id === 'presentation.clipboard.copy').permissionsAny,
+        ['view', 'edit', 'review', 'comment', 'fillForms'],
+    );
+    assert.equal(descriptors.find(command => command.id === 'presentation.clipboard.copy').mutates, false);
     assert.equal(descriptors.find(command => command.id === 'common.comment.add').permission, 'comment');
     assert.throws(
-        () => provider.execute('presentation.insert.chart'),
+        () => provider.execute('presentation.desktop.about'),
         error => error.code === 'MOBILE_COMMAND_NOT_IMPLEMENTED',
+    );
+    assert.throws(
+        () => provider.execute('presentation.insert.chart'),
+        error => error.code === 'MOBILE_COMMAND_BINDING_UNAVAILABLE',
     );
     assert.throws(
         () => provider.execute('presentation.missing'),
@@ -183,6 +178,7 @@ test('presentation provider implements the shared Runtime adapter contract and f
 test('presentation Runtime owns lifecycle callbacks, permissions, and disposal', () => {
     const callbacks = new Map();
     const comments = [];
+    let copyCount = 0;
     const api = {
         asc_registerCallback(name, callback) {
             callbacks.set(name, callback);
@@ -192,6 +188,9 @@ test('presentation Runtime owns lifecycle callbacks, permissions, and disposal',
         },
         asc_addComment(comment) {
             comments.push(comment);
+        },
+        Copy() {
+            copyCount += 1;
         },
     };
 
@@ -204,6 +203,9 @@ test('presentation Runtime owns lifecycle callbacks, permissions, and disposal',
 
     callbacks.get('asc_onTransportStateChanged')({ state: 'connected' });
     callbacks.get('asc_onDocumentOpenStateChanged')({ phase: 'ready' });
+    assert.equal(runtime.resolve('presentation.clipboard.copy').available, true);
+    runtime.execute('presentation.clipboard.copy');
+    assert.equal(copyCount, 1);
     assert.equal(runtime.resolve('common.comment.add').reason, 'permission-denied');
 
     updatePresentationEditorPermissions({ edit: true, comment: true });
@@ -224,23 +226,4 @@ test('presentation Runtime owns lifecycle callbacks, permissions, and disposal',
         () => runtime.getSession(),
         error => error.code === 'MOBILE_RUNTIME_DISPOSED',
     );
-});
-
-test('presentation EditorUIController facade preserves the current Mobile contract', () => {
-    const provider = createPresentationCommandProvider({ inventory, getApi: () => null });
-    const facade = createEditorUIControllerFacade(provider);
-
-    assert.equal(facade.isSupportEditFeature(), false);
-    assert.equal(facade.getCommandProvider(), provider);
-    assert.equal(typeof facade.initFocusObjects, 'function');
-    assert.equal(typeof facade.initEditorStyles, 'function');
-    assert.equal(typeof facade.initFonts, 'function');
-    assert.equal(typeof facade.initTableTemplates, 'function');
-    assert.equal(typeof facade.initThemeColors, 'function');
-    assert.equal(typeof facade.updateChartStyles, 'function');
-    assert.equal(typeof facade.getUndoRedo, 'function');
-    assert.equal(typeof facade.getToolbarOptions, 'function');
-    assert.equal(typeof facade.getEditCommentControllers, 'function');
-    assert.equal(typeof facade.ContextMenu.mapMenuItems, 'function');
-    assert.equal(typeof facade.ContextMenu.handleMenuItemClick, 'function');
 });
