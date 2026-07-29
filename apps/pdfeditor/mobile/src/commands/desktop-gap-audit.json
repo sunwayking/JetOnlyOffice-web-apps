@@ -1,0 +1,241 @@
+{
+  "schemaVersion": 1,
+  "editor": "pdf",
+  "releaseGateStatus": "incomplete",
+  "source": {
+    "repository": "sunwayking/JetOnlyOffice-web-apps",
+    "commit": "9c0ca538c3b211052347df09d2a4d6781f023403",
+    "hashNormalization": "text-lf",
+    "files": [
+      { "path": "apps/pdfeditor/main/app/view/Toolbar.js", "sha256": "1cd3addd068bb715ecad91bd3d639851010b6f732d2a1bb9a408ab7ed3e19e43" },
+      { "path": "apps/pdfeditor/main/app/view/InsTab.js", "sha256": "86d8dcf5947fe4882760be356d762e33f334d73e5e4a38064e07b6916bd42eb2" },
+      { "path": "apps/pdfeditor/main/app/view/FormsTab.js", "sha256": "857a9a8f8bd5c61061089e3e566c4094daade652beac5380127f8467bc7b6c7b" },
+      { "path": "apps/pdfeditor/main/app/view/RedactTab.js", "sha256": "3ae978c2cb5382f54b76a553d5cfcf7ac810eb47a15efa231f29781af83b0ecf" },
+      { "path": "apps/pdfeditor/main/app/view/DocumentHolderExt.js", "sha256": "ea82460c5170c6f492695393e674dc8db7e1df216c810133be03a3a56fa2dd12" },
+      { "path": "apps/pdfeditor/main/app/view/FileMenuPanels.js", "sha256": "e7922a962871c1edd0b2d9ae2574ee3b37350e3a07e33ff0aff08ae28944b76d" },
+      { "path": "apps/pdfeditor/main/app/view/ViewTab.js", "sha256": "55764cf6ad4334d8002db17566ffdd0a42f8e5a29e06baf55940bb684c33bf49" },
+      { "path": "apps/pdfeditor/main/app/view/LeftMenu.js", "sha256": "6dabb27243fe429a3356f3389f592202cbf675922b31c3f34483bb9f0ef2ef6e" }
+    ]
+  },
+  "policy": {
+    "desktopReference": "P1",
+    "mobileReference": "Android ONLYOFFICE 9.4.1 P0",
+    "implementationIssue": 7,
+    "excludedFeaturesAdr": "ADR-0040"
+  },
+  "mapped": {
+    "apps/pdfeditor/main/app/view/Toolbar.js": {
+      "btnAddComment": ["pdf.comment.add"],
+      "btnBold": ["pdf.edit.bold"],
+      "btnChangeCase": ["pdf.edit.change-case"],
+      "btnClear": ["pdf.forms.clear"],
+      "btnClearStyle": ["pdf.edit.clear-formatting"],
+      "btnCopy": ["pdf.clipboard.copy"],
+      "btnCut": ["pdf.clipboard.cut"],
+      "btnDecFontSize": ["pdf.edit.font-size-decrease"],
+      "btnDecLeftOffset": ["pdf.edit.indent-decrease"],
+      "btnDelPage": ["pdf.pages.remove"],
+      "btnFirstPage": ["pdf.pages.first"],
+      "btnHandTool": ["pdf.edit.hand-tool"],
+      "btnHorizontalAlign": ["pdf.edit.horizontal-align"],
+      "btnIncFontSize": ["pdf.edit.font-size-increase"],
+      "btnIncLeftOffset": ["pdf.edit.indent-increase"],
+      "btnItalic": ["pdf.edit.italic"],
+      "btnLastPage": ["pdf.pages.last"],
+      "btnNextForm": ["pdf.forms.next"],
+      "btnNextPage": ["pdf.pages.next"],
+      "btnPaste": ["pdf.clipboard.paste"],
+      "btnPrevForm": ["pdf.forms.previous"],
+      "btnPrevPage": ["pdf.pages.previous"],
+      "btnRedo": ["pdf.edit.redo"],
+      "btnRotatePage": ["pdf.pages.rotate"],
+      "btnSave": ["pdf.file.save"],
+      "btnSelectAll": ["pdf.edit.select-all"],
+      "btnSelectTool": ["pdf.edit.select-tool"],
+      "btnShapeArrange": ["pdf.object.bring-front", "pdf.object.bring-back", "pdf.object.bring-forward", "pdf.object.bring-backward"],
+      "btnSubmit": ["pdf.forms.submit"],
+      "btnSubscript": ["pdf.edit.subscript"],
+      "btnSuperscript": ["pdf.edit.superscript"],
+      "btnTextDir": ["pdf.edit.text-direction"],
+      "btnTextStrikeout": ["pdf.edit.strikeout"],
+      "btnTextUnderline": ["pdf.edit.underline"],
+      "btnUndo": ["pdf.edit.undo"],
+      "mnuArrangeBack": ["pdf.object.bring-back"],
+      "mnuArrangeBackward": ["pdf.object.bring-backward"],
+      "mnuArrangeForward": ["pdf.object.bring-forward"],
+      "mnuArrangeFront": ["pdf.object.bring-front"],
+      "mnuGroupShapes": ["pdf.object.group"],
+      "mnuUnGroupShapes": ["pdf.object.ungroup"]
+    },
+    "apps/pdfeditor/main/app/view/InsTab.js": {
+      "btnInsertTable": ["pdf.insert.table"],
+      "btnInsertTextArt": ["pdf.insert.text-art"],
+      "mnuTablePicker": ["pdf.insert.table"]
+    },
+    "apps/pdfeditor/main/app/view/FormsTab.js": {
+      "btnCheckBox": ["pdf.forms.checkbox"],
+      "btnClear": ["pdf.forms.clear"],
+      "btnComboBox": ["pdf.forms.combo"],
+      "btnDateTime": ["pdf.forms.date"],
+      "btnDropDown": ["pdf.forms.dropdown"],
+      "btnEmailField": ["pdf.forms.email"],
+      "btnPhoneField": ["pdf.forms.phone"],
+      "btnCreditCard": ["pdf.forms.credit-card"],
+      "btnImageField": ["pdf.forms.image"],
+      "btnNextForm": ["pdf.forms.next"],
+      "btnPrevForm": ["pdf.forms.previous"],
+      "btnRadioBox": ["pdf.forms.radio"],
+      "btnTextField": ["pdf.forms.text"],
+      "btnZipCode": ["pdf.forms.zip-code"]
+    },
+    "apps/pdfeditor/main/app/view/RedactTab.js": {
+      "btnApplyRedactions": ["pdf.redaction.apply"],
+      "btnFindRedact": ["pdf.redaction.search-all"],
+      "btnMarkForRedact": ["pdf.redaction.mark", "pdf.redaction.selection"],
+      "btnRedactPages": ["pdf.redaction.pages", "pdf.redaction.current-page"]
+    },
+    "apps/pdfeditor/main/app/view/DocumentHolderExt.js": {
+      "btnAddAnnotComment": ["pdf.comment.add"],
+      "btnAddComment": ["pdf.comment.add"],
+      "btnCopy": ["pdf.clipboard.copy"],
+      "btnRedact": ["pdf.redaction.selection"],
+      "btnRemAnnot": ["pdf.annotation.remove-selected"],
+      "mnuArrangeBack": ["pdf.object.bring-back"],
+      "mnuArrangeBackward": ["pdf.object.bring-backward"],
+      "mnuArrangeForward": ["pdf.object.bring-forward"],
+      "mnuArrangeFront": ["pdf.object.bring-front"],
+      "mnuCopyPage": ["pdf.pages.copy"],
+      "mnuCutPage": ["pdf.pages.cut"],
+      "mnuDeletePage": ["pdf.pages.remove"],
+      "mnuGroupImg": ["pdf.object.group"],
+      "mnuNewPageAfter": ["pdf.pages.add"],
+      "mnuNewPageBefore": ["pdf.pages.add"],
+      "mnuPastePageAfter": ["pdf.pages.paste-after"],
+      "mnuPastePageBefore": ["pdf.pages.paste-before"],
+      "mnuRotatePageLeft": ["pdf.pages.rotate"],
+      "mnuRotatePageRight": ["pdf.pages.rotate"],
+      "mnuTableMerge": ["pdf.table.merge-cells"],
+      "mnuUnGroupImg": ["pdf.object.ungroup"]
+    },
+    "apps/pdfeditor/main/app/view/FileMenuPanels.js": {
+      "btnNextPage": ["pdf.pages.next"],
+      "btnPrevPage": ["pdf.pages.previous"]
+    },
+    "apps/pdfeditor/main/app/view/ViewTab.js": {},
+    "apps/pdfeditor/main/app/view/LeftMenu.js": {}
+  },
+  "planned": {
+    "apps/pdfeditor/main/app/view/Toolbar.js": [
+      "btnColumns", "btnEditMode", "btnEditText",
+      "btnFontColor", "btnHighlight", "btnLineSpace",
+      "btnMarkers", "btnNumbers", "btnPrint", "btnSaveForm", "btnShapeAlign",
+      "btnShapeComment", "btnShapesMerge", "btnStamp", "btnStrikeout",
+      "btnTextComment", "btnTextHighlightColor",
+      "btnUnderline", "btnVerticalAlign",
+      "mnuMarkerSettings", "mnuMarkersPicker", "mnuNumberSettings", "mnuNumbersPicker",
+      "mnuTextHighlightColorPicker", "mnuTextHighlightTransparent"
+    ],
+    "apps/pdfeditor/main/app/view/InsTab.js": [
+      "btnEditHeader", "btnInsDateTime", "btnInsertChart", "btnInsertEquation",
+      "btnInsertHyperlink", "btnInsertSmartArt", "btnInsertSymbol", "btnInsSlideNum",
+      "mnuInsertSymbolsPicker"
+    ],
+    "apps/pdfeditor/main/app/view/FormsTab.js": [
+    ],
+    "apps/pdfeditor/main/app/view/RedactTab.js": [],
+    "apps/pdfeditor/main/app/view/DocumentHolderExt.js": [
+      "btnBold", "btnEditText", "btnFontColor", "btnHighlight", "btnHorizontalAlign",
+      "btnItalic", "btnStrokeColor", "btnStrokeHighlightColor", "btnStrikeout",
+      "btnSubscript", "btnSuperscript", "btnTextDir", "btnTextStrikeout",
+      "btnTextUnderline", "btnUnderline", "mnuTableSplit"
+    ],
+    "apps/pdfeditor/main/app/view/FileMenuPanels.js": [
+      "btnApply", "btnCustomizeQuickAccess", "btnEditRights", "btnPrint", "btnPrintPdf"
+    ],
+    "apps/pdfeditor/main/app/view/ViewTab.js": [
+      "btnDarkDocument", "btnInterfaceTheme", "btnNavigation"
+    ],
+    "apps/pdfeditor/main/app/view/LeftMenu.js": [
+      "btnAbout", "btnChat", "btnComments", "btnNavigation", "btnSearchBar", "btnSupport", "btnThumbnails"
+    ]
+  },
+  "excluded": {
+    "apps/pdfeditor/main/app/view/Toolbar.js": {},
+    "apps/pdfeditor/main/app/view/InsTab.js": {},
+    "apps/pdfeditor/main/app/view/FormsTab.js": {},
+    "apps/pdfeditor/main/app/view/RedactTab.js": {},
+    "apps/pdfeditor/main/app/view/DocumentHolderExt.js": {},
+    "apps/pdfeditor/main/app/view/FileMenuPanels.js": {
+      "btnKeyboardMacros": "ADR-0040"
+    },
+    "apps/pdfeditor/main/app/view/ViewTab.js": {
+      "btnMacros": "ADR-0040"
+    },
+    "apps/pdfeditor/main/app/view/LeftMenu.js": {}
+  },
+  "secondarySurfaces": {
+    "apps/pdfeditor/main/app/view/RightMenu.js": {
+      "sha256": "6a9f44a5252b0fb56857a761c988ba044e242e8c6e6e7dc080e250b2224f713e",
+      "planned": ["btnChart", "btnForm", "btnImage", "btnShape", "btnSignature", "btnTable", "btnText", "btnTextArt"]
+    },
+    "apps/pdfeditor/main/app/view/Statusbar.js": {
+      "sha256": "a7fcef2978ca7f99bf27ec81b70e416722aa629adb057efb6d6d8c8d648b0e37",
+      "planned": ["btnHandTool", "btnPageNext", "btnPagePrev", "btnSelectTool", "btnZoomDown", "btnZoomToPage", "btnZoomToWidth", "btnZoomUp"]
+    },
+    "apps/pdfeditor/main/app/view/FormSettings.js": {
+      "sha256": "b9cdad267797905c99b0fdee9f5dc83de104f07ed332190cbd528c3ce7a2538b",
+      "planned": ["btnBGColor", "btnClear", "btnColor", "btnListAdd", "btnListDelete", "btnListDown", "btnListUp", "btnLockForm", "btnSelectImage", "mnuNoBorder", "mnuNoFill"]
+    },
+    "apps/pdfeditor/main/app/view/ImageSettings.js": {
+      "sha256": "118fdac90f9eef9ea1c483ede829a0ad88f257479522b6a1ab583d5b0f229053",
+      "planned": ["btnCrop", "btnEditObject", "btnFitSlide", "btnFlipH", "btnFlipV", "btnOriginalSize", "btnResetCrop", "btnRotate270", "btnRotate90", "btnSelectImage"]
+    },
+    "apps/pdfeditor/main/app/view/ShapeSettings.js": {
+      "sha256": "83f82c480aea8059937007a24abae5db412814e4db86041504c9b95c2907acc5",
+      "planned": ["btnAddGradientStep", "btnBackColor", "btnBGColor", "btnBorderColor", "btnDirection", "btnEditChangeShape", "btnEditShape", "btnFGColor", "btnFlipH", "btnFlipV", "btnGradColor", "btnRemoveGradientStep", "btnRotate270", "btnRotate90", "btnSelectImage", "btnShadowShape", "btnTexture", "mnuDirectionPicker", "mnuShadowShapeColor", "mnuShadowShapeColorPicker"]
+    },
+    "apps/pdfeditor/main/app/view/TableSettings.js": {
+      "sha256": "47f11012274adac0b1631d2330f3ced76b164acfeba4564d090539929eb04d40",
+      "planned": ["btnBackColor", "btnBorderColor", "btnDistributeCols", "btnDistributeRows", "btnEdit", "btnTableTemplate"]
+    },
+    "apps/pdfeditor/main/app/view/TextArtSettings.js": {
+      "sha256": "f160360435e32c754f031fc7229b2aa0bfc5320293ab6bc39f3429a678bf0b6e",
+      "planned": ["btnAddGradientStep", "btnBackColor", "btnBGColor", "btnBorderColor", "btnDirection", "btnFGColor", "btnGradColor", "btnInsertFromFile", "btnInsertFromUrl", "btnRemoveGradientStep", "btnTexture", "mnuDirectionPicker"]
+    },
+    "apps/pdfeditor/main/app/view/ChartSettings.js": {
+      "sha256": "d5c7b20d975af6e64e02319c3bd163d5aa62932dffb9500ae408d1f091d034c9",
+      "planned": ["btnChartType", "btnDown", "btnEditData", "btnEditLinks", "btnLeft", "btnNarrow", "btnRatio", "btnRight", "btnUp", "btnUpdateData", "btnWiden", "mnuChartTypePicker"]
+    },
+    "apps/pdfeditor/main/app/view/ParagraphSettingsAdvanced.js": {
+      "sha256": "bf2327b07bbc38f5b66f5a2552267cf29b451d4c1637a1d91f31753834228038",
+      "planned": ["btnAddTab", "btnRemoveAll", "btnRemoveTab"]
+    },
+    "apps/pdfeditor/main/app/view/Navigation.js": {
+      "sha256": "6dc53e563dad4e5edd8978018e1b2ac9b33c7407f9a1d6be6405df9692c210fe",
+      "planned": ["btnClose", "btnSettings"]
+    },
+    "apps/pdfeditor/main/app/view/PageThumbnails.js": {
+      "sha256": "c07f8297639f01de2ae5aa15c3598e22bf225a37a93b3b78f99e304d57f73b87",
+      "planned": ["mnuSizeSetting"]
+    },
+    "apps/pdfeditor/main/app/view/LeftMenu.js": {
+      "sha256": "6dabb27243fe429a3356f3389f592202cbf675922b31c3f34483bb9f0ef2ef6e",
+      "planned": ["btnAbout", "btnChat", "btnComments", "btnNavigation", "btnSearchBar", "btnSupport", "btnThumbnails"]
+    }
+  },
+  "controllerSources": [
+    {"path": "apps/pdfeditor/main/app/controller/LeftMenu.js", "sha256": "b3b72eeea49ac66a87ff523011c8ca4fd6514a96d6e739db866076d0c5ce4139"},
+    {"path": "apps/pdfeditor/main/app/controller/DocumentHolder.js", "sha256": "71592c78856f019da27c27581088c5d705d213c4cfdaaec0dd36b7def5e8814b"},
+    {"path": "apps/pdfeditor/main/app/controller/DocumentHolderExt.js", "sha256": "96edaba11c28c7ebd13a1301f4250669e454c5058d217eaaad8f1e043d592af3"},
+    {"path": "apps/pdfeditor/main/app/controller/Main.js", "sha256": "436bd743815c3239ff6952347e374ae39806402e64e0c648dca5f6c2e760f9b5"},
+    {"path": "apps/pdfeditor/main/app/controller/FormsTab.js", "sha256": "518514e4b3c940320d21f9211c2ca44bd2f369b2813c13cd0b9c25cbcd37c1f7"},
+    {"path": "apps/pdfeditor/main/app/controller/InsTab.js", "sha256": "d20c4b58e600be93f3a0d5a2631f85b42f29c14f896a91d41d0876ac34e98d52"},
+    {"path": "apps/pdfeditor/main/app/controller/Toolbar.js", "sha256": "197c9dcb2f23b0485eab3fb45584bffb567bcd1db2f465e130cfbc08fc5e5c2a"}
+  ],
+  "blockers": [
+    "planned-desktop-controls-remain-unbound",
+    "locked-core-cannot-persist-signature-appearance-streams",
+    "server-confirmed-save-and-reopen-evidence-is-missing",
+    "permanent-redaction-reopen-and-content-stream-proof-is-missing"
+  ]
+}
