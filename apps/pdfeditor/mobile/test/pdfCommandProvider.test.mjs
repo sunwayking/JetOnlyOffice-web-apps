@@ -46,6 +46,8 @@ const SDK_METHODS = Object.freeze([
     'asc_setViewerTargetType',
     'SetRedactTool',
     'HasRedact',
+    'asc_IsPermanentRedactionSupported',
+    'asc_HasAppliedRedaction',
     'ApplyRedact',
     'AddRedactBySelect',
     'RedactPages',
@@ -111,7 +113,7 @@ function createExplicitApi(calls, callbacks = new Map()) {
         },
     };
     for (const method of SDK_METHODS) {
-        if (/^(?:asc_Can|asc_Is)/.test(method)) {
+        if (/^(?:asc_Can|asc_Is|asc_Has)/.test(method)) {
             api[method] = () => true;
             continue;
         }
@@ -382,6 +384,8 @@ test('PDF provider applies permanent redaction only after SDK-confirmed marks an
         calls.push(['ApplyRedact']);
         hasRedactionMarks = false;
     };
+    let hasAppliedRedaction = true;
+    api.asc_HasAppliedRedaction = () => hasAppliedRedaction;
     const provider = createPdfCommandProvider({catalog, getApi: () => api});
 
     assert.throws(
@@ -400,6 +404,45 @@ test('PDF provider applies permanent redaction only after SDK-confirmed marks an
         () => provider.execute('pdf.redaction.apply', {confirmed: true}),
         error => error.code === 'MOBILE_REDACTION_APPLY_UNCONFIRMED',
     );
+
+    hasRedactionMarks = true;
+    hasAppliedRedaction = false;
+    api.ApplyRedact = () => {
+        calls.push(['ApplyRedact']);
+        hasRedactionMarks = false;
+    };
+    assert.throws(
+        () => provider.execute('pdf.redaction.apply', {confirmed: true}),
+        error => error.code === 'MOBILE_REDACTION_PERSISTENCE_UNCONFIRMED',
+    );
+});
+
+test('PDF provider fails closed when the SDK cannot remove redacted content', () => {
+    const calls = [];
+    const api = createExplicitApi(calls);
+    api.asc_IsPermanentRedactionSupported = () => false;
+    const provider = createPdfCommandProvider({catalog, getApi: () => api});
+
+    for (const commandId of [
+        'pdf.redaction.mark',
+        'pdf.redaction.selection',
+        'pdf.redaction.current-page',
+        'pdf.redaction.apply',
+        'pdf.redaction.pages',
+        'pdf.redaction.search-all',
+    ]) {
+        assert.deepEqual(provider.resolveCapability(commandId), {
+            available: false,
+            reason: 'permanent-redaction-unavailable',
+        }, commandId);
+    }
+    assert.deepEqual(provider.resolveCapability('pdf.redaction.discard'), {available: true});
+    assert.throws(
+        () => provider.execute('pdf.redaction.apply', {confirmed: true}),
+        error => error.code === 'MOBILE_COMMAND_CAPABILITY_UNAVAILABLE' &&
+            error.details.reason === 'permanent-redaction-unavailable',
+    );
+    assert.deepEqual(calls, []);
 });
 
 test('PDF provider separates certificate signatures from form fields and fails closed on unpersisted appearance', () => {

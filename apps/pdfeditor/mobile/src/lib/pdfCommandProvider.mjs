@@ -36,12 +36,30 @@ const CALLBACK_FACTORIES = Object.freeze({
     }),
 });
 
+const PERMANENT_REDACTION_COMMANDS = new Set([
+    'pdf.redaction.mark',
+    'pdf.redaction.selection',
+    'pdf.redaction.current-page',
+    'pdf.redaction.apply',
+    'pdf.redaction.pages',
+    'pdf.redaction.search-all',
+]);
+
 const CAPABILITY_METHODS = Object.freeze({
-    'pdf.redaction.apply': Object.freeze(['HasRedact', 'ApplyRedact']),
-    'pdf.redaction.current-page': Object.freeze(['getCurrentPage']),
+    'pdf.redaction.mark': Object.freeze(['asc_IsPermanentRedactionSupported']),
+    'pdf.redaction.selection': Object.freeze(['asc_IsPermanentRedactionSupported']),
+    'pdf.redaction.apply': Object.freeze([
+        'HasRedact',
+        'ApplyRedact',
+        'asc_IsPermanentRedactionSupported',
+        'asc_HasAppliedRedaction',
+    ]),
+    'pdf.redaction.current-page': Object.freeze(['getCurrentPage', 'asc_IsPermanentRedactionSupported']),
+    'pdf.redaction.pages': Object.freeze(['asc_IsPermanentRedactionSupported']),
     'pdf.redaction.search-all': Object.freeze([
         'asc_findText',
         'asc_RedactAllSearchElements',
+        'asc_IsPermanentRedactionSupported',
     ]),
     'pdf.pages.previous': Object.freeze(['getCurrentPage']),
     'pdf.pages.next': Object.freeze(['getCurrentPage', 'getCountPages']),
@@ -227,6 +245,12 @@ const commandExecutors = Object.freeze({
             throw providerError(
                 'MOBILE_REDACTION_APPLY_UNCONFIRMED',
                 'The PDF SDK did not confirm that redaction marks were applied',
+            );
+        }
+        if (api.asc_HasAppliedRedaction() !== true) {
+            throw providerError(
+                'MOBILE_REDACTION_PERSISTENCE_UNCONFIRMED',
+                'The PDF SDK did not confirm that permanent redaction entered the save path',
             );
         }
         return result;
@@ -421,6 +445,10 @@ export function createPdfCommandProvider({
             if (resolvePdfSelectionContext(selection, globalThis.Asc).kind !== 'annotation') {
                 return {available: false, reason: 'annotation-selection-required'};
             }
+        }
+        if (PERMANENT_REDACTION_COMMANDS.has(command.id) &&
+            api.asc_IsPermanentRedactionSupported() !== true) {
+            return {available: false, reason: 'permanent-redaction-unavailable'};
         }
         const check = capabilityChecks[command.id];
         if (check && check(api) !== true) {
