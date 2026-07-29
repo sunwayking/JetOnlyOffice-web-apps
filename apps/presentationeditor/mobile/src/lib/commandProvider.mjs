@@ -25,6 +25,7 @@ const getDefaultSelection = api => api.getSelectedElements();
 export const createPresentationCommandProvider = ({
     inventory,
     getApi,
+    executeController,
     getSelectionSnapshot,
     subscribeState,
     resolveContextMenu,
@@ -75,7 +76,23 @@ export const createPresentationCommandProvider = ({
 
     const getCommand = id => commands.get(id) || null;
 
-    const execute = (id, payload) => {
+    const dispatchController = typeof executeController === 'function'
+        ? executeController
+        : ({command, payload}) => {
+            const detail = Object.freeze({
+                commandId: command.id,
+                action: command.binding.action,
+                mobilePath: command.mobilePath,
+                ...(payload === undefined ? {} : {payload}),
+            });
+            if (typeof window !== 'undefined' && typeof window.dispatchEvent === 'function' &&
+                typeof window.CustomEvent === 'function') {
+                window.dispatchEvent(new window.CustomEvent('asc-mobile-command', {detail}));
+            }
+            return detail;
+        };
+
+    const execute = (id, payload, trail = new Set()) => {
         assertActive();
         if (id === COMMON_COMMAND_IDS.ADD_COMMENT) {
             return requireApi().asc_addComment(payload?.comment);
@@ -90,6 +107,26 @@ export const createPresentationCommandProvider = ({
 
         const customHandler = handlers.get(id);
         if (customHandler) return customHandler(payload);
+
+        if (trail.has(id)) {
+            throw providerError('MOBILE_COMMAND_ALIAS_CYCLE', `Presentation command alias cycle: ${id}`, {
+                commandId: id,
+            });
+        }
+        const nextTrail = new Set(trail);
+        nextTrail.add(id);
+        if (command.binding?.kind === 'alias') {
+            if (!commands.has(command.binding.commandId)) {
+                throw providerError('MOBILE_COMMAND_BINDING_UNAVAILABLE', `Presentation alias target is unavailable: ${id}`, {
+                    commandId: id,
+                    target: command.binding.commandId,
+                });
+            }
+            return execute(command.binding.commandId, payload, nextTrail);
+        }
+        if (command.binding?.kind === 'controller') {
+            return dispatchController({command, payload});
+        }
 
         const api = requireApi();
         const method = command.binding && command.binding.method;

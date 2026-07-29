@@ -13,23 +13,64 @@ const inventoryUrl = new URL('../src/commands/desktop-command-inventory.json', i
 const auditedInventory = JSON.parse(await readFile(inventoryUrl, 'utf8'));
 const presentationCommandInventory = createPresentationCommandInventory(auditedInventory);
 
-test('presentation catalog preserves unmapped Desktop commands as planned work', () => {
+test('presentation catalog keeps every audited and SDK command uniquely testable', () => {
     assert.ok(presentationCommandInventory.commands.length > auditedInventory.commands.length);
     assert.equal(
         new Set(presentationCommandInventory.commands.map(command => command.id)).size,
         presentationCommandInventory.commands.length,
     );
-    const implemented = presentationCommandInventory.commands.filter(command => command.implementation === 'implemented');
-    const planned = presentationCommandInventory.commands.filter(command => command.implementation === 'planned');
-    assert.ok(implemented.length > 0);
-    assert.ok(planned.length > 0);
-    assert.ok(implemented.every(command => command.binding?.kind === 'sdk' && command.binding.method));
-    assert.ok(planned.every(command => command.binding === null));
     assert.ok(presentationCommandInventory.commands.every(command => command.testIds.length > 0));
+});
 
-    const smartArt = presentationCommandInventory.commands.find(command => command.id === 'presentation.desktop.insert-smartart');
-    assert.equal(smartArt.implementation, 'planned');
-    assert.equal(smartArt.binding, null);
+test('presentation release inventory closes every Desktop command with a real binding or ADR exclusion', () => {
+    const commandsById = new Map(presentationCommandInventory.commands.map(command => [command.id, command]));
+    const allowedExclusions = new Set([
+        'presentation.desktop.file-open',
+        'presentation.desktop.new',
+        'presentation.desktop.recent',
+        'presentation.desktop.rights',
+    ]);
+
+    assert.deepEqual(
+        presentationCommandInventory.commands.filter(command => command.implementation === 'planned').map(command => command.id),
+        [],
+    );
+
+    const excluded = presentationCommandInventory.commands.filter(command => command.implementation === 'excluded');
+    assert.deepEqual(new Set(excluded.map(command => command.id)), allowedExclusions);
+    for (const command of excluded) {
+        assert.equal(command.binding, null);
+        assert.equal(command.exclusion?.adr, 'ADR-0040');
+        assert.ok(command.exclusion?.reason);
+    }
+
+    for (const command of presentationCommandInventory.commands.filter(command => command.implementation === 'implemented')) {
+        assert.ok(['sdk', 'alias', 'controller'].includes(command.binding?.kind), command.id);
+        if (command.binding.kind === 'alias') {
+            const target = commandsById.get(command.binding.commandId);
+            assert.equal(target?.implementation, 'implemented', command.id);
+            assert.notEqual(target?.id, command.id);
+        }
+        if (command.binding.kind === 'controller') {
+            assert.ok(command.binding.action, command.id);
+            assert.notEqual(command.mobilePath, 'more.command-search', command.id);
+        }
+    }
+
+    for (const entry of presentationCommandInventory.entries) {
+        if (!entry.commandId) {
+            assert.equal(entry.disposition, 'excluded', entry.desktopKey);
+            assert.ok(entry.adr, entry.desktopKey);
+            continue;
+        }
+        const command = commandsById.get(entry.commandId);
+        if (command?.implementation === 'excluded') {
+            assert.equal(entry.disposition, 'excluded', entry.desktopKey);
+            assert.equal(entry.adr, command.exclusion.adr, entry.desktopKey);
+        } else {
+            assert.equal(entry.disposition, 'catalog', entry.desktopKey);
+        }
+    }
 });
 
 test('presentation catalog gates every SDKJS mutation used by the Mobile UI', () => {
@@ -92,7 +133,7 @@ test('presentation Mobile API calls are classified as commands or read-only infr
     const expectedInfrastructure = [
         'DemonstrationEndShowMessage', 'DemonstrationNextSlide', 'DemonstrationPrevSlide',
         'EndDemonstration', 'Resize', 'SetDrawImagePreviewBulletForMenu', 'SetDrawingFreeze',
-        'SetFontRenderingMode', 'SetThemesPath', 'asc_DownloadAs', 'asc_DownloadOrigin',
+        'SetFontRenderingMode', 'SetThemesPath', 'asc_DownloadOrigin',
         'asc_GetCurrentColorSchemeIndex', 'asc_GetDefaultTableStyles', 'asc_GoToInternalHyperlink',
         'asc_LoadDocument', 'asc_SetDocumentUnits', 'asc_SetFastCollaborative',
         'asc_SetThumbnailsPosition', 'asc_coAuthoringDisconnect', 'asc_continueSaving',
