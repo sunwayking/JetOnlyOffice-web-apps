@@ -8,8 +8,11 @@ import {
 } from '../src/lib/commandProvider.mjs';
 import {createPresentationCommandInventory} from '../src/lib/presentationCommandCatalog.mjs';
 import {
+    capturePresentationEditorViewState,
     disposePresentationEditorRuntime,
     initializePresentationEditorRuntime,
+    restorePresentationEditorViewState,
+    subscribePresentationEditorRuntime,
     updatePresentationEditorPermissions,
 } from '../src/lib/presentationEditorRuntime.mjs';
 
@@ -56,12 +59,17 @@ test('presentation inventory maps every entry to a catalog command or ADR exclus
         assert.ok(command.mobilePath);
         assert.ok(command.testIds.length > 0, command.id);
         assert.ok(command.testIds.every(testId => typeof testId === 'string' && testId.length > 0));
-        assert.ok(['implemented', 'planned'].includes(command.implementation));
+        assert.ok(['implemented', 'planned', 'excluded'].includes(command.implementation));
         if (command.implementation === 'implemented') {
-            assert.equal(command.binding?.kind, 'sdk');
-            assert.ok(command.binding.method);
+            assert.ok(['sdk', 'alias', 'controller'].includes(command.binding?.kind));
+            if (command.binding.kind === 'sdk') assert.ok(command.binding.method);
+            if (command.binding.kind === 'alias') assert.ok(command.binding.commandId);
+            if (command.binding.kind === 'controller') assert.ok(command.binding.action);
+        } else if (command.implementation === 'planned') {
+            assert.equal(command.binding, null);
         } else {
             assert.equal(command.binding, null);
+            assert.equal(command.exclusion?.adr, 'ADR-0040');
         }
     }
 
@@ -109,6 +117,7 @@ test('presentation provider implements the shared Runtime adapter contract and v
         Paste: (...args) => calls.push(['Paste', ...args]),
         put_TextPrBold: (...args) => calls.push(['put_TextPrBold', ...args]),
         put_TextPrItalic: (...args) => calls.push(['put_TextPrItalic', ...args]),
+        put_PrAlign: (...args) => calls.push(['put_PrAlign', ...args]),
         asc_addComment: (...args) => calls.push(['asc_addComment', ...args]),
         asc_registerCallback() {},
         asc_unregisterCallback() {},
@@ -161,10 +170,13 @@ test('presentation provider implements the shared Runtime adapter contract and v
     );
     assert.equal(descriptors.find(command => command.id === 'presentation.clipboard.copy').mutates, false);
     assert.equal(descriptors.find(command => command.id === 'common.comment.add').permission, 'comment');
-    assert.throws(
-        () => provider.execute('presentation.desktop.about'),
-        error => error.code === 'MOBILE_COMMAND_NOT_IMPLEMENTED',
-    );
+    assert.deepEqual(provider.execute('presentation.desktop.about'), {
+        commandId: 'presentation.desktop.about',
+        action: 'navigate',
+        mobilePath: 'settings.about',
+    });
+    assert.equal(provider.execute('presentation.desktop.align-horizontal', {value: 1}), 9);
+    assert.deepEqual(calls.at(-1), ['put_PrAlign', 1]);
     assert.throws(
         () => provider.execute('presentation.insert.chart'),
         error => error.code === 'MOBILE_COMMAND_BINDING_UNAVAILABLE',
@@ -226,4 +238,46 @@ test('presentation Runtime owns lifecycle callbacks, permissions, and disposal',
         () => runtime.getSession(),
         error => error.code === 'MOBILE_RUNTIME_DISPOSED',
     );
+});
+
+test('presentation Runtime delegates view-state capture and restore to its adapter', () => {
+    const selection = {CurPage: 6, slideSelection: {selectedObjects: ['image-2']}};
+    const state = {
+        slide: 6,
+        selection,
+        ui: {panel: 'edit', route: '/edit-replace-image/', scroll: {x: 0, y: 180}},
+    };
+    const restored = [];
+    const api = {
+        asc_registerCallback() {},
+        asc_unregisterCallback() {},
+    };
+
+    initializePresentationEditorRuntime({
+        inventory,
+        getApi: () => api,
+        captureViewState: () => state,
+        restoreViewState: value => restored.push(value),
+    });
+
+    assert.equal(capturePresentationEditorViewState(), state);
+    restorePresentationEditorViewState(state);
+    assert.deepEqual(restored, [state]);
+    disposePresentationEditorRuntime();
+});
+
+test('presentation Runtime publishes creation, permission changes, and disposal to command search', () => {
+    const published = [];
+    const detach = subscribePresentationEditorRuntime(runtime => published.push(runtime));
+    const api = {
+        asc_registerCallback() {},
+        asc_unregisterCallback() {},
+    };
+
+    const runtime = initializePresentationEditorRuntime({inventory, getApi: () => api});
+    updatePresentationEditorPermissions({edit: true});
+    disposePresentationEditorRuntime();
+    detach();
+
+    assert.deepEqual(published, [null, runtime, runtime, null]);
 });

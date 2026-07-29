@@ -57,6 +57,11 @@ import {
     updatePresentationEditorPermissions,
 } from '../lib/presentationEditorRuntime.mjs';
 import {createPresentationEditorApiGate} from '../lib/presentationEditorApiGate.mjs';
+import {
+    captureRegisteredPresentationUiState,
+    createPresentationViewStateAdapter,
+    restoreRegisteredPresentationUiState,
+} from '../lib/presentationViewState.mjs';
 import '../../../../common/main/lib/util/LanguageInfo.js'
 
 @inject(
@@ -119,6 +124,7 @@ class MainController extends Component {
 
         this.defaultTitleText = __APP_TITLE_TEXT__;
         this.stackMacrosRequests = [];
+        this.presentationZoom = null;
 
         const { t } = this.props;
         this._t = t('Controller.Main', {returnObjects:true});
@@ -308,6 +314,8 @@ class MainController extends Component {
                     initializePresentationEditorRuntime({
                         inventory: EditorUIController.getCommandProvider().inventory,
                         getApi: () => this.api,
+                        captureViewState: this.presentationViewState.capture,
+                        restoreViewState: this.presentationViewState.restore,
                     });
 
                     Common.Notifications.trigger('engineCreated', this.api);
@@ -470,6 +478,9 @@ class MainController extends Component {
         });
 
         this.api.asc_registerCallback('asc_onDocumentContentReady', this.onDocumentContentReady.bind(this));
+        this.api.asc_registerCallback('asc_onZoomChange', zoom => {
+            if (Number.isFinite(zoom) && zoom > 0) this.presentationZoom = zoom;
+        });
         this.api.asc_registerCallback('asc_onDocumentUpdateVersion', this.onUpdateVersion.bind(this));
         this.api.asc_registerCallback('asc_onServerVersion', this.onServerVersion.bind(this));
         this.api.asc_registerCallback('asc_onAdvancedOptions', this.onAdvancedOptions.bind(this));
@@ -607,7 +618,7 @@ class MainController extends Component {
 
     insertImageFromStorage(data) {
         if (data && data._urls && (!data.c || data.c === 'add') && data._urls.length > 0) {
-            this.api.AddImageUrl(data._urls, undefined, data.token);
+            Common.EditorApi.get().AddImageUrl(data._urls, undefined, data.token);
         }
     }
 
@@ -1198,7 +1209,7 @@ class MainController extends Component {
                     {
                         text: _t.leaveButtonText,
                         onClick: () => {
-                            this.api.asc_undoAllChanges();
+                            Common.EditorApi.get().asc_undoAllChanges();
                             this.api.asc_continueSaving();
                             Common.Gateway.requestClose();
                         }
@@ -1291,6 +1302,13 @@ class MainController extends Component {
     componentDidMount () {
         this.getEditorApi = createPresentationEditorApiGate({getRawApi: () => this.api});
         Common.EditorApi = {get: this.getEditorApi};
+        this.presentationViewState = createPresentationViewStateAdapter({
+            getApi: () => this.api,
+            getZoom: () => this.presentationZoom,
+            restoreZoom: zoom => this.api?.zoom?.(zoom),
+            captureUiState: captureRegisteredPresentationUiState,
+            restoreUiState: restoreRegisteredPresentationUiState,
+        });
         this.initSdk();
     }
 

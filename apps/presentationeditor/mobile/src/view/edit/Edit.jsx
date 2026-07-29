@@ -291,12 +291,12 @@ const EditView = () => {
     return (
         !Device.phone ?
             <Popover id="edit-popover" className="popover__titled" closeByOutsideClick={false} onPopoverClosed={() => mainContext.closeOptions('edit')}>
-                <View style={{ height: '410px' }} routes={routes} url='/editing-page/'>
+                <View id='presentation-edit-view' style={{ height: '410px' }} routes={routes} url='/editing-page/'>
                     <EditingPage />
                 </View>
             </Popover> :
             <Sheet id="edit-sheet" onSheetClosed={() => mainContext.closeOptions('edit')}>
-                <View routes={routes} url='/editing-page/'>
+                <View id='presentation-edit-view' routes={routes} url='/editing-page/'>
                     <EditingPage />
                 </View>
             </Sheet>
