@@ -60,6 +60,7 @@ import { Themes } from '../../../../common/mobile/lib/controller/Themes.jsx';
 import { processArrayScripts } from '../../../../common/mobile/utils/processArrayScripts.js';
 import {
     disposeSpreadsheetEditorRuntime,
+    executeSpreadsheetCommand,
     initializeSpreadsheetEditorRuntime,
     updateSpreadsheetEditorPermissions,
 } from '../lib/spreadsheetEditorRuntime.mjs';
@@ -657,7 +658,10 @@ class MainController extends Component {
 
     insertImageFromStorage (data) {
         if (data && data._urls && (!data.c || data.c === 'add') && data._urls.length > 0) {
-            this.api.asc_addImageDrawingObject(data._urls, undefined, data.token);
+            executeSpreadsheetCommand('spreadsheet.desktop.insert-image', {
+                operation: 'url',
+                args: [data._urls, undefined, data.token],
+            });
         }
     }
 
@@ -1278,7 +1282,7 @@ class MainController extends Component {
         if (!this.props.storeAppOptions.canPrint) return;
 
         if (this.api)
-            this.api.asc_Print();
+            executeSpreadsheetCommand('spreadsheet.desktop.print');
         Common.component.Analytics.trackEvent('Print');
     }
 
@@ -1341,7 +1345,7 @@ class MainController extends Component {
         } else {
             const options = new Asc.asc_CDownloadOptions(_format, true);
             options.asc_setIsSaveAs(true);
-            this.api.asc_DownloadAs(options);
+            executeSpreadsheetCommand('spreadsheet.desktop.save-desktop', { value: options });
         }
     }
 

@@ -39,6 +39,7 @@ import {Device} from '../../../../../common/mobile/utils/device';
 import { withTranslation } from 'react-i18next';
 
 import AddChart from '../../view/add/AddChart';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class AddChartController extends Component {
     constructor (props) {
@@ -71,7 +72,7 @@ class AddChartController extends Component {
                 let range = settings.getRange(),
                     isValid = !!range ? api.asc_checkDataRange(Asc.c_oAscSelectionDialogType.Chart, range, true, !settings.getInColumns(), settings.getType()) : Asc.c_oAscError.ID.No;
                 if (isValid == Asc.c_oAscError.ID.No) {
-                    api.asc_addChartDrawingObject(settings);
+                    executeSpreadsheetCommand('spreadsheet.insert.chart', { value: settings });
                     this.closeModal();
                 } else {
                     f7.dialog.alert((isValid == Asc.c_oAscError.ID.StockChartError) ? _t.errorStockChart : ((isValid == Asc.c_oAscError.ID.MaxDataSeriesError) ? _t.errorMaxRows : _t.txtInvalidRange), _t.notcriticalErrorTitle);

@@ -39,6 +39,7 @@ import { Device } from '../../../../../common/mobile/utils/device';
 import { withTranslation } from 'react-i18next';
 
 import { EditLink, PageEditTypeLink, PageEditSheet} from '../../view/edit/EditLink';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 const routes = [
     {
@@ -159,7 +160,7 @@ class EditLinkController extends Component {
 
         linkProps.asc_setTooltip(tip);
 
-        api.asc_insertHyperlink(linkProps);
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-link', { value: linkProps });
         this.props.isNavigate ? f7.views.current.router.back() : this.closeModal();
      
     }

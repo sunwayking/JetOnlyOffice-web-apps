@@ -10,7 +10,9 @@ const payloadArguments = payload => {
     if (payload === null) return [null];
     if (Array.isArray(payload)) return payload;
     if (Array.isArray(payload.args)) return payload.args;
-    return Object.prototype.hasOwnProperty.call(payload, 'value') ? [payload.value] : [payload];
+    if (Object.prototype.hasOwnProperty.call(payload, 'value')) return [payload.value];
+    const { operation, target, commitTarget, ...argument } = payload;
+    return Object.keys(argument).length ? [argument] : [];
 };
 const providerError = (code, message, details) => {
     const error = new Error(message);
@@ -37,6 +39,8 @@ const createCommandDescriptor = command => {
         descriptor.permission = command.permissions[0];
     }
 
+    if (command.aliasOf) descriptor.aliasOf = command.aliasOf;
+
     return Object.freeze(descriptor);
 };
 
@@ -48,6 +52,8 @@ export const createSpreadsheetCommandProvider = ({
     resolveContextMenu,
     captureViewState,
     restoreViewState,
+    navigateCommand,
+    executeHostCommand,
 } = {}) => {
     if (!inventory || !Array.isArray(inventory.commands)) {
         throw new TypeError('createSpreadsheetCommandProvider requires an inventory');
@@ -85,6 +91,35 @@ export const createSpreadsheetCommandProvider = ({
 
     const getCommand = id => commands.get(id) || null;
 
+    const resolveReceiver = (name, api, payload) => {
+        if (name === 'api') return api;
+        if (name === 'commitTarget') return payload?.commitTarget;
+        return payload?.target;
+    };
+
+    const resolveBindingCommand = command => {
+        const visited = new Set();
+        let resolved = command;
+
+        while (resolved?.aliasOf) {
+            if (visited.has(resolved.id)) {
+                throw providerError('MOBILE_COMMAND_ALIAS_CYCLE', `Spreadsheet command alias cycle: ${command.id}`, {
+                    commandId: command.id,
+                });
+            }
+            visited.add(resolved.id);
+            resolved = getCommand(resolved.aliasOf);
+            if (!resolved) {
+                throw providerError('MOBILE_COMMAND_ALIAS_TARGET_NOT_FOUND', `Spreadsheet command alias target is unavailable: ${command.id}`, {
+                    commandId: command.id,
+                    aliasOf: command.aliasOf,
+                });
+            }
+        }
+
+        return resolved;
+    };
+
     const execute = (id, payload) => {
         assertActive();
         if (id === COMMON_COMMAND_IDS.ADD_COMMENT) {
@@ -101,15 +136,102 @@ export const createSpreadsheetCommandProvider = ({
         const customHandler = handlers.get(id);
         if (customHandler) return customHandler(payload);
 
+        const bindingCommand = resolveBindingCommand(command);
+        if (bindingCommand.implementation !== 'implemented') {
+            throw providerError('MOBILE_COMMAND_NOT_IMPLEMENTED', `Spreadsheet command alias target is not implemented: ${id}`, {
+                commandId: id,
+                aliasOf: command.aliasOf,
+            });
+        }
+
+        const binding = bindingCommand.binding;
+        const operation = payload && !Array.isArray(payload) ? payload.operation : undefined;
+        const method = operation === undefined
+            ? binding && binding.method
+            : binding && binding.operations && binding.operations[operation];
+        if (operation !== undefined && !method) {
+            throw providerError('MOBILE_COMMAND_OPERATION_NOT_SUPPORTED', `Spreadsheet command operation is not supported: ${id}`, {
+                commandId: id,
+                bindingCommandId: bindingCommand.id,
+                operation,
+            });
+        }
+
+        if (binding?.kind === 'navigation') {
+            if (operation !== undefined) {
+                throw providerError('MOBILE_COMMAND_OPERATION_NOT_SUPPORTED', `Spreadsheet navigation command operation is not supported: ${id}`, {
+                    commandId: id,
+                    bindingCommandId: bindingCommand.id,
+                    operation,
+                });
+            }
+            const intent = Object.freeze({
+                type: 'navigate',
+                commandId: id,
+                target: binding.target,
+            });
+            return typeof navigateCommand === 'function' ? navigateCommand(intent, payload) : intent;
+        }
+
+        if (binding?.kind === 'host') {
+            if (operation !== undefined) {
+                throw providerError('MOBILE_COMMAND_OPERATION_NOT_SUPPORTED', `Spreadsheet host command operation is not supported: ${id}`, {
+                    commandId: id,
+                    bindingCommandId: bindingCommand.id,
+                    operation,
+                });
+            }
+            const intent = Object.freeze({
+                type: 'host-command',
+                commandId: id,
+                action: binding.action,
+            });
+            return typeof executeHostCommand === 'function' ? executeHostCommand(intent, payload) : intent;
+        }
+
         const api = requireApi();
-        const method = command.binding && command.binding.method;
-        if (!method || typeof api[method] !== 'function') {
+        const receiverName = binding?.kind === 'sdk-object'
+            ? binding.operationReceivers?.[operation] || binding.receiver || 'target'
+            : 'api';
+        const receiver = resolveReceiver(receiverName, api, payload);
+        if (!receiver) {
+            throw providerError('MOBILE_COMMAND_TARGET_UNAVAILABLE', `Spreadsheet command target is unavailable: ${id}`, {
+                commandId: id,
+                bindingCommandId: bindingCommand.id,
+            });
+        }
+        if (!method || typeof receiver[method] !== 'function') {
             throw providerError('MOBILE_COMMAND_BINDING_UNAVAILABLE', `Spreadsheet command binding is unavailable: ${id}`, {
                 commandId: id,
+                bindingCommandId: bindingCommand.id,
                 method,
             });
         }
-        return api[method](...payloadArguments(payload));
+        const passApi = operation === undefined
+            ? binding.passApi === true
+            : binding.operationPassApi?.[operation] === true;
+        const args = payloadArguments(payload);
+        const result = receiver[method](...(passApi ? [api, ...args] : args));
+
+        if (binding.commit) {
+            const commitReceiver = resolveReceiver(binding.commit.receiver, api, payload);
+            if (!commitReceiver || typeof commitReceiver[binding.commit.method] !== 'function') {
+                throw providerError('MOBILE_COMMAND_COMMIT_UNAVAILABLE', `Spreadsheet command commit binding is unavailable: ${id}`, {
+                    commandId: id,
+                    bindingCommandId: bindingCommand.id,
+                    method: binding.commit.method,
+                });
+            }
+            const commitArgs = binding.commit.args.map(argument => {
+                if (argument === 'api') return api;
+                if (argument === 'target') return payload?.target;
+                if (argument === 'result') return result;
+                return argument;
+            });
+            commitReceiver[binding.commit.method](...commitArgs);
+        }
+
+        return result;
     };
 
     return Object.freeze({

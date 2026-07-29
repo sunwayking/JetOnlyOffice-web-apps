@@ -38,6 +38,7 @@ import FilterView from '../../src/view/FilterOptions';
 import { f7,Sheet,Popover } from 'framework7-react';
 import { Device } from '../../../../common/mobile/utils/device';
 import { useTranslation } from 'react-i18next';
+import { executeSpreadsheetCommand } from '../lib/spreadsheetEditorRuntime.mjs';
 
 const FilterOptionsController = memo(props => {
     const { t } = useTranslation();
@@ -94,15 +95,20 @@ const FilterOptionsController = memo(props => {
     }
 
     const onSort = (type) => {
-        const api = Common.EditorApi.get();
-        api.asc_sortColFilter(type == 'sortdown' ? Asc.c_oAscSortOptions.Ascending : Asc.c_oAscSortOptions.Descending, configRef.current.asc_getCellId(), configRef.current.asc_getDisplayName());
+        const sortType = type == 'sortdown' ? Asc.c_oAscSortOptions.Ascending : Asc.c_oAscSortOptions.Descending;
+        const commandId = sortType === Asc.c_oAscSortOptions.Ascending
+            ? 'spreadsheet.desktop.sort-ascending'
+            : 'spreadsheet.desktop.sort-descending';
+        executeSpreadsheetCommand(commandId, {
+            operation: 'apply',
+            args: [sortType, configRef.current.asc_getCellId(), configRef.current.asc_getDisplayName()],
+        });
         f7.sheet.close('.picker__sheet');
         f7.popover.close('#picker-popover');
     };
     
     const onClearFilter = () => {
-        const api = Common.EditorApi.get();
-        if(api) api.asc_clearFilter();
+        executeSpreadsheetCommand('spreadsheet.desktop.clear-filter');
         setCheckSort('');
     };
 
@@ -111,7 +117,10 @@ const FilterOptionsController = memo(props => {
         let formatTableInfo = api.asc_getCellInfo().asc_getFormatTableInfo();
         let tablename = (formatTableInfo) ? formatTableInfo.asc_getTableName() : undefined;
         if(api) {
-            api.asc_changeAutoFilter(tablename, Asc.c_oAscChangeFilterOptions.filter, false);
+            executeSpreadsheetCommand('spreadsheet.desktop.auto-filter', {
+                operation: 'toggle',
+                args: [tablename, Asc.c_oAscChangeFilterOptions.filter, false],
+            });
             f7.sheet.close('.picker__sheet');
             f7.popover.close('#picker-popover');
         }
@@ -157,7 +166,10 @@ const FilterOptionsController = memo(props => {
             );
 
             configRef.current.asc_getFilterObj().asc_setType(Asc.c_oAscAutoFilterTypes.Filters);
-            api.asc_applyAutoFilter(configRef.current);
+            executeSpreadsheetCommand('spreadsheet.desktop.auto-filter', {
+                operation: 'apply',
+                args: [configRef.current],
+            });
         }
 
         setClearDisable(configRef.current);

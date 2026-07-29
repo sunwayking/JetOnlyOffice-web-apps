@@ -38,6 +38,7 @@ import { f7 } from 'framework7-react';
 import {Device} from '../../../../../common/mobile/utils/device';
 
 import AddShape from '../../view/add/AddShape';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class AddShapeController extends Component {
     constructor (props) {
@@ -54,8 +55,7 @@ class AddShapeController extends Component {
     }
 
     onShapeClick (type) {
-        const api = Common.EditorApi.get();
-        api.asc_addShapeOnSheet(type);
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-shape', { value: type });
         this.closeModal();
     }
 

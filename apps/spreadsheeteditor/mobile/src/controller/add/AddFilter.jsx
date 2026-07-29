@@ -39,6 +39,7 @@ import { withTranslation } from 'react-i18next';
 import {observer, inject} from "mobx-react";
 
 import AddSortAndFilter from '../../view/add/AddFilter';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class AddFilterController extends Component {
     constructor (props) {
@@ -87,7 +88,10 @@ class AddFilterController extends Component {
         f7.popover.close('#add-popover');
         
         let typeCheck = type == 'down' ? Asc.c_oAscSortOptions.Ascending : Asc.c_oAscSortOptions.Descending;
-        let res = api.asc_sortCellsRangeExpand();
+        const commandId = typeCheck === Asc.c_oAscSortOptions.Ascending
+            ? 'spreadsheet.desktop.sort-ascending'
+            : 'spreadsheet.desktop.sort-descending';
+        let res = executeSpreadsheetCommand(commandId);
         switch (res) {
             case Asc.c_oAscSelectionSortExpand.showExpandMessage:
                 f7.dialog.create({
@@ -98,14 +102,20 @@ class AddFilterController extends Component {
                             text: _t.txtExpand,
                             bold: true,
                             onClick: () => {
-                                api.asc_sortColFilter(typeCheck, '', undefined, undefined, true);
+                                executeSpreadsheetCommand(commandId, {
+                                    operation: 'apply',
+                                    args: [typeCheck, '', undefined, undefined, true],
+                                });
                             }
                         },
                         {
                             text: _t.txtSortSelected,
                             bold: true,
                             onClick: () => {
-                                api.asc_sortColFilter(typeCheck, '', undefined, undefined);
+                                executeSpreadsheetCommand(commandId, {
+                                    operation: 'apply',
+                                    args: [typeCheck, '', undefined, undefined],
+                                });
                             }
                         },
                         {
@@ -124,7 +134,10 @@ class AddFilterController extends Component {
                             text: _t.txtYes,
                             bold: true,
                             onClick: () => {
-                                api.asc_sortColFilter(typeCheck, '', undefined, undefined, false);
+                                executeSpreadsheetCommand(commandId, {
+                                    operation: 'apply',
+                                    args: [typeCheck, '', undefined, undefined, false],
+                                });
                             }
                         },
                         {
@@ -136,7 +149,10 @@ class AddFilterController extends Component {
                 break;
             case Asc.c_oAscSelectionSortExpand.expandAndNotShowMessage:
             case Asc.c_oAscSelectionSortExpand.notExpandAndNotShowMessage:
-                api.asc_sortColFilter(typeCheck, '', undefined, undefined, res === Asc.c_oAscSelectionSortExpand.expandAndNotShowMessage);
+                executeSpreadsheetCommand(commandId, {
+                    operation: 'apply',
+                    args: [typeCheck, '', undefined, undefined, res === Asc.c_oAscSelectionSortExpand.expandAndNotShowMessage],
+                });
                 break;
         }
     }
@@ -148,9 +164,12 @@ class AddFilterController extends Component {
         const tablename = (formatTableInfo) ? formatTableInfo.asc_getTableName() : undefined;
         
         if (checked || tablename) {
-            api.asc_addAutoFilter();
+            executeSpreadsheetCommand('spreadsheet.desktop.auto-filter');
         } else {
-            api.asc_changeAutoFilter(tablename, Asc.c_oAscChangeFilterOptions.filter, checked);
+            executeSpreadsheetCommand('spreadsheet.desktop.auto-filter', {
+                operation: 'toggle',
+                args: [tablename, Asc.c_oAscChangeFilterOptions.filter, checked],
+            });
         }
     }
 

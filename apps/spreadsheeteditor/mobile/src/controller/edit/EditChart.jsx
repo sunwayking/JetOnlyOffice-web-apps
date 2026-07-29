@@ -39,6 +39,7 @@ import {Device} from '../../../../../common/mobile/utils/device';
 import {observer, inject} from "mobx-react";
 
 import { EditChart } from '../../view/edit/EditChart';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class EditChartController extends Component {
     constructor (props) {
@@ -86,8 +87,7 @@ class EditChartController extends Component {
     };
 
     onRemoveChart() {
-        const api = Common.EditorApi.get();
-        api.asc_Remove();
+        executeSpreadsheetCommand('spreadsheet.object.delete');
         this.closeModal();
     }
 
@@ -188,7 +188,6 @@ class EditChartController extends Component {
     }
 
     onReorder(type) {
-        const api = Common.EditorApi.get();
         let ascType;
 
         if (type == 'all-up') {
@@ -201,7 +200,9 @@ class EditChartController extends Component {
             ascType = Asc.c_oAscDrawingLayerType.SendBackward;
         }
 
-        api.asc_setSelectedDrawingObjectLayer(ascType);
+        executeSpreadsheetCommand(type === 'all-down' || type === 'move-down'
+            ? 'spreadsheet.desktop.object-backward'
+            : 'spreadsheet.desktop.object-forward', { value: ascType });
     }
 
     setLayoutProperty(propertyMethod, value) {

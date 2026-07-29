@@ -39,6 +39,7 @@ import {Device} from '../../../../../common/mobile/utils/device';
 import {withTranslation} from 'react-i18next';
 
 import {AddLink, PageTypeLink, PageSheet} from '../../view/add/AddLink';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 const routes = [
     {
@@ -145,7 +146,7 @@ class AddLinkController extends Component {
         }
 
         link.asc_setTooltip(args.tooltip);
-        api.asc_insertHyperlink(link);
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-link', { value: link });
         
         if(this.props.isNavigate) {
             this.closeModal('.add-popup', '#add-popover');

@@ -39,6 +39,7 @@ import { Device } from '../../../../../common/mobile/utils/device';
 import { withTranslation, useTranslation } from 'react-i18next';
 import { f7 } from 'framework7-react';
 import { observer, inject } from "mobx-react";
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class DownloadController extends Component {
     constructor(props) {
@@ -90,13 +91,17 @@ class DownloadController extends Component {
                         {
                             text: _t.textOk,
                             onClick: () => {
-                                api.asc_DownloadAs(new Asc.asc_CDownloadOptions(format));
+                                executeSpreadsheetCommand('spreadsheet.desktop.save-desktop', {
+                                    value: new Asc.asc_CDownloadOptions(format),
+                                });
                             }
                         }
                     ]
                 }).open();
             } else {
-                api.asc_DownloadAs(new Asc.asc_CDownloadOptions(format));
+                executeSpreadsheetCommand('spreadsheet.desktop.save-desktop', {
+                    value: new Asc.asc_CDownloadOptions(format),
+                });
             }
         }
     }

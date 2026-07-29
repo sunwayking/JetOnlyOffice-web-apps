@@ -38,6 +38,7 @@ import { Device } from '../../../../common/mobile/utils/device';
 import { f7 } from "framework7-react";
 import { Encoding } from "../view/Encoding";
 import { withTranslation } from 'react-i18next';
+import { executeSpreadsheetCommand } from '../lib/spreadsheetEditorRuntime.mjs';
 
 class EncodingController extends Component {
     constructor(props) {
@@ -109,7 +110,7 @@ class EncodingController extends Component {
 
         if(this.mode === 2) {
             this.formatOptions && this.formatOptions.asc_setAdvancedOptions(new Asc.asc_CTextOptions(valueEncoding, valueDelimeter));
-            api.asc_DownloadAs(this.formatOptions);
+            executeSpreadsheetCommand('spreadsheet.desktop.save-desktop', { value: this.formatOptions });
         } else {
             api.asc_setAdvancedOptions(Asc.c_oAscAdvancedOptionsID.CSV, new Asc.asc_CTextOptions(valueEncoding, valueDelimeter));
         }

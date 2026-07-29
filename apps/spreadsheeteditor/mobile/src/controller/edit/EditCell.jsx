@@ -38,6 +38,7 @@ import { EditCell } from '../../view/edit/EditCell';
 import { f7 } from 'framework7-react';
 import {observer, inject} from "mobx-react";
 import { Device } from '../../../../../common/mobile/utils/device';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class EditCellController extends Component {
     constructor (props) {
@@ -180,39 +181,35 @@ class EditCellController extends Component {
     }
 
     toggleBold(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellBold(value);
+        executeSpreadsheetCommand('spreadsheet.text.bold', { value });
     }
 
     toggleItalic(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellItalic(value);
-        
+        executeSpreadsheetCommand('spreadsheet.text.italic', { value });
     }
 
     toggleUnderline(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellUnderline(value);
+        executeSpreadsheetCommand('spreadsheet.desktop.underline', { value });
     }
 
     toggleStrikethrough(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellStrikeout(value);
+        executeSpreadsheetCommand('spreadsheet.desktop.strikeout', { value });
     }
 
     onStyleClick(type) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellStyle(type);
+        executeSpreadsheetCommand('spreadsheet.desktop.cell-style', { value: type });
     }
 
     onTextColor(color) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellTextColor(Common.Utils.ThemeColor.getRgbColor(color));
+        executeSpreadsheetCommand('spreadsheet.desktop.font-color', {
+            value: Common.Utils.ThemeColor.getRgbColor(color),
+        });
     }
 
     onFillColor(color) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellBackgroundColor(color == 'transparent' ? null : Common.Utils.ThemeColor.getRgbColor(color));
+        executeSpreadsheetCommand('spreadsheet.desktop.fill-color', {
+            value: color == 'transparent' ? null : Common.Utils.ThemeColor.getRgbColor(color),
+        });
     }
 
     onFontSize(curSize, isDecrement) {
@@ -220,9 +217,9 @@ class EditCellController extends Component {
         let size = curSize;
 
         if (isDecrement) {
-            typeof size === 'undefined' ? api.asc_decreaseFontSize() : size = Math.max(1, --size);
+            typeof size === 'undefined' ? executeSpreadsheetCommand('spreadsheet.desktop.decrease-font') : size = Math.max(1, --size);
         } else {
-            typeof size === 'undefined' ? api.asc_increaseFontSize() : size = Math.min(409, ++size);
+            typeof size === 'undefined' ? executeSpreadsheetCommand('spreadsheet.desktop.increase-font') : size = Math.min(409, ++size);
         }
 
         if (typeof size !== 'undefined') {
@@ -239,7 +236,6 @@ class EditCellController extends Component {
     }
 
     onHAlignChange(value) {
-        const api = Common.EditorApi.get();
         let type;
 
         if (value == 'center') {
@@ -252,11 +248,10 @@ class EditCellController extends Component {
             type = AscCommon.align_Left;
         }
 
-        api.asc_setCellAlign(type);
+        executeSpreadsheetCommand('spreadsheet.desktop.halign', { value: type });
     }
 
     onVAlignChange(value) {
-        const api = Common.EditorApi.get();
         let type;
 
         if (value == 'top') {
@@ -267,16 +262,14 @@ class EditCellController extends Component {
             type = Asc.c_oAscVAlign.Bottom;
         }
 
-        api.asc_setCellVertAlign(type);
+        executeSpreadsheetCommand('spreadsheet.desktop.valign', { value: type });
     }
 
     onWrapTextChange(checked) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellTextWrap(checked);
+        executeSpreadsheetCommand('spreadsheet.desktop.wrap-text', { value: checked });
     }
 
     onTextOrientationChange(value) {
-        const api = Common.EditorApi.get();
         let angle = 0;
 
         switch (value) {
@@ -287,7 +280,7 @@ class EditCellController extends Component {
             case 'rotatedown': angle = -90; break;
         }
 
-        api.asc_setCellAngle(angle);
+        executeSpreadsheetCommand('spreadsheet.desktop.text-orientation', { value: angle });
     }
 
     onCellFormat(format) {
@@ -347,19 +340,17 @@ class EditCellController extends Component {
             newBorders[borderId] = new Asc.asc_CBorder(bordersWidth, bordersColor);
         }
 
-        api.asc_setCellBorders(newBorders);
+        executeSpreadsheetCommand('spreadsheet.desktop.cell-borders', { value: newBorders });
     }
 
     onTextColorAuto() {
-        const api = Common.EditorApi.get();
         const color = new Asc.asc_CColor();
         color.put_auto(true);
-        api.asc_setCellTextColor(color);
+        executeSpreadsheetCommand('spreadsheet.desktop.font-color', { value: color });
     }
 
     setRtlTextdDirection(direction) {
-        const api = Common.EditorApi.get();        
-        api.asc_setCellReadingOrder(direction);
+        executeSpreadsheetCommand('spreadsheet.desktop.direction', { value: direction });
     }
 
     render () {

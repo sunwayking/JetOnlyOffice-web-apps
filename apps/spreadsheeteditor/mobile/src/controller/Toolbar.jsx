@@ -158,7 +158,7 @@ const ToolbarController = inject('storeAppOptions', 'users', 'storeSpreadsheetIn
                             text: _t.textSave,
                             onClick: () => {
                                 LocalStorage.save();
-                                Common.EditorApi.get().asc_Save();
+                                executeSpreadsheetCommand('spreadsheet.desktop.save');
                                 setTimeout(() => goBackLocation(current), 200);
                             }
                         },

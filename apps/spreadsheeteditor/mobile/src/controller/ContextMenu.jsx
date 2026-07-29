@@ -150,7 +150,7 @@ class ContextMenu extends ContextMenuController {
                 }
                 break;
             case 'copy':
-                if (!api.asc_Copy() && !LocalStorage.getBool("sse-hide-copy-cut-paste-warning") && this.props.canCopy) {
+                if (!executeSpreadsheetCommand('spreadsheet.clipboard.copy') && !LocalStorage.getBool("sse-hide-copy-cut-paste-warning") && this.props.canCopy) {
                     this.showCopyCutPasteModal();
                 }
                 break;
@@ -186,7 +186,7 @@ class ContextMenu extends ContextMenuController {
                 }
                 break;
             case 'autofillCells':
-                api.asc_fillHandleDone();
+                executeSpreadsheetCommand('spreadsheet.cell.autofill');
                 break;
         }
     }

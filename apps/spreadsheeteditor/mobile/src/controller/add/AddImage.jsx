@@ -39,6 +39,7 @@ import {Device} from '../../../../../common/mobile/utils/device';
 import {withTranslation} from 'react-i18next';
 
 import {AddImage} from '../../view/add/AddImage';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class AddImageController extends Component {
     constructor (props) {
@@ -56,8 +57,7 @@ class AddImageController extends Component {
     }
 
     onInsertByFile () {
-        const api = Common.EditorApi.get();
-        api.asc_addImage();
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-image');
         this.closeModal();
     }
 
@@ -70,8 +70,10 @@ class AddImageController extends Component {
         if (_value) {
             if ((/((^https?)|(^ftp)):\/\/.+/i.test(_value))) {
                 this.closeModal();
-                const api = Common.EditorApi.get();
-                api.asc_addImageDrawingObject([_value]);
+                executeSpreadsheetCommand('spreadsheet.desktop.insert-image', {
+                    operation: 'url',
+                    value: [_value],
+                });
             } else {
                 f7.dialog.alert(_t.txtNotUrl, _t.notcriticalErrorTitle);
             }

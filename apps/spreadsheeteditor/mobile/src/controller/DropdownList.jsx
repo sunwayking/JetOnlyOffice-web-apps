@@ -38,6 +38,7 @@ import { Device } from '../../../../common/mobile/utils/device';
 import { f7 } from "framework7-react";
 import { withTranslation } from "react-i18next";
 import DropdownList from "../view/DropdownList";
+import { executeSpreadsheetCommand } from '../lib/spreadsheetEditorRuntime.mjs';
 
 class DropdownListController extends Component {
     constructor(props) {
@@ -77,10 +78,10 @@ class DropdownListController extends Component {
     }
 
     onChangeItemList(value) {
-        const api = Common.EditorApi.get();
-
         this.closeModal();
-        api.asc_insertInCell(value, Asc.c_oAscPopUpSelectorType.None, false);
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-formula', {
+            args: [value, Asc.c_oAscPopUpSelectorType.None, false],
+        });
     }
 
     render() {

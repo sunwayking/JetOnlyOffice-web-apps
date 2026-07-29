@@ -39,6 +39,7 @@ import { f7 } from 'framework7-react';
 import {Device} from '../../../../../common/mobile/utils/device';
 import {LocalStorage} from '../../../../../common/mobile/utils/LocalStorage.mjs';
 import {AddFunction} from '../../view/add/AddFunction';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class _FunctionGroups extends Component {
     constructor (props) {
@@ -119,7 +120,9 @@ class AddFunctionController extends Component {
 
     onInsertFunction (type) {
         const api = Common.EditorApi.get();
-        api.asc_insertInCell(api.asc_getFormulaLocaleName(type), Asc.c_oAscPopUpSelectorType.Func, true);
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-formula', {
+            args: [api.asc_getFormulaLocaleName(type), Asc.c_oAscPopUpSelectorType.Func, true],
+        });
         this.closeModal();
     }
 

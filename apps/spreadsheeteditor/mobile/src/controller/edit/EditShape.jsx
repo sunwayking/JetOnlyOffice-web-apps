@@ -39,6 +39,7 @@ import {Device} from '../../../../../common/mobile/utils/device';
 import {observer, inject} from "mobx-react";
 
 import { EditShape } from '../../view/edit/EditShape';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class EditShapeController extends Component {
     constructor (props) {
@@ -57,7 +58,6 @@ class EditShapeController extends Component {
     }
 
     onReorder(type) {
-        const api = Common.EditorApi.get();
         let ascType;
 
         switch(type) {
@@ -75,7 +75,9 @@ class EditShapeController extends Component {
                 break;
         }
 
-        api.asc_setSelectedDrawingObjectLayer(ascType);
+        executeSpreadsheetCommand(type === 'all-down' || type === 'move-down'
+            ? 'spreadsheet.desktop.object-backward'
+            : 'spreadsheet.desktop.object-forward', { value: ascType });
     }
 
     closeModal() {
@@ -87,8 +89,7 @@ class EditShapeController extends Component {
     };
 
     onRemoveShape() {
-        const api = Common.EditorApi.get();
-        api.asc_Remove();
+        executeSpreadsheetCommand('spreadsheet.object.delete');
         this.closeModal();
     }
 

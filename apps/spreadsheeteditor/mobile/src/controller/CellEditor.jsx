@@ -39,6 +39,7 @@ import { f7 } from 'framework7-react';
 import { Device } from '../../../../common/mobile/utils/device';
 import { useTranslation } from 'react-i18next';
 import {observer, inject} from "mobx-react";
+import { executeSpreadsheetCommand } from '../lib/spreadsheetEditorRuntime.mjs';
 
 const CellEditor = inject("storeFunctions")(observer(props => {
     useEffect(() => {
@@ -333,8 +334,9 @@ const CellEditor = inject("storeFunctions")(observer(props => {
     }
 
     const insertFormula = (name, type) => {
-        const api = Common.EditorApi.get();
-        api.asc_insertInCell(name, type, false);
+        executeSpreadsheetCommand('spreadsheet.desktop.insert-formula', {
+            args: [name, type, false],
+        });
         f7.popover.close('#idx-functions-list');
     }
     

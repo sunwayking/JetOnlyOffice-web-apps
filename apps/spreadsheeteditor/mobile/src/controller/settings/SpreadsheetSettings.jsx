@@ -37,6 +37,7 @@
 import React, {Component} from 'react';
 import {SpreadsheetSettings} from '../../view/settings/SpreadsheetSettings';
 import {observer, inject} from "mobx-react";
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class SpreadsheetSettingsController extends Component {
     constructor (props) {
@@ -95,12 +96,16 @@ class SpreadsheetSettingsController extends Component {
             case 'bottom': changeProps.asc_setBottom(marginValue); break;
         }
 
-        api.asc_changePageMargins(changeProps, undefined, undefined, undefined, undefined, api.asc_getActiveWorksheetIndex());
+        executeSpreadsheetCommand('spreadsheet.desktop.page-margins', {
+            args: [changeProps, undefined, undefined, undefined, undefined, api.asc_getActiveWorksheetIndex()],
+        });
     }
 
     onOrientationChange(value) {
         const api = Common.EditorApi.get();
-        api.asc_changePageOrient(+value === Asc.c_oAscPageOrientation.PagePortrait, api.asc_getActiveWorksheetIndex());
+        executeSpreadsheetCommand('spreadsheet.desktop.page-orient', {
+            args: [+value === Asc.c_oAscPageOrientation.PagePortrait, api.asc_getActiveWorksheetIndex()],
+        });
     }
 
     clickCheckboxHideHeadings(value) {
@@ -119,13 +124,14 @@ class SpreadsheetSettingsController extends Component {
     }
 
     onColorSchemeChange(index) {
-        const api = Common.EditorApi.get();
-        api.asc_ChangeColorSchemeByIdx(+index); 
+        executeSpreadsheetCommand('spreadsheet.desktop.theme-colors', { value: +index });
     }
 
     onFormatChange(value) {
         const api = Common.EditorApi.get();
-        api.asc_changeDocSize(parseFloat(value[0]), parseFloat(value[1]), api.asc_getActiveWorksheetIndex());
+        executeSpreadsheetCommand('spreadsheet.desktop.page-size', {
+            args: [parseFloat(value[0]), parseFloat(value[1]), api.asc_getActiveWorksheetIndex()],
+        });
         this.initSpreadsheetSettings();
     }
 

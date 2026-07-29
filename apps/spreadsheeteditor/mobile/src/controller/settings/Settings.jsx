@@ -40,6 +40,7 @@ import SettingsView from "../../view/settings/Settings";
 import { f7 } from 'framework7-react';
 import { useTranslation } from 'react-i18next';
 import { LocalStorage } from "../../../../../common/mobile/utils/LocalStorage.mjs";
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 export const SettingsContext = createContext();
 
@@ -59,11 +60,9 @@ const SettingsController = inject('storeAppOptions', 'storeSpreadsheetInfo')(obs
     };
 
     const onPrint = () => {
-        const api = Common.EditorApi.get();
-
         closeModal();
         setTimeout(() => {
-            api.asc_Print();
+            executeSpreadsheetCommand('spreadsheet.desktop.print');
         }, 400);
     };
 
@@ -221,7 +220,7 @@ const SettingsController = inject('storeAppOptions', 'storeSpreadsheetInfo')(obs
     };
 
     const tryToSave = () => {
-        Common.EditorApi.get().asc_Save();
+        executeSpreadsheetCommand('spreadsheet.desktop.save');
     };
 
     return (

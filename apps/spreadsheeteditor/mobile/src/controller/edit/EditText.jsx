@@ -38,6 +38,7 @@ import { f7 } from 'framework7-react';
 import {Device} from '../../../../../common/mobile/utils/device';
 
 import { EditText } from '../../view/edit/EditText';
+import { executeSpreadsheetCommand } from '../../lib/spreadsheetEditorRuntime.mjs';
 
 class EditTextController extends Component {
     constructor (props) {
@@ -45,23 +46,19 @@ class EditTextController extends Component {
     }
 
     toggleBold(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellBold(value);
+        executeSpreadsheetCommand('spreadsheet.text.bold', { value });
     };
 
     toggleItalic(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellItalic(value);
+        executeSpreadsheetCommand('spreadsheet.text.italic', { value });
     };
 
     toggleUnderline(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellUnderline(value);
+        executeSpreadsheetCommand('spreadsheet.desktop.underline', { value });
     };
 
     toggleStrikethrough(value) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellStrikeout(value);
+        executeSpreadsheetCommand('spreadsheet.desktop.strikeout', { value });
     }
 
     // Additional
@@ -102,7 +99,7 @@ class EditTextController extends Component {
             if ('superscript' === type) {
                 api.asc_setCellSuperscript(value);
             } else {
-                api.asc_setCellSubscript(value);
+                executeSpreadsheetCommand('spreadsheet.desktop.subscript', { value });
             }
         }
     }
@@ -124,7 +121,6 @@ class EditTextController extends Component {
     }
 
     onParagraphAlign(type) {
-        const api = Common.EditorApi.get();
         let value = AscCommon.align_Left;
         
         switch (type) {
@@ -139,11 +135,10 @@ class EditTextController extends Component {
                 break;
         }
 
-        api.asc_setCellAlign(value);
+        executeSpreadsheetCommand('spreadsheet.desktop.halign', { value });
     };
 
     onParagraphValign(type) {
-        const api = Common.EditorApi.get();
         let value;
 
         switch(type) {
@@ -158,7 +153,7 @@ class EditTextController extends Component {
                 break;
         }
 
-        api.asc_setCellVertAlign(value);
+        executeSpreadsheetCommand('spreadsheet.desktop.valign', { value });
     };
 
     changeFontSize(curSize, isDecrement) {
@@ -166,9 +161,9 @@ class EditTextController extends Component {
         let size = curSize;
 
         if (isDecrement) {
-            typeof size === 'undefined' ? api.asc_decreaseFontSize() : size = Math.max(1, --size);
+            typeof size === 'undefined' ? executeSpreadsheetCommand('spreadsheet.desktop.decrease-font') : size = Math.max(1, --size);
         } else {
-            typeof size === 'undefined' ? api.asc_increaseFontSize() : size = Math.min(409, ++size);
+            typeof size === 'undefined' ? executeSpreadsheetCommand('spreadsheet.desktop.increase-font') : size = Math.min(409, ++size);
         }
 
         if (typeof size !== 'undefined') {
@@ -184,8 +179,9 @@ class EditTextController extends Component {
     }
 
     onTextColor(color) {
-        const api = Common.EditorApi.get();
-        api.asc_setCellTextColor(Common.Utils.ThemeColor.getRgbColor(color));
+        executeSpreadsheetCommand('spreadsheet.desktop.font-color', {
+            value: Common.Utils.ThemeColor.getRgbColor(color),
+        });
     }
 
     setOrientationTextShape(direction) {
@@ -197,8 +193,7 @@ class EditTextController extends Component {
     }
 
     setRtlTextdDirection(direction) {
-        const api = Common.EditorApi.get();        
-        api.asc_setCellReadingOrder(direction);
+        executeSpreadsheetCommand('spreadsheet.desktop.text-direction', { value: direction });
     }
 
     render () {
