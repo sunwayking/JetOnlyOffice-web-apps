@@ -234,7 +234,7 @@ const SettingsController = inject('storeAppOptions', 'storeSpreadsheetInfo')(obs
             switchAutosave,
             tryToSave,
         }}>
-            <SettingsView />
+            <SettingsView initialTarget={props.initialTarget} />
         </SettingsContext.Provider>
     );
 }));

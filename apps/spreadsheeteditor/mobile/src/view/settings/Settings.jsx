@@ -120,8 +120,19 @@ routes.forEach(route => {
     };
 });
 
-const SettingsView = () => {
+const settingsRoutes = Object.freeze({
+    about: '/about/',
+    'application-settings': '/application-settings/',
+    download: '/download/',
+    'spreadsheet-info': '/spreadsheet-info/',
+    'spreadsheet-settings': '/spreadsheet-settings/',
+    theme: '/theme-settings/',
+});
+
+const SettingsView = ({initialTarget}) => {
     const mainContext = useContext(MainContext);
+    const hasDirectRoute = Boolean(settingsRoutes[initialTarget]);
+    const initialUrl = settingsRoutes[initialTarget] || '/settings-page/';
 
     useEffect(() => {
         if(Device.phone) {
@@ -134,13 +145,13 @@ const SettingsView = () => {
     return (
         !Device.phone ?
             <Popover id="settings-popover" closeByOutsideClick={false} className="popover__titled" onPopoverClosed={() => mainContext.closeOptions('settings')}>
-                <View routes={routes} url='/settings-page/' style={{ height: '410px' }}>
-                    <SettingsPage />
+                <View routes={routes} url={initialUrl} style={{ height: '410px' }}>
+                    {!hasDirectRoute && <SettingsPage />}
                 </View>
             </Popover> :
             <Popup className="settings-popup" onPopupClosed={() => mainContext.closeOptions('settings')}>
-                <View routes={routes} url='/settings-page/'>
-                    <SettingsPage />
+                <View routes={routes} url={initialUrl}>
+                    {!hasDirectRoute && <SettingsPage />}
                 </View>
             </Popup>
     )

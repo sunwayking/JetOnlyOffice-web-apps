@@ -64,6 +64,10 @@ import {
     initializeSpreadsheetEditorRuntime,
     updateSpreadsheetEditorPermissions,
 } from '../lib/spreadsheetEditorRuntime.mjs';
+import {
+    createSpreadsheetHostCommandHandler,
+    createSpreadsheetNavigationHandler,
+} from '../lib/mobileCommandAdapters.mjs';
 import '../../../../common/main/lib/util/LanguageInfo.js'
 
 @inject(
@@ -408,9 +412,19 @@ class MainController extends Component {
                         'translate': _translate,
                         'isRtlInterface': Common.Locale.isCurrentLangRtl
                     });
+                    const commandProvider = EditorUIController.getCommandProvider();
                     initializeSpreadsheetEditorRuntime({
-                        inventory: EditorUIController.getCommandProvider().inventory,
+                        inventory: commandProvider.inventory,
                         getApi: () => this.api,
+                        navigateCommand: createSpreadsheetNavigationHandler({
+                            inventory: commandProvider.inventory,
+                            notifications: Common.Notifications,
+                        }),
+                        executeHostCommand: createSpreadsheetHostCommandHandler({
+                            gateway: Common.Gateway,
+                            notifications: Common.Notifications,
+                            suggestUrl: '{{SUGGEST_URL}}',
+                        }),
                     });
 
                     Common.Notifications.trigger('engineCreated', this.api);

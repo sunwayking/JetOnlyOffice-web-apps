@@ -179,7 +179,6 @@ const remainingNavigationCommands = new Set([
     'spreadsheet.desktop.about',
     'spreadsheet.desktop.advancedsearch',
     'spreadsheet.desktop.auto-bordercolor',
-    'spreadsheet.desktop.back',
     'spreadsheet.desktop.charttab',
     'spreadsheet.desktop.custom-border-color',
     'spreadsheet.desktop.draw',
@@ -202,6 +201,7 @@ const remainingNavigationCommands = new Set([
 ]);
 
 const remainingHostBindings = {
+    'spreadsheet.desktop.back': 'go-back',
     'spreadsheet.desktop.close-editor': 'close-editor',
     'spreadsheet.desktop.edit': 'request-edit-rights',
     'spreadsheet.desktop.exit': 'go-back',
@@ -225,6 +225,7 @@ const remainingSdkOperations = {
     'spreadsheet.desktop.formula-textdata': { wizard: 'asc_startWizard' },
     'spreadsheet.desktop.freeze-panes': { border: 'asc_setFrozenPaneBorderType' },
     'spreadsheet.desktop.import-data': {
+        'preview-text': 'asc_TextImport',
         'text-to-columns': 'asc_TextToColumns',
         'xml-start': 'asc_ImportXmlStart',
         'xml-end': 'asc_ImportXmlEnd',
@@ -611,13 +612,18 @@ test('spreadsheet closure commands invoke audited SDKJS bindings and aliases', (
     );
 });
 
-test('spreadsheet provider executes SDK object operations and returns navigation intents', () => {
+test('spreadsheet provider executes SDK object operations and dispatches navigation intents', () => {
     const calls = [];
     const api = {
         asc_getCellInfo: () => ({ type: 'cell' }),
         asc_refreshAllPivots: (...args) => calls.push(['api', 'asc_refreshAllPivots', ...args]),
     };
-    const provider = createSpreadsheetCommandProvider({ inventory, getApi: () => api });
+    const provider = createSpreadsheetCommandProvider({
+        inventory,
+        getApi: () => api,
+        navigateCommand: intent => intent,
+        executeHostCommand: intent => intent,
+    });
     const target = new Proxy({}, {
         get(object, property) {
             if (typeof property === 'string') {
@@ -662,7 +668,7 @@ test('spreadsheet provider executes SDK object operations and returns navigation
     assert.deepEqual(provider.execute('spreadsheet.desktop.sparklinetab'), {
         type: 'navigate',
         commandId: 'spreadsheet.desktop.sparklinetab',
-        target: 'more.command-search',
+        target: 'advanced.sparkline',
     });
     assert.deepEqual(provider.execute('spreadsheet.desktop.recent'), {
         type: 'host-command',

@@ -53,6 +53,11 @@ import AddingController from '../controller/add/Add';
 import EditView from '../view/edit/Edit';
 import VersionHistoryController from '../../../../common/mobile/lib/controller/VersionHistory';
 import { DrawController } from "../../../../common/mobile/lib/controller/Draw";
+import CommandCenter from '../controller/CommandCenter';
+import {
+    activateSpreadsheetCommandDestination,
+    SPREADSHEET_COMMAND_NAVIGATION_EVENT,
+} from '../lib/mobileCommandAdapters.mjs';
 
 export const MainContext = createContext();
 
@@ -64,9 +69,12 @@ class MainPage extends Component {
             addOptionsVisible: false,
             addShowOptions: null,
             settingsVisible: false,
+            settingsTarget: null,
             collaborationVisible: false,
             addLinkSettingsVisible: false,
             editLinkSettingsVisible: false,
+            commandSearchVisible: false,
+            commandSearchTarget: null,
             isOpenModal: false
         };
     }
@@ -89,6 +97,7 @@ class MainPage extends Component {
         } else if ( opts === 'settings' ) {
             this.state.settingsVisible && (opened = true);
             newState.settingsVisible = true;
+            newState.settingsTarget = showOpts?.panels?.[0] || showOpts?.panel || null;
             newState.isOpenModal = true;
         } else if ( opts === 'coauth' ) {
             this.state.collaborationVisible && (opened = true);
@@ -102,6 +111,11 @@ class MainPage extends Component {
             newState.editLinkSettingsVisible = true;
         } else if (opts === 'history') {
             newState.historyVisible = true;
+        } else if (opts === 'command-search') {
+            this.state.commandSearchVisible && (opened = true);
+            newState.commandSearchVisible = true;
+            newState.commandSearchTarget = showOpts?.panel || showOpts?.target || showOpts || null;
+            newState.isOpenModal = true;
         }
 
         for (let key in this.state) {
@@ -121,14 +135,14 @@ class MainPage extends Component {
         }
     };
 
-    handleOptionsViewClosed = opts => {
+    handleOptionsViewClosed = (opts, afterClosed) => {
         this.setState(state => {
             if ( opts == 'edit' )
                 return {editOptionsVisible: false, isOpenModal: false};
             else if ( opts == 'add' )
                 return {addOptionsVisible: false, addShowOptions: null, isOpenModal: false};
             else if ( opts == 'settings' )
-                return {settingsVisible: false, isOpenModal: false};
+                return {settingsVisible: false, settingsTarget: null, isOpenModal: false};
             else if ( opts == 'coauth' )
                 return {collaborationVisible: false, isOpenModal: false};
             else if ( opts === 'add-link') 
@@ -137,11 +151,14 @@ class MainPage extends Component {
                 return {editLinkSettingsVisible: false};
             else if (opts === 'history')
                 return {historyVisible: false}
+            else if (opts === 'command-search')
+                return {commandSearchVisible: false, commandSearchTarget: null, isOpenModal: false};
+        }, () => {
+            if ((opts === 'edit' || opts === 'coauth') && Device.phone) {
+                f7.navbar.show('.main-navbar');
+            }
+            if (typeof afterClosed === 'function') afterClosed();
         });
-
-        if ((opts === 'edit' || opts === 'coauth') && Device.phone) {
-            f7.navbar.show('.main-navbar');
-        }
     };
 
     touchMoveHandler (e) {
@@ -156,6 +173,7 @@ class MainPage extends Component {
 
     componentDidMount () {
         document.addEventListener('touchmove', this.touchMoveHandler);
+        Common.Notifications.on(SPREADSHEET_COMMAND_NAVIGATION_EVENT, this.handleCommandNavigation);
 
         if (Device.ios) {
             document.addEventListener('gesturestart', this.gesturePreventHandler);
@@ -166,6 +184,7 @@ class MainPage extends Component {
 
     componentWillUnmount() {
         document.removeEventListener('touchmove', this.touchMoveHandler);
+        Common.Notifications.off(SPREADSHEET_COMMAND_NAVIGATION_EVENT, this.handleCommandNavigation);
 
         if (Device.ios) {
             document.removeEventListener('gesturestart', this.gesturePreventHandler);
@@ -173,6 +192,17 @@ class MainPage extends Component {
             document.removeEventListener('gestureend', this.gesturePreventHandler);
         }
     }
+
+    handleCommandNavigation = destination => {
+        activateSpreadsheetCommandDestination(destination, {
+            enableSearch: () => f7.searchbar.enable('.searchbar'),
+            openCommandPanel: (panel, commandId) => this.handleClickToOpenOptions('command-search', {
+                target: panel,
+                commandId,
+            }),
+            openOptions: this.handleClickToOpenOptions,
+        });
+    };
 
     render() {
         const appOptions = this.props.storeAppOptions;
@@ -270,7 +300,7 @@ class MainPage extends Component {
                                 closeOptions={this.handleOptionsViewClosed.bind(this)} 
                             />
                         }
-                        {!this.state.settingsVisible ? null : <SettingsController />}
+                        {!this.state.settingsVisible ? null : <SettingsController initialTarget={this.state.settingsTarget} />}
                         {!this.state.collaborationVisible ? null :
                             <CollaborationView  
                                 closeOptions={this.handleOptionsViewClosed.bind(this)} 
@@ -278,6 +308,9 @@ class MainPage extends Component {
                         }
                         {!this.state.historyVisible ? null :
                             <VersionHistoryController onclosed={this.handleOptionsViewClosed.bind(this, 'history')} />
+                        }
+                        {!this.state.commandSearchVisible ? null :
+                            <CommandCenter initialTarget={this.state.commandSearchTarget} />
                         }
                         {appOptions.isDocReady &&
                             <Fragment key='filter-context'>

@@ -168,6 +168,11 @@ const SettingsPage = inject('storeAppOptions', 'storeSpreadsheetInfo', 'storeToo
                             <SvgIcon slot="media" symbolId={IconSearch.id} className={'icon icon-svg'} />
                         </ListItem>
                     }
+                    {_isEdit &&
+                        <ListItem title={t('CommandCenter.commands')} link="#" className="no-indicator" onClick={() => onOpenOptions('command-search')}>
+                            <SvgIcon slot="media" symbolId={IconSearch.id} className={'icon icon-svg'} />
+                        </ListItem>
+                    }
                     {window.matchMedia("(max-width: 359px)").matches ?
                         <ListItem title={_t.textCollaboration} link="#" onClick={() => onOpenOptions('coauth')} className='no-indicator'>
                             <SvgIcon slot="media" symbolId={IconCollaboration.id} className={'icon icon-svg'} />

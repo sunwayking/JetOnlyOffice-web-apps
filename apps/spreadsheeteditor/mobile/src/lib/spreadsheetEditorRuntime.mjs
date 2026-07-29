@@ -19,10 +19,20 @@ const runtimePermissions = {
 
 let spreadsheetRuntime = null;
 
-export function initializeSpreadsheetEditorRuntime({ inventory, getApi }) {
+export function initializeSpreadsheetEditorRuntime({
+    inventory,
+    getApi,
+    navigateCommand,
+    executeHostCommand,
+}) {
     disposeSpreadsheetEditorRuntime();
     spreadsheetRuntime = createEditorRuntime({
-        adapter: createSpreadsheetCommandProvider({ inventory, getApi }),
+        adapter: createSpreadsheetCommandProvider({
+            inventory,
+            getApi,
+            navigateCommand,
+            executeHostCommand,
+        }),
         permissions: runtimePermissions,
     });
     setActiveEditorRuntime(spreadsheetRuntime);

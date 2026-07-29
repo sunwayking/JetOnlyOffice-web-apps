@@ -21,6 +21,62 @@ const providerError = (code, message, details) => {
     return error;
 };
 
+const receiverNames = new Set(['api', 'target', 'commitTarget']);
+
+const validateBinding = (command, commands) => {
+    if (command.implementation !== 'implemented') return;
+    if (command.aliasOf) {
+        if (command.binding !== null) {
+            throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Alias command must not define a binding: ${command.id}`, {commandId: command.id});
+        }
+        if (!commands.has(command.aliasOf)) {
+            throw providerError('MOBILE_COMMAND_ALIAS_TARGET_NOT_FOUND', `Spreadsheet command alias target is unavailable: ${command.id}`, {commandId: command.id, aliasOf: command.aliasOf});
+        }
+        return;
+    }
+
+    const binding = command.binding;
+    if (!binding || !['sdk', 'sdk-object', 'navigation', 'host'].includes(binding.kind)) {
+        throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet command binding is invalid: ${command.id}`, {commandId: command.id});
+    }
+    if (binding.kind === 'navigation') {
+        if (typeof binding.target !== 'string' || !binding.target) {
+            throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet navigation target is invalid: ${command.id}`, {commandId: command.id});
+        }
+        return;
+    }
+    if (binding.kind === 'host') {
+        if (typeof binding.action !== 'string' || !binding.action) {
+            throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet host action is invalid: ${command.id}`, {commandId: command.id});
+        }
+        return;
+    }
+    if (typeof binding.method !== 'string' || !binding.method) {
+        throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet SDK method is invalid: ${command.id}`, {commandId: command.id});
+    }
+    if (binding.receiver !== undefined && !receiverNames.has(binding.receiver)) {
+        throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet SDK receiver is invalid: ${command.id}`, {commandId: command.id, receiver: binding.receiver});
+    }
+    if (binding.operations !== undefined &&
+        (!binding.operations || typeof binding.operations !== 'object' ||
+            Object.keys(binding.operations).some(operation => typeof binding.operations[operation] !== 'string' || !binding.operations[operation]))) {
+        throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet SDK operations are invalid: ${command.id}`, {commandId: command.id});
+    }
+    if (binding.operationReceivers !== undefined) {
+        const operations = binding.operations || {};
+        if (Object.keys(binding.operationReceivers).some(operation =>
+            !Object.prototype.hasOwnProperty.call(operations, operation) || !receiverNames.has(binding.operationReceivers[operation]))) {
+            throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet SDK operation receivers are invalid: ${command.id}`, {commandId: command.id});
+        }
+    }
+    if (binding.commit !== undefined) {
+        if (!binding.commit || !receiverNames.has(binding.commit.receiver) ||
+            typeof binding.commit.method !== 'string' || !Array.isArray(binding.commit.args)) {
+            throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet SDK commit binding is invalid: ${command.id}`, {commandId: command.id});
+        }
+    }
+};
+
 const getDefaultSelection = api => api.asc_getCellInfo();
 
 const createCommandDescriptor = command => {
@@ -63,6 +119,7 @@ export const createSpreadsheetCommandProvider = ({
     }
 
     const commands = new Map(inventory.commands.map(command => [command.id, command]));
+    inventory.commands.forEach(command => validateBinding(command, commands));
     const handlers = new Map();
     const descriptors = Object.freeze(inventory.commands
         .filter(command => command.implementation === 'implemented')
@@ -94,7 +151,8 @@ export const createSpreadsheetCommandProvider = ({
     const resolveReceiver = (name, api, payload) => {
         if (name === 'api') return api;
         if (name === 'commitTarget') return payload?.commitTarget;
-        return payload?.target;
+        if (name === 'target') return payload?.target;
+        throw providerError('MOBILE_COMMAND_BINDING_INVALID', `Spreadsheet command receiver is invalid: ${name}`, {receiver: name});
     };
 
     const resolveBindingCommand = command => {
@@ -170,7 +228,10 @@ export const createSpreadsheetCommandProvider = ({
                 commandId: id,
                 target: binding.target,
             });
-            return typeof navigateCommand === 'function' ? navigateCommand(intent, payload) : intent;
+            if (typeof navigateCommand !== 'function') {
+                throw providerError('MOBILE_NAVIGATION_HANDLER_UNAVAILABLE', `Spreadsheet navigation handler is unavailable: ${id}`, {commandId: id});
+            }
+            return navigateCommand(intent, payload);
         }
 
         if (binding?.kind === 'host') {
@@ -186,7 +247,10 @@ export const createSpreadsheetCommandProvider = ({
                 commandId: id,
                 action: binding.action,
             });
-            return typeof executeHostCommand === 'function' ? executeHostCommand(intent, payload) : intent;
+            if (typeof executeHostCommand !== 'function') {
+                throw providerError('MOBILE_HOST_HANDLER_UNAVAILABLE', `Spreadsheet host command handler is unavailable: ${id}`, {commandId: id});
+            }
+            return executeHostCommand(intent, payload);
         }
 
         const api = requireApi();

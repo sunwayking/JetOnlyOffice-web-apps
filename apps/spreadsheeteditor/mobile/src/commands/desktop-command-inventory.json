@@ -457,8 +457,8 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "navigation",
-        "target": "more.command-search"
+        "kind": "host",
+        "action": "go-back"
       },
       "mobilePath": "more.command-search",
       "testIds": [
@@ -1356,7 +1356,7 @@
         "kind": "sdk",
         "method": "asc_setDefinedNames"
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.named-ranges",
       "testIds": [
         "sse-issue-8-desktop-id-context-menu-item-add-named-range"
       ]
@@ -1392,7 +1392,7 @@
         "kind": "sdk",
         "method": "asc_setActiveNamedSheetView"
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.sheet-view",
       "testIds": [
         "sse-issue-8-desktop-id-toolbar-btn-closeview"
       ]
@@ -1410,7 +1410,7 @@
         "kind": "sdk",
         "method": "asc_addNamedSheetView"
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.sheet-view",
       "testIds": [
         "sse-issue-8-desktop-id-toolbar-btn-createview"
       ]
@@ -1428,12 +1428,13 @@
         "kind": "sdk",
         "method": "asc_TextFromFileOrUrl",
         "operations": {
+          "preview-text": "asc_TextImport",
           "text-to-columns": "asc_TextToColumns",
           "xml-start": "asc_ImportXmlStart",
           "xml-end": "asc_ImportXmlEnd"
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.import-data",
       "testIds": [
         "sse-issue-8-desktop-import-data"
       ]
@@ -1791,7 +1792,7 @@
           "delete": "asc_delDefinedNames"
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.named-ranges",
       "testIds": [
         "sse-issue-8-desktop-named-ranges"
       ]
@@ -2118,9 +2119,9 @@
       "implementation": "implemented",
       "binding": {
         "kind": "navigation",
-        "target": "more.command-search"
+        "target": "advanced.pivot"
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.pivot",
       "testIds": [
         "sse-issue-8-desktop-pivot"
       ],
@@ -2147,7 +2148,7 @@
           ]
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.pivot",
       "testIds": [
         "sse-issue-8-desktop-pivot-blank-rows"
       ]
@@ -2176,7 +2177,7 @@
           ]
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.pivot",
       "testIds": [
         "sse-issue-8-desktop-pivot-grand-totals"
       ]
@@ -2206,7 +2207,7 @@
           ]
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.pivot",
       "testIds": [
         "sse-issue-8-desktop-pivot-layout"
       ]
@@ -2231,7 +2232,7 @@
           "all": "api"
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.pivot",
       "testIds": [
         "sse-issue-8-desktop-pivot-refresh"
       ]
@@ -2260,7 +2261,7 @@
           ]
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.pivot",
       "testIds": [
         "sse-issue-8-desktop-pivot-subtotals"
       ]
@@ -2676,7 +2677,7 @@
           "delete": "asc_deleteNamedSheetViews"
         }
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.sheet-view",
       "testIds": [
         "sse-issue-8-desktop-sheet-view"
       ]
@@ -2694,7 +2695,7 @@
         "kind": "sdk",
         "method": "asc_setSparklineGroup"
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.sparkline",
       "testIds": [
         "sse-issue-8-sparkline-type"
       ]
@@ -2752,9 +2753,9 @@
       "implementation": "implemented",
       "binding": {
         "kind": "navigation",
-        "target": "more.command-search"
+        "target": "advanced.sparkline"
       },
-      "mobilePath": "more.command-search",
+      "mobilePath": "advanced.sparkline",
       "testIds": [
         "sse-issue-8-desktop-sparklinetab"
       ],
@@ -3190,7 +3191,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.pivot"
     },
     {
       "desktopKey": "protect",
@@ -3229,7 +3230,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.sparkline"
     },
     {
       "desktopKey": "tabledesign",
@@ -3294,7 +3295,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.import-data"
     },
     {
       "desktopKey": "id-context-menu-cell",
@@ -3327,7 +3328,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.named-ranges"
     },
     {
       "desktopKey": "id-context-menu-item-view-add-comment",
@@ -3790,7 +3791,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.named-ranges"
     },
     {
       "desktopKey": "about",
@@ -3842,7 +3843,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.pivot"
     },
     {
       "desktopKey": "pivot-grand-totals",
@@ -3855,7 +3856,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.pivot"
     },
     {
       "desktopKey": "pivot-layout",
@@ -3868,7 +3869,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.pivot"
     },
     {
       "desktopKey": "pivot-refresh",
@@ -3881,7 +3882,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.pivot"
     },
     {
       "desktopKey": "pivot-subtotals",
@@ -3894,7 +3895,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.pivot"
     },
     {
       "desktopKey": "sheet-view",
@@ -3907,7 +3908,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.sparkline"
     },
     {
       "desktopKey": "id-tab-menu-new-color",
@@ -5078,7 +5079,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.named-ranges"
     },
     {
       "desktopKey": "number-fill",
@@ -5574,7 +5575,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.sheet-view"
     },
     {
       "desktopKey": "id-toolbar-btn-createview",
@@ -5587,7 +5588,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.sheet-view"
     },
     {
       "desktopKey": "interface-theme",
@@ -5613,7 +5614,7 @@
       "permissions": [
         "edit"
       ],
-      "mobilePath": "more.command-search"
+      "mobilePath": "advanced.sheet-view"
     }
   ]
 }
