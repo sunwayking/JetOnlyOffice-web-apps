@@ -121,7 +121,7 @@ const AddingPage = inject("storeApplicationSettings")(observer(props => {
             });
         }
 
-        if(!showPanels || showPanels === 'function') {
+        if(includesSpreadsheetPanel(showPanels, 'function')) {
             tabs.push({
                 caption: _t.textFunction,
                 id: 'add-function',

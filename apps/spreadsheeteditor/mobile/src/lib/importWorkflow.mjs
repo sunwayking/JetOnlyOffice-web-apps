@@ -15,7 +15,9 @@ export function createSpreadsheetImportWorkflow({
     executeCommand,
     createTextOptions = () => new Asc.asc_CTextOptions(0, 4, ''),
     getActiveWorksheetName = () => null,
+    getDefaultXmlDestination = () => '',
     getWorksheetNames = () => [],
+    validateXmlDestination = () => true,
     commandId = 'spreadsheet.desktop.import-data',
 } = {}) {
     if (typeof executeCommand !== 'function') {
@@ -72,9 +74,15 @@ export function createSpreadsheetImportWorkflow({
         options: state.options || createTextOptions(),
         data: data || null,
     });
+    const previewXml = fileContent => fileContent
+        ? publish({phase: 'xml-preview', source: 'xml', fileContent})
+        : publish({phase: 'idle', source: null, fileContent: null});
 
     return Object.freeze({
         getState: () => state,
+        getDefaultXmlDestination() {
+            return String(getDefaultXmlDestination() || '').trim();
+        },
         subscribe(subscriber) {
             if (typeof subscriber !== 'function') throw new TypeError('Import workflow subscriber must be a function');
             subscribers.add(subscriber);
@@ -113,7 +121,7 @@ export function createSpreadsheetImportWorkflow({
                 {phase: 'xml-loading', source: 'xml', fileContent: null, error: null},
                 () => executeCommand(commandId, {
                     operation: 'xml-start',
-                    args: [fileContent => publish({phase: 'xml-preview', source: 'xml', fileContent})],
+                    args: [previewXml],
                 }),
             );
         },
@@ -127,9 +135,20 @@ export function createSpreadsheetImportWorkflow({
                 {phase: 'idle', source: null, data: null, error: null},
             );
         },
-        applyXml({destination, sheetName} = {}) {
-            if (state.phase !== 'xml-preview' || typeof state.fileContent !== 'string') {
+        applyXml({mode = 'existing', destination, sheetName} = {}) {
+            if (state.phase !== 'xml-preview' || state.fileContent === null || state.fileContent === undefined) {
                 throw workflowError('MOBILE_IMPORT_XML_PREVIEW_REQUIRED', 'XML data must be loaded before it can be imported');
+            }
+            if (!['existing', 'new'].includes(mode)) {
+                throw workflowError('MOBILE_IMPORT_XML_MODE_INVALID', `Unsupported XML import destination mode: ${mode}`);
+            }
+            const importToNewWorksheet = mode === 'new';
+            const normalizedDestination = importToNewWorksheet ? null : String(destination || '').trim();
+            if (!importToNewWorksheet && !normalizedDestination) {
+                throw workflowError('MOBILE_IMPORT_XML_DESTINATION_REQUIRED', 'A destination range is required');
+            }
+            if (!importToNewWorksheet && validateXmlDestination(normalizedDestination) !== true) {
+                throw workflowError('MOBILE_IMPORT_XML_DESTINATION_INVALID', 'The destination range is invalid');
             }
             const names = new Set((getWorksheetNames() || []).map(name => String(name).toLocaleLowerCase()));
             let generatedSheetName = sheetName || 'Sheet1';
@@ -141,8 +160,8 @@ export function createSpreadsheetImportWorkflow({
                     operation: 'xml-end',
                     args: [
                         state.fileContent,
-                        destination || null,
-                        destination ? getActiveWorksheetName() : generatedSheetName,
+                        normalizedDestination,
+                        importToNewWorksheet ? generatedSheetName : getActiveWorksheetName(),
                     ],
                 }),
                 {phase: 'idle', source: null, fileContent: null, error: null},

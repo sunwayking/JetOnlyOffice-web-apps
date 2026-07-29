@@ -240,6 +240,7 @@ test('Spreadsheet panel helpers keep targeted panels reachable and RTL ordering 
     assert.equal(includesSpreadsheetPanel(undefined, 'shape'), true);
     assert.equal(includesSpreadsheetPanel(['shape'], 'shape'), true);
     assert.equal(includesSpreadsheetPanel(['image', 'shape'], 'shape'), true);
+    assert.equal(includesSpreadsheetPanel('function', 'function'), true);
     assert.equal(includesSpreadsheetPanel('function', 'shape'), false);
 
     const panels = [{id: 'chart'}, {id: 'shape'}];

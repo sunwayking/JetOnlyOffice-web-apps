@@ -29,6 +29,13 @@ export function createSpreadsheetAdvancedWorkflow({
     createPivotProperties = () => new Asc.CT_pivotTableDefinition(),
     createSparklineProperties = () => new Asc.sparklineGroup(),
     definedNamesListMode = typeof Asc !== 'undefined' ? Asc.c_oAscGetDefinedNamesList?.All : undefined,
+    namedRangeSelectionType = typeof Asc !== 'undefined' ? Asc.c_oAscSelectionDialogType?.Chart : undefined,
+    dataRangeError = typeof Asc !== 'undefined' ? Asc.c_oAscError?.ID?.DataRangeError : undefined,
+    definedNameReasonExisted = typeof Asc !== 'undefined' ? Asc.c_oAscDefinedNameReason?.Existed : undefined,
+    definedNameReasonLocked = typeof Asc !== 'undefined' ? Asc.c_oAscDefinedNameReason?.IsLocked : undefined,
+    definedNameReasonReserved = typeof Asc !== 'undefined' ? Asc.c_oAscDefinedNameReason?.NameReserved : undefined,
+    tableDefinedNameType = typeof Asc !== 'undefined' ? Asc.c_oAscDefNameType?.table : undefined,
+    slicerDefinedNameType = typeof Asc !== 'undefined' ? Asc.c_oAscDefNameType?.slicer : undefined,
 } = {}) {
     if (typeof executeCommand !== 'function') {
         throw new TypeError('createSpreadsheetAdvancedWorkflow requires executeCommand');
@@ -53,12 +60,80 @@ export function createSpreadsheetAdvancedWorkflow({
         if (!sparkline) throw workflowError('MOBILE_SPARKLINE_SELECTION_REQUIRED', 'Select a cell containing a sparkline');
         return sparkline;
     };
-    const buildDefinedName = input => createDefinedName({
-        name: requireText(input?.name, 'MOBILE_NAMED_RANGE_NAME_REQUIRED', 'A name is required'),
-        range: requireText(input?.range, 'MOBILE_NAMED_RANGE_REFERENCE_REQUIRED', 'A cell reference is required'),
-        scope: input?.scope ?? null,
-        ...(input?.type === undefined ? {} : {type: input.type}),
-    });
+    const matchesDefinedNameType = (type, expected) => expected !== undefined && expected !== null && type === expected;
+    const readNamedRange = raw => {
+        const type = readValue(raw, ['asc_getType']);
+        const lockId = readValue(raw, ['asc_getIsLock']);
+        const locked = lockId !== null && lockId !== undefined;
+        const isTable = matchesDefinedNameType(type, tableDefinedNameType);
+        const isSlicer = matchesDefinedNameType(type, slicerDefinedNameType);
+        const protectedType = isTable || isSlicer;
+        const kind = isTable ? 'table' : isSlicer ? 'slicer' : 'range';
+        return {
+            raw,
+            name: readValue(raw, ['asc_getName'], ''),
+            range: readValue(raw, ['asc_getRef', 'asc_getRange'], ''),
+            scope: readValue(raw, ['asc_getScope']),
+            type,
+            kind,
+            lockId,
+            locked,
+            referenceEditable: !locked && !protectedType,
+            deletable: !locked && !protectedType,
+        };
+    };
+    const assertNamedRangeMutable = (original, {deleting = false} = {}) => {
+        const item = readNamedRange(original);
+        if (item.locked) {
+            throw workflowError('MOBILE_NAMED_RANGE_LOCKED', 'The selected named range is locked by another editor');
+        }
+        if (deleting && !item.deletable) {
+            throw workflowError('MOBILE_NAMED_RANGE_DELETE_UNAVAILABLE', 'Table and slicer names cannot be deleted here');
+        }
+        return item;
+    };
+    const sameValue = (left, right) => String(left ?? '').toLocaleLowerCase() === String(right ?? '').toLocaleLowerCase();
+    const validateNamedRange = (input, original) => {
+        const api = requireApi();
+        const validation = api.asc_checkDefinedName?.(input.name, input.scope);
+        if (validation?.asc_getStatus?.() === false) {
+            const reason = validation.asc_getReason?.();
+            const originalItem = original ? readNamedRange(original) : null;
+            const unchangedExistingName = reason === definedNameReasonExisted && originalItem &&
+                sameValue(originalItem.name, input.name) && originalItem.scope === input.scope;
+            const allowedReservedName = reason === definedNameReasonReserved && !originalItem;
+            if (!unchangedExistingName && !allowedReservedName) {
+                const code = reason === definedNameReasonLocked
+                    ? 'MOBILE_NAMED_RANGE_LOCKED'
+                    : 'MOBILE_NAMED_RANGE_NAME_INVALID';
+                throw workflowError(code, code === 'MOBILE_NAMED_RANGE_LOCKED'
+                    ? 'The named range is locked by another editor'
+                    : 'The named range name is invalid or already exists');
+            }
+        }
+
+        const canValidateRange = Boolean(input.range) && typeof api.asc_checkDataRange === 'function';
+        const rangeValidation = canValidateRange
+            ? api.asc_checkDataRange(namedRangeSelectionType, input.range, false)
+            : undefined;
+        const originalRange = original ? readNamedRange(original).range : null;
+        if (canValidateRange && rangeValidation === dataRangeError && !sameValue(originalRange, input.range)) {
+            throw workflowError('MOBILE_NAMED_RANGE_REFERENCE_INVALID', 'The named range reference is invalid');
+        }
+    };
+    const buildDefinedName = (input, original = null) => {
+        const originalItem = original ? readNamedRange(original) : null;
+        const type = input?.type === undefined ? originalItem?.type : input.type;
+        const range = String(input?.range || '').trim();
+        const value = {
+            name: requireText(input?.name, 'MOBILE_NAMED_RANGE_NAME_REQUIRED', 'A name is required'),
+            range,
+            scope: Object.prototype.hasOwnProperty.call(input || {}, 'scope') ? input.scope : originalItem?.scope ?? null,
+            type,
+        };
+        validateNamedRange(value, original);
+        return createDefinedName(value);
+    };
     const pivotPayload = (value, configure) => {
         const target = createPivotProperties();
         configure?.(target);
@@ -71,26 +146,42 @@ export function createSpreadsheetAdvancedWorkflow({
 
     return Object.freeze({
         listNamedRanges() {
-            return (requireApi().asc_getDefinedNames?.(definedNamesListMode) || []).map(raw => ({
-                raw,
+            return (requireApi().asc_getDefinedNames?.(definedNamesListMode) || []).map(readNamedRange);
+        },
+        listNamedRangeScopes() {
+            const api = requireApi();
+            const count = api.asc_getWorksheetsCount?.() || 0;
+            return [{scope: null, name: null}].concat(Array.from({length: count}, (_, scope) => ({
+                scope,
+                name: api.asc_getWorksheetName?.(scope) || String(scope + 1),
+            })));
+        },
+        createNamedRangeDraft() {
+            const raw = requireApi().asc_getDefaultDefinedName?.();
+            return {
                 name: readValue(raw, ['asc_getName'], ''),
                 range: readValue(raw, ['asc_getRef', 'asc_getRange'], ''),
-                scope: readValue(raw, ['asc_getScope']),
+                scope: null,
                 type: readValue(raw, ['asc_getType']),
-            }));
+            };
         },
         addNamedRange(input) {
             return executeCommand('spreadsheet.desktop.named-ranges', {args: [buildDefinedName(input)]});
         },
         editNamedRange(original, input) {
             if (!original) throw workflowError('MOBILE_NAMED_RANGE_SELECTION_REQUIRED', 'Select a named range to edit');
+            const item = assertNamedRangeMutable(original);
+            if (!item.referenceEditable && !sameValue(item.range, input?.range)) {
+                throw workflowError('MOBILE_NAMED_RANGE_REFERENCE_LOCKED', 'This named range reference cannot be changed');
+            }
             return executeCommand('spreadsheet.desktop.named-ranges', {
                 operation: 'edit',
-                args: [original, buildDefinedName(input)],
+                args: [original, buildDefinedName(input, original)],
             });
         },
         deleteNamedRange(original) {
             if (!original) throw workflowError('MOBILE_NAMED_RANGE_SELECTION_REQUIRED', 'Select a named range to delete');
+            assertNamedRangeMutable(original, {deleting: true});
             return executeCommand('spreadsheet.desktop.named-ranges', {operation: 'delete', args: [original]});
         },
         listSheetViews() {
@@ -125,6 +216,25 @@ export function createSpreadsheetAdvancedWorkflow({
         setPivotBlankRows(value) {
             return executeCommand('spreadsheet.desktop.pivot-blank-rows', pivotPayload(value === true));
         },
+        getPivotSnapshot() {
+            const pivot = currentPivot();
+            const outline = readValue(pivot, ['asc_getOutline'], undefined);
+            const compact = readValue(pivot, ['asc_getCompact'], undefined);
+            const defaultSubtotal = readValue(pivot, ['asc_getDefaultSubtotal'], undefined);
+            const subtotalTop = readValue(pivot, ['asc_getSubtotalTop'], undefined);
+            return Object.freeze({
+                layout: outline === undefined && compact === undefined
+                    ? null
+                    : compact === true ? 'compact' : outline === true ? 'outline' : 'tabular',
+                fillDownLabels: readValue(pivot, ['asc_getFillDownLabelsDefault'], null),
+                blankRows: readValue(pivot, ['asc_getInsertBlankRow'], null),
+                subtotals: defaultSubtotal === undefined
+                    ? null
+                    : defaultSubtotal === true ? subtotalTop === true ? 'top' : 'bottom' : 'none',
+                rowGrandTotals: readValue(pivot, ['asc_getRowGrandTotals'], null),
+                columnGrandTotals: readValue(pivot, ['asc_getColGrandTotals'], null),
+            });
+        },
         setPivotGrandTotals({rows, columns}) {
             return executeCommand('spreadsheet.desktop.pivot-grand-totals', pivotPayload(rows === true, properties => {
                 properties.asc_setRowGrandTotals?.(rows === true);
@@ -142,6 +252,12 @@ export function createSpreadsheetAdvancedWorkflow({
                 properties.asc_setOutline?.(settings.outline);
                 properties.asc_setCompact?.(settings.compact);
             }));
+        },
+        setPivotFillDownLabels(value) {
+            return executeCommand('spreadsheet.desktop.pivot-layout', {
+                operation: 'fill-down',
+                ...pivotPayload(value === true),
+            });
         },
         setPivotSubtotals(position) {
             if (!['none', 'top', 'bottom'].includes(position)) {

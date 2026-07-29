@@ -35,6 +35,5 @@ jobs:
             apps/documenteditor/mobile/src/lib/wordSessionRecovery.test.mjs \
             apps/api/documents/test/appTypeRouting.test.mjs \
             apps/pdfeditor/mobile/test/*.test.mjs \
-            apps/spreadsheeteditor/mobile/test/commandProvider.test.mjs \
-            apps/spreadsheeteditor/mobile/test/spreadsheetUiModel.test.mjs \
+            apps/spreadsheeteditor/mobile/test/*.test.mjs \
             apps/presentationeditor/mobile/test/*.test.mjs

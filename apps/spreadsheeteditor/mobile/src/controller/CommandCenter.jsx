@@ -19,7 +19,6 @@ import {
     Popover,
     Popup,
     Segmented,
-    Toggle,
     View,
     f7,
 } from 'framework7-react';
@@ -31,6 +30,7 @@ import {searchSpreadsheetCommands} from '../lib/commandSearchModel.mjs';
 import {createSpreadsheetImportWorkflow} from '../lib/importWorkflow.mjs';
 import {createSpreadsheetAdvancedWorkflow} from '../lib/advancedCommandWorkflow.mjs';
 import {activateSpreadsheetCommandDestination} from '../lib/mobileCommandAdapters.mjs';
+import {ImportPanel, NamedRangesPanel, PivotPanel} from './command-center/AdvancedPanels';
 import {
     executeSpreadsheetCommand,
     getSpreadsheetEditorRuntime,
@@ -53,66 +53,6 @@ const showError = error => f7.dialog.alert(error?.message || String(error));
 const ActionButton = ({children, onClick, disabled}) => (
     <Button fill onClick={onClick} disabled={disabled}>{children}</Button>
 );
-
-const NamedRangesPanel = ({workflow, text}) => {
-    const [items, setItems] = useState([]);
-    const [selected, setSelected] = useState(null);
-    const [name, setName] = useState('');
-    const [range, setRange] = useState('');
-    const refresh = () => setItems(workflow.listNamedRanges());
-
-    useEffect(refresh, []);
-    const choose = item => {
-        setSelected(item);
-        setName(item.name);
-        setRange(item.range);
-    };
-    const apply = edit => {
-        try {
-            if (edit) workflow.editNamedRange(selected?.raw, {name, range, scope: selected?.scope});
-            else workflow.addNamedRange({name, range, scope: selected?.scope});
-            refresh();
-        } catch (error) {
-            showError(error);
-        }
-    };
-    const remove = () => {
-        try {
-            workflow.deleteNamedRange(selected?.raw);
-            setSelected(null);
-            setName('');
-            setRange('');
-            refresh();
-        } catch (error) {
-            showError(error);
-        }
-    };
-
-    return <>
-        <List strong inset>
-            {items.map(item => <ListItem
-                key={`${item.name}:${item.range}`}
-                radio
-                name="spreadsheet-named-range"
-                title={item.name}
-                after={item.range}
-                checked={selected?.raw === item.raw}
-                onClick={() => choose(item)}
-            />)}
-        </List>
-        <List strong inset>
-            <ListInput label={text('name')} type="text" value={name} onInput={event => setName(event.target.value)} />
-            <ListInput label={text('reference')} type="text" value={range} onInput={event => setRange(event.target.value)} />
-        </List>
-        <Block strong inset className="command-center-actions">
-            <Segmented raised>
-                <Button onClick={() => apply(false)}>{text('add')}</Button>
-                <Button disabled={!selected} onClick={() => apply(true)}>{text('update')}</Button>
-                <Button disabled={!selected} onClick={remove}>{text('delete')}</Button>
-            </Segmented>
-        </Block>
-    </>;
-};
 
 const SheetViewsPanel = ({workflow, text}) => {
     const [items, setItems] = useState([]);
@@ -148,49 +88,6 @@ const SheetViewsPanel = ({workflow, text}) => {
             <Segmented raised>
                 <Button onClick={() => run(workflow.createSheetView)}>{text('newView')}</Button>
                 <Button disabled={!selected} onClick={() => run(() => workflow.deleteSheetView(selected.raw))}>{text('delete')}</Button>
-            </Segmented>
-        </Block>
-    </>;
-};
-
-const PivotPanel = ({workflow, text}) => {
-    const run = action => {
-        try { action(); } catch (error) { showError(error); }
-    };
-    return <>
-        <BlockTitle>{text('layout')}</BlockTitle>
-        <List strong inset>
-            {['compact', 'outline', 'tabular'].map(layout => <ListItem
-                key={layout}
-                radio
-                name="spreadsheet-pivot-layout"
-                title={text(layout)}
-                onClick={() => run(() => workflow.setPivotLayout(layout))}
-            />)}
-        </List>
-        <BlockTitle>{text('subtotals')}</BlockTitle>
-        <List strong inset>
-            {['none', 'top', 'bottom'].map(position => <ListItem
-                key={position}
-                radio
-                name="spreadsheet-pivot-subtotals"
-                title={text(position)}
-                onClick={() => run(() => workflow.setPivotSubtotals(position))}
-            />)}
-            <ListItem title={text('blankRows')}>
-                <Toggle onToggleChange={checked => run(() => workflow.setPivotBlankRows(checked))} />
-            </ListItem>
-        </List>
-        <Block strong inset>
-            <Segmented raised>
-                <Button onClick={() => run(() => workflow.setPivotGrandTotals({rows: true, columns: true}))}>{text('grandTotals')}</Button>
-                <Button onClick={() => run(() => workflow.setPivotGrandTotals({rows: false, columns: false}))}>{text('noTotals')}</Button>
-            </Segmented>
-        </Block>
-        <Block strong inset>
-            <Segmented raised>
-                <Button onClick={() => run(() => workflow.refreshPivot('current'))}>{text('refresh')}</Button>
-                <Button onClick={() => run(() => workflow.refreshPivot('all'))}>{text('refreshAll')}</Button>
             </Segmented>
         </Block>
     </>;
@@ -253,39 +150,6 @@ const RenamePanel = ({text}) => {
         <Block inset><ActionButton onClick={() => {
             try { executeSpreadsheetCommand('spreadsheet.desktop.rename', {title}); } catch (error) { showError(error); }
         }}>{text('rename')}</ActionButton></Block>
-    </>;
-};
-
-const ImportPanel = ({workflow, text}) => {
-    const [state, setState] = useState(workflow.getState());
-    const [url, setUrl] = useState('');
-    const [destination, setDestination] = useState('A1');
-    useEffect(() => workflow.subscribe(setState), [workflow]);
-    const run = action => {
-        try { action(); } catch (error) { showError(error); }
-    };
-
-    return <>
-        <List strong inset>
-            <ListItem link="#" title={text('file')} onClick={() => run(workflow.startFile)} />
-            <ListInput label={text('url')} type="url" value={url} onInput={event => setUrl(event.target.value)} />
-            <ListItem link="#" title={text('openUrl')} onClick={() => run(() => workflow.startUrl(url))} />
-            <ListItem link="#" title={text('textToColumns')} onClick={() => run(workflow.startTextToColumns)} />
-            <ListItem link="#" title={text('xml')} onClick={() => run(workflow.startXml)} />
-        </List>
-        {state.phase === 'text-preview' && <>
-            <BlockTitle>{text('preview')}</BlockTitle>
-            <Block strong inset>{Array.isArray(state.data)
-                ? state.data.slice(0, 5).map(row => row.join(' | ')).join('\n')
-                : String(state.data || '').slice(0, 1000)}</Block>
-            <Block inset><ActionButton onClick={() => run(workflow.applyTextPreview)}>{text('import')}</ActionButton></Block>
-        </>}
-        {state.phase === 'xml-preview' && <>
-            <List strong inset>
-                <ListInput label={text('destination')} type="text" value={destination} onInput={event => setDestination(event.target.value)} />
-            </List>
-            <Block inset><ActionButton onClick={() => run(() => workflow.applyXml({destination}))}>{text('importXml')}</ActionButton></Block>
-        </>}
     </>;
 };
 
@@ -355,10 +219,21 @@ const CommandCenterPage = ({initialTarget, close}) => {
             const editorApi = api();
             return editorApi.asc_getWorksheetName?.(editorApi.asc_getActiveWorksheetIndex?.());
         },
+        getDefaultXmlDestination: () => {
+            const editorApi = api();
+            return editorApi?.asc_getActiveRangeStr?.(Asc.referenceType.A) || 'A1';
+        },
         getWorksheetNames: () => {
             const editorApi = api();
             const count = editorApi.asc_getWorksheetsCount?.() || 0;
             return Array.from({length: count}, (_, index) => editorApi.asc_getWorksheetName?.(index)).filter(Boolean);
+        },
+        validateXmlDestination: destination => {
+            const editorApi = api();
+            return editorApi?.asc_checkDataRange?.(
+                Asc.c_oAscSelectionDialogType.ImportXml,
+                destination,
+            ) === Asc.c_oAscError.ID.No;
         },
     }), []);
     const openOptions = (option, payload) => {
