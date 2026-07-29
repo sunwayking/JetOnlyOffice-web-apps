@@ -33,11 +33,15 @@ const lockedSource = file => execFileSync('git', ['show', `${audit.source.commit
 
 test('PDF Desktop gap audit pins its source commit and direct-assignment scope', async () => {
     assert.equal(audit.releaseGateStatus, 'incomplete');
+    assert.equal(audit.commandCoverageStatus, 'incomplete');
     assert.ok(audit.blockers.length > 0);
+    assert.ok(audit.blockers.includes('pdf-header-footer-sdk-capability-is-missing'));
+    assert.ok(audit.blockers.includes('typed-mobile-command-payloads-are-incomplete'));
     assert.equal(audit.controlDiscovery, 'simple-receiver-common-ui-direct-assignments');
     assert.equal(audit.controlUnit, 'control-identifier');
-    assert.equal(audit.controllerDiscovery, 'source-hash-only');
-    assert.ok(audit.blockers.includes('dynamic-and-controller-control-classification-incomplete'));
+    assert.equal(audit.controllerDiscovery, 'source-hash-and-command-mapping');
+    assert.equal(audit.blockers.includes('planned-desktop-controls-remain-unbound'), false);
+    assert.equal(audit.blockers.includes('dynamic-and-controller-control-classification-incomplete'), false);
     assert.equal(
         execFileSync('git', ['rev-parse', '--verify', `${audit.source.commit}^{commit}`], {
             cwd: repositoryPath,
@@ -62,6 +66,7 @@ test('PDF Desktop gap audit pins its source commit and direct-assignment scope',
         const partition = [...mapped, ...planned, ...excluded];
         assert.equal(new Set(partition).size, partition.length, `${file.path}: duplicate classification`);
         assert.deepEqual(partition.sort(), sourceControls(source), `${file.path}: unclassified Desktop control`);
+        assert.deepEqual(planned, [], `${file.path}: planned commands remain`);
 
         for (const commandIds of Object.values(audit.mapped[file.path] || {})) {
             assert.ok(commandIds.length > 0, file.path);
@@ -73,18 +78,34 @@ test('PDF Desktop gap audit pins its source commit and direct-assignment scope',
     }
 });
 
-test('PDF Desktop direct secondary controls stay pinned while controller sources remain unclassified', async () => {
+test('PDF Desktop secondary controls and controller sources are completely command-mapped', async () => {
+    const catalogIds = new Set(catalog.commands.map(command => command.id));
     const primaryPaths = new Set(audit.source.files.map(file => file.path));
     for (const [file, surface] of Object.entries(audit.secondarySurfaces || {})) {
         assert.equal(primaryPaths.has(file), false, `${file}: duplicate primary/secondary surface`);
         const source = (await readFile(new URL(file, repositoryRoot), 'utf8')).replace(/\r\n/g, '\n');
         assert.equal(createHash('sha256').update(source).digest('hex'), surface.sha256, file);
         assert.equal(createHash('sha256').update(lockedSource(file)).digest('hex'), surface.sha256, `${file}: locked commit`);
-        assert.deepEqual([...surface.planned].sort(), sourceControls(source), `${file}: secondary control drift`);
+        const mapped = Object.keys(surface.mapped || {});
+        const planned = surface.planned || [];
+        const excluded = Object.keys(surface.excluded || {});
+        const partition = [...mapped, ...planned, ...excluded];
+        assert.equal(new Set(partition).size, partition.length, `${file}: duplicate classification`);
+        assert.deepEqual(partition.sort(), sourceControls(source), `${file}: secondary control drift`);
+        assert.deepEqual(planned, [], `${file}: planned commands remain`);
+        for (const [control, commandIds] of Object.entries(surface.mapped || {})) {
+            assert.ok(commandIds.length > 0, `${file}:${control}`);
+            commandIds.forEach(commandId => assert.ok(catalogIds.has(commandId), `${file}:${control}:${commandId}`));
+        }
+        for (const [control, adr] of Object.entries(surface.excluded || {})) {
+            assert.match(adr, /^ADR-\d{4}$/, `${file}:${control}`);
+        }
     }
 
     for (const sourceEntry of audit.controllerSources || []) {
-        assert.equal(sourceEntry.classification, 'unclassified');
+        assert.equal(sourceEntry.classification, 'command-mapped');
+        assert.ok(sourceEntry.commandIds.length > 0, sourceEntry.path);
+        sourceEntry.commandIds.forEach(commandId => assert.ok(catalogIds.has(commandId), `${sourceEntry.path}:${commandId}`));
         const source = (await readFile(new URL(sourceEntry.path, repositoryRoot), 'utf8')).replace(/\r\n/g, '\n');
         assert.equal(createHash('sha256').update(source).digest('hex'), sourceEntry.sha256, sourceEntry.path);
         assert.equal(
@@ -93,4 +114,30 @@ test('PDF Desktop direct secondary controls stay pinned while controller sources
             `${sourceEntry.path}: locked commit`,
         );
     }
+});
+
+test('PDF audited bindings preserve the real Desktop and SDK call signatures', () => {
+    const commands = new Map(catalog.commands.map(command => [command.id, command]));
+    assert.deepEqual(commands.get('pdf.edit.page-text').binding, {
+        kind: 'sdk', method: 'asc_EditPage', arguments: [],
+    });
+    assert.deepEqual(commands.get('pdf.file.properties').binding, {
+        kind: 'sdk', method: 'asc_setCoreProps', arguments: [{payload: 'properties'}],
+    });
+    assert.deepEqual(commands.get('pdf.edit.columns').binding, {
+        kind: 'sdk', method: 'ShapeApply', arguments: [{payload: 'properties'}],
+    });
+    assert.deepEqual(commands.get('pdf.insert.chart').binding, {
+        kind: 'sdk',
+        method: 'asc_addChartDrawingObject',
+        arguments: [{payload: 'type'}, {undefined: true}, {value: true}],
+    });
+    assert.deepEqual(commands.get('pdf.insert.header-footer').binding, {
+        kind: 'sdk',
+        method: 'asc_setHeaderFooterProperties',
+        arguments: [{payload: 'properties'}, {payload: 'applyToAll'}],
+    });
+    assert.deepEqual(commands.get('pdf.insert.page-number').binding, {
+        kind: 'sdk', method: 'asc_addPageNumber', arguments: [],
+    });
 });

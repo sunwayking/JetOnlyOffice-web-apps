@@ -366,6 +366,87 @@
     text-align: center;
 }
 
+.pdf-information-content {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 20px 16px;
+}
+
+.pdf-product-facts {
+    align-content: start;
+}
+
+.pdf-product-facts strong {
+    font-size: 17px;
+    font-weight: 600;
+    line-height: 22px;
+}
+
+.pdf-product-facts span {
+    color: var(--pdf-muted);
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.pdf-information-action {
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 44px;
+    height: auto;
+    padding: 10px 12px;
+    border: 1px solid var(--pdf-divider);
+    border-radius: 6px;
+    color: var(--pdf-text);
+    background: transparent;
+    font: inherit;
+    line-height: 20px;
+    text-align: center;
+    white-space: normal;
+}
+
+.pdf-information-action:disabled {
+    color: var(--pdf-muted);
+    opacity: 0.55;
+}
+
+.pdf-chart-link-list {
+    list-style: none;
+}
+
+.pdf-chart-link-list li {
+    display: grid;
+    min-width: 0;
+    gap: 4px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--pdf-divider);
+}
+
+.pdf-chart-link-list li:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.pdf-chart-link-list span {
+    color: var(--pdf-muted);
+    font-size: 12px;
+    line-height: 18px;
+}
+
+.pdf-chart-link-list a,
+.pdf-chart-link-list code {
+    min-width: 0;
+    overflow-wrap: anywhere;
+    color: var(--pdf-text);
+    font-family: inherit;
+    font-size: 14px;
+    line-height: 20px;
+}
+
+.pdf-chart-link-list a {
+    color: var(--pdf-accent);
+}
+
 .pdf-settings-content {
     display: grid;
     gap: 24px;
@@ -549,6 +630,20 @@
 .pdf-input-content textarea:focus {
     border-color: var(--pdf-accent);
     box-shadow: 0 0 0 2px rgba(18, 107, 86, 0.18);
+}
+
+.pdf-input-content .pdf-input-checkbox {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-height: 44px;
+}
+
+.pdf-input-content .pdf-input-checkbox input[type='checkbox'] {
+    flex: 0 0 22px;
+    width: 22px;
+    min-height: 22px;
+    margin: 0;
 }
 
 .pdf-input-error {

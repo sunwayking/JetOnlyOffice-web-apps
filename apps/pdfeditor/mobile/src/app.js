@@ -19,6 +19,7 @@ import {
 } from './lib/pdfPermissionPolicy.mjs';
 import {createPdfSdkBootstrap} from './lib/pdfSdkBootstrap.mjs';
 import {
+    createPdfUiCommandHandler,
     disposePdfEditorRuntime,
     getPdfCommandProvider,
     initializePdfEditorRuntime,
@@ -59,6 +60,22 @@ const mobileState = createPdfMobileStateController({
     scheduleFrame: callback => window.requestAnimationFrame(callback),
 });
 
+const executePdfUiCommand = createPdfUiCommandHandler({
+    openSettings: () => mobileState.openOverlay('settings'),
+    openEditRights: () => mobileState.openOverlay('collaboration'),
+    openPages: () => mobileState.openTask('pages'),
+    openSearch: () => mobileState.openOverlay('command-search'),
+    openComments: () => mobileState.openTask('comment'),
+    openAbout: () => mobileState.openOverlay('about'),
+    openSupport: () => mobileState.openOverlay('support'),
+    openForms: () => mobileState.openTask('forms'),
+    openEdit: () => mobileState.openTask('edit'),
+    openSignatures: () => mobileState.openTask('signatures'),
+    openChartLinks: () => mobileState.openOverlay('chart-links'),
+    updateChartData: () => mobileState.openOverlay('chart-data'),
+    closePanel: () => mobileState.closePanel(),
+});
+
 function resolvePermissions(options = {}) {
     if (typeof options.profile === 'string') {
         return resolvePdfPermissionProfile(options.profile);
@@ -75,6 +92,7 @@ window.JetOnlyOfficePdfMobile = Object.freeze({
             catalog,
             getApi: () => editorApi,
             permissions: runtimePermissions,
+            executeUiCommand: executePdfUiCommand,
         }) : null;
         window.dispatchEvent(new CustomEvent('jetonlyoffice:pdf-api-ready', {
             detail: {api: editorApi, permissions: runtimePermissions, runtime: editorRuntime},

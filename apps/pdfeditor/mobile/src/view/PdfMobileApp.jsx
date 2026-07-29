@@ -36,10 +36,12 @@ import {PDF_TASK_SPACE_IDS} from '../lib/pdfCommandProvider.mjs';
 import {isPdfChineseLocale} from '../lib/pdfLocale.mjs';
 import {
     filterPdfCommandSearchResults,
+    getPdfCommandLabel,
     normalizePdfParticipants,
     resolvePdfCommandInput,
     resolvePdfSelectionContext,
 } from '../lib/pdfMobileUiModel.mjs';
+import {buildPdfCommandPayload, hasPdfCommandPayloadBuilder} from '../lib/pdfCommandPayloads.mjs';
 import {parsePdfPageRange} from '../lib/pdfRedactionInput.mjs';
 
 const TASK_ICONS = Object.freeze({
@@ -51,93 +53,74 @@ const TASK_ICONS = Object.freeze({
     signatures: Signature,
 });
 
-const COMMAND_LABELS = Object.freeze({
-    'pdf.file.save': ['Save', '保存'],
-    'pdf.clipboard.copy': ['Copy', '复制'],
-    'pdf.clipboard.cut': ['Cut', '剪切'],
-    'pdf.clipboard.paste': ['Paste', '粘贴'],
-    'pdf.edit.undo': ['Undo', '撤销'],
-    'pdf.edit.redo': ['Redo', '重做'],
-    'pdf.edit.bold': ['Bold', '粗体'],
-    'pdf.edit.italic': ['Italic', '斜体'],
-    'pdf.edit.underline': ['Underline', '下划线'],
-    'pdf.edit.strikeout': ['Strikeout', '删除线'],
-    'pdf.edit.superscript': ['Superscript', '上标'],
-    'pdf.edit.subscript': ['Subscript', '下标'],
-    'pdf.edit.change-case': ['Change case', '更改大小写'],
-    'pdf.edit.horizontal-align': ['Horizontal align', '水平对齐'],
-    'pdf.edit.text-direction': ['Text direction', '文字方向'],
-    'pdf.edit.select-all': ['Select all', '全选'],
-    'pdf.edit.clear-formatting': ['Clear formatting', '清除格式'],
-    'pdf.edit.font-size-increase': ['Increase font size', '增大字号'],
-    'pdf.edit.font-size-decrease': ['Decrease font size', '减小字号'],
-    'pdf.edit.indent-increase': ['Increase indent', '增加缩进'],
-    'pdf.edit.indent-decrease': ['Decrease indent', '减少缩进'],
-    'pdf.edit.select-tool': ['Select tool', '选择工具'],
-    'pdf.edit.hand-tool': ['Hand tool', '抓手工具'],
-    'pdf.redaction.mark': ['Mark for redaction', '标记脱敏'],
-    'pdf.redaction.selection': ['Selected text', '所选文字'],
-    'pdf.redaction.current-page': ['Current page', '当前页'],
-    'pdf.redaction.apply': ['Apply redaction', '应用脱敏'],
-    'pdf.redaction.pages': ['Page range', '页码范围'],
-    'pdf.redaction.search-all': ['Search results', '搜索结果'],
-    'pdf.redaction.discard': ['Discard marks', '放弃标记'],
-    'pdf.insert.image': ['Image', '图片'],
-    'pdf.insert.image-url': ['Image link', '图片链接'],
-    'pdf.insert.shape': ['Shape', '形状'],
-    'pdf.insert.text-art': ['Text art', '艺术字'],
-    'pdf.insert.table': ['Table', '表格'],
-    'pdf.comment.add': ['Comment', '评论'],
-    'pdf.annotation.marker': ['Text markup', '文字标记'],
-    'pdf.annotation.ink-start': ['Draw', '绘图'],
-    'pdf.annotation.ink-stop': ['Stop drawing', '结束绘图'],
-    'pdf.annotation.remove-selected': ['Remove selected', '删除所选'],
-    'pdf.pages.add': ['Add page', '添加页面'],
-    'pdf.pages.remove': ['Remove page', '删除页面'],
-    'pdf.pages.rotate': ['Rotate page', '旋转页面'],
-    'pdf.pages.copy': ['Copy pages', '复制页面'],
-    'pdf.pages.cut': ['Cut pages', '剪切页面'],
-    'pdf.pages.paste-before': ['Paste before', '粘贴到前面'],
-    'pdf.pages.paste-after': ['Paste after', '粘贴到后面'],
-    'pdf.pages.first': ['First page', '第一页'],
-    'pdf.pages.previous': ['Previous page', '上一页'],
-    'pdf.pages.next': ['Next page', '下一页'],
-    'pdf.pages.last': ['Last page', '最后一页'],
-    'pdf.object.group': ['Group objects', '组合对象'],
-    'pdf.object.ungroup': ['Ungroup objects', '取消组合'],
-    'pdf.object.bring-front': ['Bring to front', '置于顶层'],
-    'pdf.object.bring-back': ['Send to back', '置于底层'],
-    'pdf.object.bring-forward': ['Bring forward', '上移一层'],
-    'pdf.object.bring-backward': ['Send backward', '下移一层'],
-    'pdf.table.merge-cells': ['Merge cells', '合并单元格'],
-    'pdf.table.distribute-rows': ['Distribute rows', '平均分布行'],
-    'pdf.table.distribute-columns': ['Distribute columns', '平均分布列'],
-    'pdf.forms.text': ['Text field', '文本字段'],
-    'pdf.forms.date': ['Date field', '日期字段'],
-    'pdf.forms.image': ['Image field', '图片字段'],
-    'pdf.forms.checkbox': ['Checkbox', '复选框'],
-    'pdf.forms.radio': ['Radio button', '单选按钮'],
-    'pdf.forms.combo': ['Combo box', '组合框'],
-    'pdf.forms.dropdown': ['Dropdown', '下拉列表'],
-    'pdf.forms.email': ['Email field', '电子邮件字段'],
-    'pdf.forms.phone': ['Phone field', '电话字段'],
-    'pdf.forms.credit-card': ['Credit card field', '信用卡字段'],
-    'pdf.forms.zip-code': ['ZIP code field', '邮政编码字段'],
-    'pdf.forms.clear': ['Clear fields', '清除字段'],
-    'pdf.forms.previous': ['Previous field', '上一个字段'],
-    'pdf.forms.next': ['Next field', '下一个字段'],
-    'pdf.forms.submit': ['Submit form', '提交表单'],
-    'pdf.forms.signature': ['Signature field', '签名字段'],
-    'pdf.signatures.apply-appearance': ['Add signature', '添加签名'],
-    'pdf.signatures.certificates': ['Certificate signatures', '证书签名'],
-    'pdf.signatures.fields': ['Signature fields', '签名字段'],
-    'pdf.signatures.requested': ['Pending signatures', '待签名'],
-    'pdf.view.fit-page': ['Fit page', '适合页面'],
-    'pdf.view.fit-width': ['Fit width', '适合宽度'],
-    'pdf.view.zoom-in': ['Zoom in', '放大'],
-    'pdf.view.zoom-out': ['Zoom out', '缩小'],
-    'pdf.view.zoom': ['Zoom', '缩放'],
-});
+const PRODUCT_NAME = 'JetOnlyOffice PDF';
+const PRODUCT_VERSION = '{{PRODUCT_VERSION}}';
+const STANDARD_SUPPORT_URL = '{{SUPPORT_URL}}';
+const DEFAULT_SUPPORT_URL = 'https://support.onlyoffice.com';
+
+const isUnresolvedBuildToken = value => (
+    typeof value !== 'string' || !value.trim() || /\{\{[^}]+\}\}/.test(value)
+);
+
+const resolveProductVersion = config => [
+    config?.productVersion,
+    config?.version,
+    PRODUCT_VERSION,
+].find(value => !isUnresolvedBuildToken(value))?.trim() || null;
+
+const resolveHttpUrl = value => {
+    if (isUnresolvedBuildToken(value)) return null;
+    try {
+        const url = new URL(value, window.location.href);
+        return /^https?:$/.test(url.protocol) ? url.href : null;
+    } catch {
+        return null;
+    }
+};
+
+const resolveSupportUrl = config => [
+    config?.customization?.feedback?.url,
+    STANDARD_SUPPORT_URL,
+    DEFAULT_SUPPORT_URL,
+].map(resolveHttpUrl).find(Boolean) || null;
+
+const resolveSelectedChartLinks = selection => {
+    const sources = [];
+    for (const element of Array.isArray(selection) ? selection : []) {
+        try {
+            const value = typeof element?.get_ObjectValue === 'function'
+                ? element.get_ObjectValue()
+                : element;
+            const drawingProperties = value?.get_ChartProperties?.() || value;
+            const chartProperties = drawingProperties?.get_ChartProperties?.() || drawingProperties;
+            const reference = chartProperties?.getExternalReference?.();
+            const source = reference?.asc_getSource?.();
+            if (typeof source === 'string' && source.trim()) sources.push(source.trim());
+        } catch {
+            // Selection snapshots may contain stale SDK objects while collaboration updates arrive.
+        }
+    }
+    return [...new Set(sources)];
+};
+
+function PdfInformationPanel({id, title, closeLabel, onClose, children}) {
+    return (
+        <section
+            className="pdf-global-panel pdf-information-panel"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby={id}
+        >
+            <header className="pdf-global-header">
+                <h2 id={id}>{title}</h2>
+                <Button onClick={onClose} aria-label={closeLabel}>
+                    <Xmark aria-hidden="true" />
+                </Button>
+            </header>
+            {children}
+        </section>
+    );
+}
 
 const DEFAULT_PAYLOADS = Object.freeze({
     'pdf.edit.bold': {enabled: true},
@@ -223,6 +206,7 @@ export default function PdfMobileApp({bridge}) {
     const [zoomValue, setZoomValue] = useState(100);
     const [commandInput, setCommandInput] = useState(null);
     const [commandInputValue, setCommandInputValue] = useState('');
+    const [commandInputValues, setCommandInputValues] = useState({});
     const [commandInputError, setCommandInputError] = useState(null);
     const chinese = isPdfChineseLocale(window.Common?.Locale, navigator.language);
     const activeTask = uiState.activeTask;
@@ -300,7 +284,7 @@ export default function PdfMobileApp({bridge}) {
         [activeTask],
     );
 
-    const commandLabel = commandId => COMMAND_LABELS[commandId]?.[chinese ? 1 : 0] || commandId;
+    const commandLabel = commandId => getPdfCommandLabel(commandId, chinese);
     const searchResults = useMemo(() => filterPdfCommandSearchResults({
         commands: catalog.commands,
         query: searchQuery,
@@ -309,6 +293,18 @@ export default function PdfMobileApp({bridge}) {
     }), [bridge, chinese, searchQuery, sessionState, uiState]);
 
     const buildPayload = (commandId, inputValue = '') => {
+        if (hasPdfCommandPayloadBuilder(commandId)) {
+            const descriptor = resolvePdfCommandInput(commandId, chinese);
+            const values = inputValue && typeof inputValue === 'object' && !Array.isArray(inputValue)
+                ? inputValue
+                : Object.fromEntries((descriptor?.fields || []).map(field => [field.name, field.defaultValue]));
+            return buildPdfCommandPayload(commandId, values, {
+                Asc: window.Asc,
+                AscPDF: window.AscPDF,
+                AscCommon: window.AscCommon,
+                api: bridge.getEditorApi(),
+            });
+        }
         if (commandId === 'pdf.redaction.pages') {
             return {
                 pages: parsePdfPageRange(inputValue, bridge.getEditorApi()?.getCountPages?.()),
@@ -374,6 +370,7 @@ export default function PdfMobileApp({bridge}) {
     const closeCommandInput = () => {
         setCommandInput(null);
         setCommandInputValue('');
+        setCommandInputValues({});
         setCommandInputError(null);
         bridge.closeOverlay();
     };
@@ -387,6 +384,7 @@ export default function PdfMobileApp({bridge}) {
         }
         setCommandInput(descriptor);
         setCommandInputValue('');
+        setCommandInputValues(Object.fromEntries((descriptor.fields || []).map(field => [field.name, field.defaultValue])));
         setCommandInputError(null);
         bridge.openOverlay('command-input');
         return true;
@@ -396,7 +394,19 @@ export default function PdfMobileApp({bridge}) {
         event.preventDefault();
         if (!commandInput) return;
         try {
-            const payload = buildPayload(commandInput.commandId, commandInputValue);
+            const structured = Array.isArray(commandInput.fields);
+            const values = structured ? commandInputValues : commandInputValue;
+            const missing = structured && commandInput.fields.find(field => (
+                field.required === true && (
+                    values[field.name] === undefined || values[field.name] === null ||
+                    (typeof values[field.name] === 'string' && !values[field.name].trim())
+                )
+            ));
+            if (missing) {
+                setCommandInputError(chinese ? `请填写${missing.label}。` : `Enter ${missing.label}.`);
+                return;
+            }
+            const payload = buildPayload(commandInput.commandId, values);
             if (payload === null) {
                 setCommandInputError(chinese ? '请输入内容。' : 'Enter a value.');
                 return;
@@ -421,8 +431,32 @@ export default function PdfMobileApp({bridge}) {
         executeCommand(commandId);
     };
 
+    const updateCommandInputField = (field, value) => {
+        setCommandInputValues(current => ({...current, [field.name]: field.type === 'checkbox' ? value : value}));
+    };
+    const commandInputCanSubmit = commandInput?.fields
+        ? commandInput.fields.every(field => field.required !== true || (
+            commandInputValues[field.name] !== undefined && commandInputValues[field.name] !== null &&
+            (typeof commandInputValues[field.name] !== 'string' || commandInputValues[field.name].trim())
+        ))
+        : Boolean(commandInputValue.trim());
+
     const handleBack = () => bridge.handleBack();
     const currentTask = catalog.taskSpaces.find(item => item.id === activeTask);
+    const editorConfig = window.native?.editorConfig || window.editorConfig || window.config || {};
+    const productVersion = resolveProductVersion(editorConfig);
+    const supportUrl = resolveSupportUrl(editorConfig);
+    let selectedChartLinks = [];
+    if (uiState.overlay === 'chart-links') {
+        try {
+            selectedChartLinks = resolveSelectedChartLinks(bridge.getSelection());
+        } catch {
+            selectedChartLinks = [];
+        }
+    }
+    const chartEditDataResolution = uiState.overlay === 'chart-data'
+        ? bridge.resolveCommand('pdf.chart.edit-data')
+        : null;
     const openGlobalPanel = panelId => {
         setLastError(null);
         if (panelId === 'command-search') setSearchQuery('');
@@ -638,6 +672,104 @@ export default function PdfMobileApp({bridge}) {
                         </section>
                     )}
 
+                    {uiState.overlay === 'about' && (
+                        <PdfInformationPanel
+                            id="pdf-about-title"
+                            title={chinese ? '关于' : 'About'}
+                            closeLabel={chinese ? '关闭' : 'Close'}
+                            onClose={() => bridge.closeOverlay()}
+                        >
+                            <div className="pdf-information-content pdf-product-facts">
+                                <strong>{PRODUCT_NAME}</strong>
+                                {productVersion && (
+                                    <span>{chinese ? '版本' : 'Version'} {productVersion}</span>
+                                )}
+                            </div>
+                        </PdfInformationPanel>
+                    )}
+
+                    {uiState.overlay === 'support' && (
+                        <PdfInformationPanel
+                            id="pdf-support-title"
+                            title={chinese ? '支持' : 'Support'}
+                            closeLabel={chinese ? '关闭' : 'Close'}
+                            onClose={() => bridge.closeOverlay()}
+                        >
+                            <div className="pdf-information-content">
+                                {supportUrl ? (
+                                    <a
+                                        className="button pdf-information-action"
+                                        href={supportUrl}
+                                        target="_blank"
+                                        rel="noopener noreferrer"
+                                    >
+                                        {chinese ? '打开支持页面' : 'Open support'}
+                                    </a>
+                                ) : (
+                                    <button className="button pdf-information-action" type="button" disabled>
+                                        {chinese ? '支持链接不可用' : 'Support link unavailable'}
+                                    </button>
+                                )}
+                            </div>
+                        </PdfInformationPanel>
+                    )}
+
+                    {uiState.overlay === 'chart-links' && (
+                        <PdfInformationPanel
+                            id="pdf-chart-links-title"
+                            title={chinese ? '图表链接' : 'Chart links'}
+                            closeLabel={chinese ? '关闭' : 'Close'}
+                            onClose={() => bridge.closeOverlay()}
+                        >
+                            {selectedChartLinks.length > 0 ? (
+                                <ul className="pdf-information-content pdf-chart-link-list">
+                                    {selectedChartLinks.map((source, index) => {
+                                        const sourceUrl = resolveHttpUrl(source);
+                                        return (
+                                            <li key={source}>
+                                                <span>{chinese ? `链接 ${index + 1}` : `Link ${index + 1}`}</span>
+                                                {sourceUrl ? (
+                                                    <a href={sourceUrl} target="_blank" rel="noopener noreferrer">{source}</a>
+                                                ) : (
+                                                    <code>{source}</code>
+                                                )}
+                                            </li>
+                                        );
+                                    })}
+                                </ul>
+                            ) : (
+                                <p className="pdf-empty-state">
+                                    {chinese
+                                        ? '所选图表没有可用的链接数据源'
+                                        : 'No linked data source available for the selected chart'}
+                                </p>
+                            )}
+                        </PdfInformationPanel>
+                    )}
+
+                    {uiState.overlay === 'chart-data' && (
+                        <PdfInformationPanel
+                            id="pdf-chart-data-title"
+                            title={chinese ? '图表数据' : 'Chart data'}
+                            closeLabel={chinese ? '关闭' : 'Close'}
+                            onClose={() => bridge.closeOverlay()}
+                        >
+                            <div className="pdf-information-content">
+                                <button
+                                    className="button pdf-information-action"
+                                    type="button"
+                                    disabled={!chartEditDataResolution?.available}
+                                    onClick={() => {
+                                        bridge.closeOverlay();
+                                        runCommand('pdf.chart.edit-data');
+                                    }}
+                                >
+                                    {commandLabel('pdf.chart.edit-data')}
+                                </button>
+                            </div>
+                        </PdfInformationPanel>
+                    )}
+
                     {uiState.overlay === 'context-menu' && (
                         <div className="pdf-modal-backdrop pdf-context-backdrop" role="presentation" onClick={() => bridge.closeOverlay()}>
                             <section
@@ -683,27 +815,72 @@ export default function PdfMobileApp({bridge}) {
                                         </button>
                                     </header>
                                     <div className="pdf-input-content">
-                                        <label htmlFor="pdf-command-input-value">{commandInput.label}</label>
-                                        {commandInput.multiline ? (
-                                            <textarea
-                                                id="pdf-command-input-value"
-                                                value={commandInputValue}
-                                                onChange={event => setCommandInputValue(event.target.value)}
-                                                placeholder={commandInput.placeholder}
-                                                rows="3"
-                                                autoFocus
-                                            />
-                                        ) : (
-                                            <input
-                                                id="pdf-command-input-value"
-                                                type={commandInput.type}
-                                                inputMode={commandInput.inputMode}
-                                                value={commandInputValue}
-                                                onChange={event => setCommandInputValue(event.target.value)}
-                                                placeholder={commandInput.placeholder}
-                                                autoComplete="off"
-                                                autoFocus
-                                            />
+                                        {commandInput.fields ? commandInput.fields.map(field => {
+                                            const id = `pdf-command-input-${field.name}`;
+                                            if (field.type === 'checkbox') {
+                                                return (
+                                                    <label className="pdf-input-checkbox" htmlFor={id} key={field.name}>
+                                                        <input
+                                                            id={id}
+                                                            type="checkbox"
+                                                            checked={commandInputValues[field.name] === true}
+                                                            onChange={event => updateCommandInputField(field, event.target.checked)}
+                                                        />
+                                                        <span>{field.label}</span>
+                                                    </label>
+                                                );
+                                            }
+                                            return (
+                                                <label htmlFor={id} key={field.name}>
+                                                    <span>{field.label}</span>
+                                                    {field.type === 'textarea' ? (
+                                                        <textarea
+                                                            id={id}
+                                                            value={commandInputValues[field.name] ?? ''}
+                                                            onChange={event => updateCommandInputField(field, event.target.value)}
+                                                            rows="3"
+                                                            autoFocus={field === commandInput.fields[0]}
+                                                        />
+                                                    ) : (
+                                                        <input
+                                                            id={id}
+                                                            type={field.type}
+                                                            min={field.min}
+                                                            max={field.max}
+                                                            step={field.step}
+                                                            value={commandInputValues[field.name] ?? ''}
+                                                            onChange={event => updateCommandInputField(field, event.target.value)}
+                                                            autoComplete="off"
+                                                            autoFocus={field === commandInput.fields[0]}
+                                                        />
+                                                    )}
+                                                </label>
+                                            );
+                                        }) : (
+                                            <>
+                                                <label htmlFor="pdf-command-input-value">{commandInput.label}</label>
+                                                {commandInput.multiline ? (
+                                                    <textarea
+                                                        id="pdf-command-input-value"
+                                                        value={commandInputValue}
+                                                        onChange={event => setCommandInputValue(event.target.value)}
+                                                        placeholder={commandInput.placeholder}
+                                                        rows="3"
+                                                        autoFocus
+                                                    />
+                                                ) : (
+                                                    <input
+                                                        id="pdf-command-input-value"
+                                                        type={commandInput.type}
+                                                        inputMode={commandInput.inputMode}
+                                                        value={commandInputValue}
+                                                        onChange={event => setCommandInputValue(event.target.value)}
+                                                        placeholder={commandInput.placeholder}
+                                                        autoComplete="off"
+                                                        autoFocus
+                                                    />
+                                                )}
+                                            </>
                                         )}
                                         {commandInputError && <p className="pdf-input-error" role="alert">{commandInputError}</p>}
                                     </div>
@@ -711,7 +888,7 @@ export default function PdfMobileApp({bridge}) {
                                         <button className="button" type="button" onClick={closeCommandInput}>
                                             {chinese ? '取消' : 'Cancel'}
                                         </button>
-                                        <button className="button is-primary" type="submit" disabled={!commandInputValue.trim()}>
+                                        <button className="button is-primary" type="submit" disabled={!commandInputCanSubmit}>
                                             {chinese ? '确定' : 'Apply'}
                                         </button>
                                     </div>

@@ -36,12 +36,31 @@ const CALLBACK_FACTORIES = Object.freeze({
     }),
 });
 
+const PERMANENT_REDACTION_COMMANDS = new Set([
+    'pdf.redaction.mark',
+    'pdf.redaction.selection',
+    'pdf.redaction.current-page',
+    'pdf.redaction.apply',
+    'pdf.redaction.pages',
+    'pdf.redaction.search-all',
+]);
+
 const CAPABILITY_METHODS = Object.freeze({
-    'pdf.redaction.apply': Object.freeze(['HasRedact', 'ApplyRedact']),
-    'pdf.redaction.current-page': Object.freeze(['getCurrentPage']),
+    'pdf.file.properties': Object.freeze(['asc_getCoreProps']),
+    'pdf.redaction.mark': Object.freeze(['asc_IsPermanentRedactionSupported']),
+    'pdf.redaction.selection': Object.freeze(['asc_IsPermanentRedactionSupported']),
+    'pdf.redaction.apply': Object.freeze([
+        'HasRedact',
+        'ApplyRedact',
+        'asc_IsPermanentRedactionSupported',
+        'asc_HasAppliedRedaction',
+    ]),
+    'pdf.redaction.current-page': Object.freeze(['getCurrentPage', 'asc_IsPermanentRedactionSupported']),
+    'pdf.redaction.pages': Object.freeze(['asc_IsPermanentRedactionSupported']),
     'pdf.redaction.search-all': Object.freeze([
         'asc_findText',
         'asc_RedactAllSearchElements',
+        'asc_IsPermanentRedactionSupported',
     ]),
     'pdf.pages.previous': Object.freeze(['getCurrentPage']),
     'pdf.pages.next': Object.freeze(['getCurrentPage', 'getCountPages']),
@@ -229,6 +248,12 @@ const commandExecutors = Object.freeze({
                 'The PDF SDK did not confirm that redaction marks were applied',
             );
         }
+        if (api.asc_HasAppliedRedaction() !== true) {
+            throw providerError(
+                'MOBILE_REDACTION_PERSISTENCE_UNCONFIRMED',
+                'The PDF SDK did not confirm that permanent redaction entered the save path',
+            );
+        }
         return result;
     },
     'pdf.redaction.pages': (api, payload = {}) => api.RedactPages(resolvePages(api, 'pdf.redaction.pages', payload)),
@@ -351,9 +376,29 @@ const commandExecutors = Object.freeze({
     )),
 });
 
+const hasOwn = (value, key) => Object.prototype.hasOwnProperty.call(value, key);
+
+const resolveBindingArguments = (command, payload) => (command.binding.arguments || []).map(argument => {
+    if (argument.undefined === true) return undefined;
+    if (hasOwn(argument, 'value')) return argument.value;
+    if (typeof argument.payload !== 'string' || !argument.payload) {
+        throw providerError(
+            'MOBILE_COMMAND_DESCRIPTOR_INVALID',
+            `PDF command has an invalid binding argument: ${command.id}`,
+            {commandId: command.id},
+        );
+    }
+    if (!payload || typeof payload !== 'object' || !hasOwn(payload, argument.payload)) {
+        throw payloadError(command.id, `${argument.payload} is required`, payload);
+    }
+    return payload[argument.payload];
+});
+
 const validateCatalogBindings = commands => {
     for (const command of commands.values()) {
-        if (!commandExecutors[command.id]) {
+        const bindingKind = command.binding?.kind || 'sdk';
+        const declarative = ['sdk', 'ui'].includes(bindingKind) && Array.isArray(command.binding?.arguments || []);
+        if (!commandExecutors[command.id] && !declarative) {
             throw providerError('MOBILE_COMMAND_DESCRIPTOR_INVALID', `PDF command has no executor: ${command.id}`, {
                 commandId: command.id,
             });
@@ -373,6 +418,7 @@ export function createPdfCommandProvider({
     resolveContextMenu,
     captureViewState,
     restoreViewState,
+    executeUiCommand,
 } = {}) {
     if (!catalog || !Array.isArray(catalog.commands)) {
         throw new TypeError('createPdfCommandProvider requires a command catalog');
@@ -408,7 +454,14 @@ export function createPdfCommandProvider({
         return api;
     };
     const inspectCapability = (api, command) => {
-        const methods = [command.binding?.method, ...(CAPABILITY_METHODS[command.id] || [])]
+        const bindingKind = command.binding?.kind || 'sdk';
+        if (bindingKind === 'ui' && typeof executeUiCommand !== 'function') {
+            return {available: false, reason: 'mobile-ui-binding-unavailable'};
+        }
+        const methods = [
+            ...(bindingKind === 'sdk' ? [command.binding?.method] : []),
+            ...(CAPABILITY_METHODS[command.id] || []),
+        ]
             .filter((name, index, values) => name && values.indexOf(name) === index);
         const missingMethods = methods.filter(name => typeof api[name] !== 'function');
         if (missingMethods.length) {
@@ -421,6 +474,10 @@ export function createPdfCommandProvider({
             if (resolvePdfSelectionContext(selection, globalThis.Asc).kind !== 'annotation') {
                 return {available: false, reason: 'annotation-selection-required'};
             }
+        }
+        if (PERMANENT_REDACTION_COMMANDS.has(command.id) &&
+            api.asc_IsPermanentRedactionSupported() !== true) {
+            return {available: false, reason: 'permanent-redaction-unavailable'};
         }
         const check = capabilityChecks[command.id];
         if (check && check(api) !== true) {
@@ -550,7 +607,12 @@ export function createPdfCommandProvider({
                     {commandId, reason: capability.reason},
                 );
             }
-            return commandExecutors[commandId](api, payload, {executeSearchRedaction});
+            const executor = commandExecutors[commandId];
+            if (executor) return executor(api, payload, {executeSearchRedaction});
+            if ((command.binding.kind || 'sdk') === 'ui') {
+                return executeUiCommand(command.binding.method, payload, command);
+            }
+            return api[command.binding.method](...resolveBindingArguments(command, payload));
         },
         resolveCapability(commandId) {
             assertActive();
