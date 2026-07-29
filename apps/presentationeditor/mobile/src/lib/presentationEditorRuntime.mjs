@@ -11,18 +11,20 @@ import {
 import { createPresentationCommandProvider } from './commandProvider.mjs';
 
 const runtimePermissions = {
+    view: true,
     edit: false,
     review: false,
     comment: false,
     fillForms: false,
 };
+const mutablePermissionKeys = Object.freeze(['edit', 'review', 'comment', 'fillForms']);
 
 let presentationRuntime = null;
 
-export function initializePresentationEditorRuntime({ inventory, getApi }) {
+export function initializePresentationEditorRuntime({ inventory, getApi, executeUiCommand }) {
     disposePresentationEditorRuntime();
     presentationRuntime = createEditorRuntime({
-        adapter: createPresentationCommandProvider({ inventory, getApi }),
+        adapter: createPresentationCommandProvider({ inventory, getApi, executeUiCommand }),
         permissions: runtimePermissions,
     });
     setActiveEditorRuntime(presentationRuntime);
@@ -30,7 +32,7 @@ export function initializePresentationEditorRuntime({ inventory, getApi }) {
 }
 
 export function updatePresentationEditorPermissions(permissions) {
-    Object.keys(runtimePermissions).forEach(key => {
+    mutablePermissionKeys.forEach(key => {
         runtimePermissions[key] = permissions?.[key] === true;
     });
 }
@@ -57,7 +59,7 @@ export function disposePresentationEditorRuntime() {
         presentationRuntime.dispose();
         presentationRuntime = null;
     }
-    Object.keys(runtimePermissions).forEach(key => {
+    mutablePermissionKeys.forEach(key => {
         runtimePermissions[key] = false;
     });
 }

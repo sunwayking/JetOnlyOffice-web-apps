@@ -37,4 +37,4 @@ jobs:
             apps/pdfeditor/mobile/test/*.test.mjs \
             apps/spreadsheeteditor/mobile/test/commandProvider.test.mjs \
             apps/spreadsheeteditor/mobile/test/spreadsheetUiModel.test.mjs \
-            apps/presentationeditor/mobile/test/commandProvider.test.mjs
+            apps/presentationeditor/mobile/test/*.test.mjs

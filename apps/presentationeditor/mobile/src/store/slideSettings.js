@@ -53,11 +53,11 @@ export class storeSlideSettings {
         });
     }
 
-    arrayLayouts;
+    arrayLayouts = [];
     slideLayoutIndex = -1;
     fillColor = undefined;
-    arrayThemes;
-    slideThemeIndex;
+    arrayThemes = [];
+    slideThemeIndex = -1;
     
     getFillColor (slideObject) {
         let color = 'transparent';

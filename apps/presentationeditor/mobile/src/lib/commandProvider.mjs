@@ -44,9 +44,12 @@ export const createPresentationCommandProvider = ({
         .filter(command => command.implementation === 'implemented')
         .map(command => Object.freeze({
             id: command.id,
-            permission: command.permissions.includes('view') ? 'view' : command.permissions[0],
+            ...(command.permissions.length === 1
+                ? {permission: command.permissions[0]}
+                : {permissionsAny: Object.freeze(command.permissions.slice())}),
             contexts: Object.freeze(command.contexts.slice()),
             mobilePath: command.mobilePath,
+            mutates: command.mutates !== false,
         }))
         .concat(Object.freeze({
             id: COMMON_COMMAND_IDS.ADD_COMMENT,
@@ -180,26 +183,4 @@ export const createPresentationCommandProvider = ({
             handlers.clear();
         },
     });
-};
-
-const noop = () => null;
-
-export const createEditorUIControllerFacade = provider => {
-    const EditorUIController = () => null;
-    EditorUIController.isSupportEditFeature = () => false;
-    EditorUIController.getCommandProvider = () => provider;
-    EditorUIController.initFocusObjects = noop;
-    EditorUIController.initEditorStyles = noop;
-    EditorUIController.initFonts = noop;
-    EditorUIController.initTableTemplates = noop;
-    EditorUIController.initThemeColors = noop;
-    EditorUIController.updateChartStyles = noop;
-    EditorUIController.getUndoRedo = noop;
-    EditorUIController.getToolbarOptions = noop;
-    EditorUIController.getEditCommentControllers = noop;
-    EditorUIController.ContextMenu = {
-        mapMenuItems: () => [],
-        handleMenuItemClick: () => false,
-    };
-    return EditorUIController;
 };

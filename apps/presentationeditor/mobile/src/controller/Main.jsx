@@ -56,6 +56,7 @@ import {
     initializePresentationEditorRuntime,
     updatePresentationEditorPermissions,
 } from '../lib/presentationEditorRuntime.mjs';
+import {createPresentationEditorApiGate} from '../lib/presentationEditorApiGate.mjs';
 import '../../../../common/main/lib/util/LanguageInfo.js'
 
 @inject(
@@ -1288,11 +1289,13 @@ class MainController extends Component {
     }
 
     componentDidMount () {
-        Common.EditorApi = {get: () => this.api};
+        this.getEditorApi = createPresentationEditorApiGate({getRawApi: () => this.api});
+        Common.EditorApi = {get: this.getEditorApi};
         this.initSdk();
     }
 
     componentWillUnmount () {
+        EditorUIController.dispose();
         disposePresentationEditorRuntime();
     }
 }
