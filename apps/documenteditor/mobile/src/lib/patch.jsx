@@ -87,6 +87,10 @@ function getGraphicFocusValue(store, context) {
     return null;
 }
 
+function isCommandAvailable(commandId) {
+    return getWordEditorRuntime()?.resolve(commandId)?.available === true;
+}
+
 function createFocusInterface(store) {
     const typeTokens = new Map([
         [Asc.c_oAscTypeSelectElement.Header, ['header']],
@@ -168,8 +172,6 @@ EditorUIController.initFocusObjects = store => {
 EditorUIController.initTableTemplates = store => {
     registerOnce('table-templates', 'asc_onInitTableTemplates', () => {
         const api = Common.EditorApi.get();
-        const runtime = getWordEditorRuntime();
-        const isCommandAvailable = commandId => runtime?.resolve(commandId)?.available === true;
         store.setStyles(api.asc_getTableStylesPreviews(), 'default');
     });
 };

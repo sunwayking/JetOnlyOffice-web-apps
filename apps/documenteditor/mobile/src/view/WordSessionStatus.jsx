@@ -14,6 +14,7 @@ import {
     subscribeWordEditorRuntime
 } from '../lib/wordEditorRuntime.mjs';
 import {presentWordSession} from '../lib/wordSessionPresentation.mjs';
+import {requestWordSessionReopen} from '../lib/wordSessionRecovery.mjs';
 
 const WordSessionStatus = ({openOptions}) => {
     const {t} = useTranslation();
@@ -52,6 +53,12 @@ const WordSessionStatus = ({openOptions}) => {
         );
     }
 
+    const reopenSession = () => requestWordSessionReopen({
+        getApi: () => Common.EditorApi.get(),
+        confirmDiscard: () => typeof window.confirm === 'function' && window.confirm(t('Session.textDiscardConfirm')),
+        reload: () => window.location.reload()
+    });
+
     return (
         <div className="word-session-recovery" role="alertdialog" aria-modal="true" aria-labelledby="word-session-recovery-title">
             <div className="word-session-recovery__content">
@@ -60,7 +67,7 @@ const WordSessionStatus = ({openOptions}) => {
                 <div className="word-session-recovery__actions">
                     <Button fill onClick={() => openOptions('settings')}>{t('Session.textOpenSettings')}</Button>
                     {presentation.code === 'fatal' &&
-                        <Button outline onClick={() => window.location.reload()}>{t('Session.textReopen')}</Button>
+                        <Button outline onClick={reopenSession}>{t('Session.textReopen')}</Button>
                     }
                     <Button outline onClick={() => Common.Notifications.trigger('goback')}>
                         {t('Session.textReturn')}

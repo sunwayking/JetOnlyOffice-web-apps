@@ -194,6 +194,13 @@ test('enforces all five permission profiles across the complete catalog', () => 
     });
 });
 
+test('allows every content-changing permission profile to request a server save', () => {
+    assert.deepEqual(
+        getWordCommandSpecByMethod('asc_Save').permissions,
+        ['edit', 'review', 'comment', 'fillForms']
+    );
+});
+
 test('routes mapped controller calls through Runtime and preserves query passthrough', () => {
     const api = createApi();
     const runtime = initializeWordEditorRuntime({getApi: () => api});
@@ -236,6 +243,27 @@ test('mapped controller calls cannot bypass a missing Runtime', () => {
         error => error.code === 'MOBILE_RUNTIME_UNAVAILABLE'
     );
     assert.equal(api.calls.length, 0);
+});
+
+test('Word API gate leaves non-Word editor methods on their owning API', () => {
+    disposeWordEditorRuntime();
+    const calls = [];
+    const api = {
+        asc_Save: (...args) => calls.push(['asc_Save', ...args]),
+        Copy: (...args) => calls.push(['Copy', ...args])
+    };
+    const getApi = createWordEditorApiGate({
+        getRawApi: () => api,
+        shouldGate: () => false
+    });
+
+    getApi().asc_Save('pdf');
+    getApi().Copy('selection');
+
+    assert.deepEqual(calls, [
+        ['asc_Save', 'pdf'],
+        ['Copy', 'selection']
+    ]);
 });
 
 test('forwards only explicit SDK lifecycle facts and unregisters them', () => {

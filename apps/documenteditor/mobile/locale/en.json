@@ -844,6 +844,7 @@
   "Session": {
     "textBlockingSave": "Saving was rejected. Editing is paused to protect your changes.",
     "textConflict": "The server version changed. Export a copy before choosing how to continue.",
+    "textDiscardConfirm": "Reopening may discard changes that have not reached the server. Reopen anyway?",
     "textFatal": "The editor cannot continue safely. Export a copy if available, then reopen the file.",
     "textOpenSettings": "Open file options",
     "textOpening": "Opening document",

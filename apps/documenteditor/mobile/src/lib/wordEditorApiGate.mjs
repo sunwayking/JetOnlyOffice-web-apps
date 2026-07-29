@@ -10,9 +10,12 @@ import {
     executeWordCommand
 } from './wordEditorRuntime.mjs';
 
-export function createWordEditorApiGate({getRawApi} = {}) {
+export function createWordEditorApiGate({getRawApi, shouldGate = () => true} = {}) {
     if (typeof getRawApi !== 'function') {
         throw new TypeError('createWordEditorApiGate requires getRawApi');
+    }
+    if (typeof shouldGate !== 'function') {
+        throw new TypeError('createWordEditorApiGate requires shouldGate to be a function');
     }
 
     let cachedApi = null;
@@ -38,7 +41,9 @@ export function createWordEditorApiGate({getRawApi} = {}) {
 
                 const spec = getWordCommandSpecByMethod(String(property));
                 const method = spec
-                    ? (...args) => executeWordCommand(spec.id, {args})
+                    ? (...args) => shouldGate()
+                        ? executeWordCommand(spec.id, {args})
+                        : value.apply(target, args)
                     : value.bind(target);
                 methodCache.set(property, method);
                 return method;

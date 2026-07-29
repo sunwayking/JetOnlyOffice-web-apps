@@ -3,12 +3,15 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, {useContext, useMemo, useState} from 'react';
+import React, {useContext, useEffect, useMemo, useState} from 'react';
 import {List, ListInput, ListItem, Navbar, Page} from 'framework7-react';
 import {useTranslation} from 'react-i18next';
 
 import {SettingsContext} from '../../controller/settings/Settings';
-import {getWordEditorRuntime} from '../../lib/wordEditorRuntime.mjs';
+import {
+    getWordEditorRuntime,
+    subscribeWordEditorRuntime
+} from '../../lib/wordEditorRuntime.mjs';
 import {
     getWordSelectionContexts,
     searchAvailableWordCommands
@@ -20,11 +23,28 @@ const CommandSearch = () => {
     const {openOptions} = useContext(MainContext);
     const settingsContext = useContext(SettingsContext);
     const [query, setQuery] = useState('');
+    const [runtime, setRuntime] = useState(() => getWordEditorRuntime());
+    const [runtimeRevision, setRuntimeRevision] = useState(0);
+
+    useEffect(() => {
+        let detachSession;
+        const detachRuntime = subscribeWordEditorRuntime(nextRuntime => {
+            detachSession?.();
+            setRuntime(nextRuntime);
+            detachSession = nextRuntime?.subscribe(() => {
+                setRuntimeRevision(revision => revision + 1);
+            });
+        });
+        return () => {
+            detachSession?.();
+            detachRuntime();
+        };
+    }, []);
+
     const commands = useMemo(() => {
-        const runtime = getWordEditorRuntime();
         const contexts = getWordSelectionContexts(runtime?.getSelection() ?? []);
         return searchAvailableWordCommands({runtime, locale: i18n.language, query, contexts});
-    }, [i18n.language, query]);
+    }, [i18n.language, query, runtime, runtimeRevision]);
 
     const openCommandPanel = command => {
         if (command.target === 'settings') {

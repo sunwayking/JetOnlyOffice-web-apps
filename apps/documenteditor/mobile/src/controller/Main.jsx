@@ -515,6 +515,7 @@ class MainController extends Component {
 
                     let result = /[\?\&]fileType=\b(pdf)|(djvu|xps|oxps)\b&?/i.exec(window.location.search),
                         isPDF = (!!result && result.length && typeof result[2] === 'string') || (!!result && result.length && typeof result[1] === 'string') && !window.isPDFForm;
+                    this.isPdfEditor = isPDF;
 
                     const config = {
                         'id-view'  : 'editor_sdk',
@@ -1758,7 +1759,10 @@ class MainController extends Component {
     }
 
     componentDidMount() {
-        this.getEditorApi = createWordEditorApiGate({getRawApi: () => this.api});
+        this.getEditorApi = createWordEditorApiGate({
+            getRawApi: () => this.api,
+            shouldGate: () => this.isPdfEditor !== true
+        });
         Common.EditorApi = {get: this.getEditorApi};
         this.initSdk();
     }

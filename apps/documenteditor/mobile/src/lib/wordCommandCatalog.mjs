@@ -37,6 +37,7 @@ const viewOnly = Object.freeze(['view']);
 const commentOnly = Object.freeze(['comment']);
 const reviewOnly = Object.freeze(['review']);
 const fillFormsOnly = Object.freeze(['fillForms']);
+const saveCapable = Object.freeze(['edit', 'review', 'comment', 'fillForms']);
 
 function methodSlug(method) {
     return method
@@ -97,7 +98,7 @@ const primaryCommands = [
     command({id: WORD_COMMAND_IDS.REVIEW_TRACK, method: 'asc_SetTrackRevisions', permissions: reviewOnly, contexts: ['document'], mobilePath: 'collaboration.review.track', labels: {en: 'Track changes', zh: '\u8ddf\u8e2a\u4fee\u8ba2'}, searchable: true}),
     command({id: WORD_COMMAND_IDS.REVIEW_ACCEPT, method: 'asc_AcceptChanges', permissions: reviewOnly, contexts: ['revision'], mobilePath: 'collaboration.review.accept', labels: {en: 'Accept change', zh: '\u63a5\u53d7\u4fee\u8ba2'}, searchable: true}),
     command({id: WORD_COMMAND_IDS.REVIEW_REJECT, method: 'asc_RejectChanges', permissions: reviewOnly, contexts: ['revision'], mobilePath: 'collaboration.review.reject', labels: {en: 'Reject change', zh: '\u62d2\u7edd\u4fee\u8ba2'}, searchable: true}),
-    command({id: WORD_COMMAND_IDS.SAVE, method: 'asc_Save', permissions: editOnly, contexts: ['document'], mobilePath: 'settings.save', labels: {en: 'Save', zh: '\u4fdd\u5b58'}, searchable: true})
+    command({id: WORD_COMMAND_IDS.SAVE, method: 'asc_Save', permissions: saveCapable, contexts: ['document'], mobilePath: 'settings.save', labels: {en: 'Save', zh: '\u4fdd\u5b58'}, searchable: true})
 ];
 
 const methodGroups = [

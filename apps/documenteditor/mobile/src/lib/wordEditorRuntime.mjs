@@ -69,6 +69,9 @@ export function updateWordEditorPermissions(permissions) {
     Object.keys(runtimePermissions).forEach(key => {
         runtimePermissions[key] = permissions?.[key] === true;
     });
+    if (wordRuntime) {
+        publishRuntime();
+    }
 }
 
 export function getWordEditorRuntime() {

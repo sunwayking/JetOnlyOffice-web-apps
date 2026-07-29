@@ -84,6 +84,7 @@ class AddImageController extends Component {
         return (
             <AddImage onInsertByFile={this.onInsertByFile}
                       onInsertByUrl={this.onInsertByUrl}
+                      embedded={this.props.embedded}
             />
         )
     }

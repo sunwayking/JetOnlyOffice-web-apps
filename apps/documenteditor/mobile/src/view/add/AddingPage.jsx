@@ -178,7 +178,7 @@ const AddingPage = inject("storeFocusObjects", "storeTableSettings", "storeAppli
             caption: _t.textImage,
             id: 'add-image-tab',
             icon: Device.ios ? IconAddImageIos.id : IconAddImageAndroid.id,
-            component: <AddImageController />
+            component: <AddImageController embedded />
         });
     }
 
