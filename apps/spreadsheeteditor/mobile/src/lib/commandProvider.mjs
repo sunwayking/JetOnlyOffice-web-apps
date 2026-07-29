@@ -12,7 +12,6 @@ const payloadArguments = payload => {
     if (Array.isArray(payload.args)) return payload.args;
     return Object.prototype.hasOwnProperty.call(payload, 'value') ? [payload.value] : [payload];
 };
-
 const providerError = (code, message, details) => {
     const error = new Error(message);
     error.code = code;
@@ -21,6 +20,25 @@ const providerError = (code, message, details) => {
 };
 
 const getDefaultSelection = api => api.asc_getCellInfo();
+
+const createCommandDescriptor = command => {
+    const descriptor = {
+        id: command.id,
+        contexts: Object.freeze(command.contexts.slice()),
+        mobilePath: command.mobilePath,
+        mutates: command.mutates !== false,
+    };
+
+    if (command.permissions.includes('view')) {
+        descriptor.permission = 'view';
+    } else if (command.permissions.length > 1) {
+        descriptor.permissionsAny = Object.freeze(command.permissions.slice());
+    } else {
+        descriptor.permission = command.permissions[0];
+    }
+
+    return Object.freeze(descriptor);
+};
 
 export const createSpreadsheetCommandProvider = ({
     inventory,
@@ -42,15 +60,11 @@ export const createSpreadsheetCommandProvider = ({
     const handlers = new Map();
     const descriptors = Object.freeze(inventory.commands
         .filter(command => command.implementation === 'implemented')
-        .map(command => Object.freeze({
-            id: command.id,
-            permission: command.permissions.includes('view') ? 'view' : command.permissions[0],
-            contexts: Object.freeze(command.contexts.slice()),
-            mobilePath: command.mobilePath,
-        }))
+        .map(createCommandDescriptor)
         .concat(Object.freeze({
             id: COMMON_COMMAND_IDS.ADD_COMMENT,
             permission: 'comment',
+            mutates: true,
         })));
     const detachSubscriptions = new Set();
     let disposed = false;
@@ -180,25 +194,4 @@ export const createSpreadsheetCommandProvider = ({
             handlers.clear();
         },
     });
-};
-
-const noop = () => null;
-
-export const createEditorUIControllerFacade = provider => {
-    const EditorUIController = () => null;
-    EditorUIController.isSupportEditFeature = () => false;
-    EditorUIController.getCommandProvider = () => provider;
-    EditorUIController.initCellInfo = noop;
-    EditorUIController.initEditorStyles = noop;
-    EditorUIController.initFonts = noop;
-    EditorUIController.initThemeColors = noop;
-    EditorUIController.toolbarOptions = {
-        getUndoRedo: noop,
-        getEditOptions: noop,
-    };
-    EditorUIController.ContextMenu = {
-        mapMenuItems: () => [],
-        handleMenuItemClick: () => false,
-    };
-    return EditorUIController;
 };

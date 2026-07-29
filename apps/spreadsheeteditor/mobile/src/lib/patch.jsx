@@ -33,17 +33,214 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import React from 'react';
+import {f7, Link} from 'framework7-react';
+import {Device} from '../../../../common/mobile/utils/device';
+import SvgIcon from '../../../../common/mobile/lib/component/SvgIcon';
+import IconEditIos from '@common-ios-icons/icon-edit.svg?ios';
+import IconEditAndroid from '@common-android-icons/icon-edit.svg';
+import IconPlusIos from '@common-ios-icons/icon-plus.svg?ios';
+import IconPlusAndroid from '@common-android-icons/icon-plus.svg';
+import IconUndoIos from '@common-ios-icons/icon-undo.svg?ios';
+import IconUndoAndroid from '@common-android-icons/icon-undo.svg';
+import IconRedoIos from '@common-ios-icons/icon-redo.svg?ios';
+import IconRedoAndroid from '@common-android-icons/icon-redo.svg';
+import {LocalStorage} from '../../../../common/mobile/utils/LocalStorage.mjs';
 import inventory from '../commands/desktop-command-inventory.json';
+import {createSpreadsheetCommandProvider} from './commandProvider.mjs';
 import {
-    createEditorUIControllerFacade,
-    createSpreadsheetCommandProvider,
-} from './commandProvider.mjs';
+    buildSpreadsheetContextMenuItems,
+    createSpreadsheetFocusInterface,
+    isSpreadsheetObjectSelection,
+    resolveSpreadsheetContextMenuAction,
+} from './spreadsheetUiModel.mjs';
+import {executeSpreadsheetCommand} from './spreadsheetEditorRuntime.mjs';
 
 const provider = createSpreadsheetCommandProvider({
     inventory,
     getApi: () => Common.EditorApi && Common.EditorApi.get(),
 });
 
-const EditorUIController = createEditorUIControllerFacade(provider);
+const apiRegistrations = new WeakMap();
+
+function registerOnce(key, eventName, handler) {
+    const api = Common.EditorApi.get();
+    if (!api) return;
+    let registrations = apiRegistrations.get(api);
+    if (!registrations) {
+        registrations = new Map();
+        apiRegistrations.set(api, registrations);
+    }
+    if (registrations.has(key)) return;
+    api.asc_registerCallback(eventName, handler);
+    registrations.set(key, {eventName, handler});
+}
+
+const EditorUIController = () => null;
+
+EditorUIController.isSupportEditFeature = () => true;
+EditorUIController.getCommandProvider = () => provider;
+
+EditorUIController.toolbarOptions = {
+    getUndoRedo: ({disabledUndo, disabledRedo, onUndoClick, onRedoClick}) => [
+        <Link iconOnly key='undo' className={disabledUndo ? 'disabled' : ''} href={false} onClick={onUndoClick}>
+            <SvgIcon symbolId={(Device.ios ? IconUndoIos : IconUndoAndroid).id} className='icon icon-svg' />
+        </Link>,
+        <Link iconOnly key='redo' className={disabledRedo ? 'disabled' : ''} href={false} onClick={onRedoClick}>
+            <SvgIcon symbolId={(Device.ios ? IconRedoIos : IconRedoAndroid).id} className='icon icon-svg' />
+        </Link>,
+    ],
+    getEditOptions: ({disabledEdit, disabledAdd, onEditClick, onAddClick}) => [
+        <Link iconOnly key='edit-options' className={disabledEdit ? 'disabled' : ''} href={false} onClick={onEditClick}>
+            <SvgIcon symbolId={(Device.ios ? IconEditIos : IconEditAndroid).id} className='icon icon-svg' />
+        </Link>,
+        <Link iconOnly key='add-options' className={disabledAdd ? 'disabled' : ''} href={false} onClick={onAddClick}>
+            <SvgIcon symbolId={(Device.ios ? IconPlusIos : IconPlusAndroid).id} className='icon icon-svg' />
+        </Link>,
+    ],
+};
+
+EditorUIController.initCellInfo = props => {
+    const api = Common.EditorApi.get();
+    const focusStore = props.storeFocusObjects;
+    if (!focusStore.intf) {
+        focusStore.intf = createSpreadsheetFocusInterface(focusStore, {
+            selectionTypes: Asc.c_oAscSelectionType,
+            selectElementTypes: Asc.c_oAscTypeSelectElement,
+        });
+    }
+
+    const synchronizeSelection = cellInfo => {
+        if (!cellInfo) return;
+        focusStore.resetCellInfo(cellInfo);
+        focusStore.resetFocusObjects(api.asc_getGraphicObjectProps?.() || []);
+        focusStore.changeFocus(isSpreadsheetObjectSelection(cellInfo, Asc.c_oAscSelectionType));
+        focusStore.setIsLocked(cellInfo);
+        props.storeCellSettings.initCellSettings(cellInfo);
+        props.storeTextSettings.initTextSettings(cellInfo);
+    };
+
+    registerOnce('selection', 'asc_onSelectionChanged', synchronizeSelection);
+    synchronizeSelection(api.asc_getCellInfo?.());
+};
+
+EditorUIController.initEditorStyles = store => {
+    registerOnce('editor-styles', 'asc_onInitEditorStyles', styles => store.initCellStyles(styles));
+};
+
+EditorUIController.initFonts = props => {
+    registerOnce('editor-fonts', 'asc_onInitEditorFonts', (fonts, select) => {
+        props.storeCellSettings.initEditorFonts(fonts, select);
+        props.storeTextSettings.initEditorFonts(fonts, select);
+    });
+};
+
+EditorUIController.initThemeColors = () => {
+    registerOnce('theme-colors', 'asc_onSendThemeColors', (colors, standardColors) => {
+        Common.Utils.ThemeColor.setColors(colors, standardColors);
+    });
+};
+
+EditorUIController.ContextMenu = {
+    mapMenuItems(controller) {
+        const api = Common.EditorApi.get();
+        const cellInfo = api.asc_getCellInfo();
+        const labels = {...controller.props.t('ContextMenu', {returnObjects: true})};
+        [
+            'menuChart',
+            'menuClear',
+            'menuCopy',
+            'menuCut',
+            'menuImage',
+            'menuInsertAbove',
+            'menuInsertLeft',
+            'menuPaste',
+            'menuReplaceImage',
+            'menuShape',
+        ].forEach(key => {
+            labels[key] = controller.props.t(`ContextMenu.${key}`);
+        });
+        const locked = cellInfo.asc_getLocked?.() === true || controller.props.wsLock === true;
+
+        return buildSpreadsheetContextMenuItems({
+            cellInfo,
+            selectionTypes: Asc.c_oAscSelectionType,
+            labels,
+            canCopy: controller.props.canCopy !== false && api.can_CopyCut?.() !== false,
+            canCutPaste: controller.props.canCopy !== false && api.can_CopyCut?.() !== false,
+            canMutate: controller.props.isEdit === true,
+            canViewComments: controller.props.canViewComments === true,
+            canAddComments: controller.props.canCoAuthoring === true && controller.props.canComments === true,
+            isResolvedComments: controller.props.isResolvedComments === true,
+            isDisconnected: controller.props.isDisconnected === true,
+            isVersionHistoryMode: controller.props.isVersionHistoryMode === true,
+            isLocked: locked,
+            isCellEdited: api.isCellEdited === true,
+            canFillHandle: api.asc_canFillHandle?.() === true,
+        });
+    },
+
+    handleMenuItemClick(controller, action) {
+        if (action === 'addcomment') {
+            Common.Notifications.trigger('addcomment');
+            return true;
+        }
+
+        const api = Common.EditorApi.get();
+        const resolved = resolveSpreadsheetContextMenuAction({
+            action,
+            cellInfo: api.asc_getCellInfo(),
+            selectionTypes: Asc.c_oAscSelectionType,
+            canDeleteComments: controller.props.canDeleteComments === true,
+            constants: {
+                cleanAll: Asc.c_oAscCleanOptions.All,
+                deleteCellsLeft: Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft,
+                deleteColumns: Asc.c_oAscDeleteOptions.DeleteColumns,
+                deleteRows: Asc.c_oAscDeleteOptions.DeleteRows,
+                insertColumns: Asc.c_oAscInsertOptions.InsertColumns,
+                insertRows: Asc.c_oAscInsertOptions.InsertRows,
+                merge: Asc.c_oAscMergeOptions.Merge,
+            },
+        });
+        if (!resolved) return false;
+
+        if (resolved.kind === 'route') {
+            controller.props.openOptions(resolved.target);
+            return true;
+        }
+        if (action === 'merge') {
+            controller.onMergeCells();
+            return true;
+        }
+
+        try {
+            const result = executeSpreadsheetCommand(resolved.commandId, resolved.payload);
+            if (action === 'copy' && result === false &&
+                !LocalStorage.getBool('sse-hide-copy-cut-paste-warning') && controller.props.canCopy) {
+                controller.showCopyCutPasteModal();
+            }
+            if ((action === 'cut' || action === 'paste') &&
+                !LocalStorage.getBool('sse-hide-copy-cut-paste-warning') && controller.props.canCopy) {
+                controller.showCopyCutPasteModal();
+            }
+        } catch (error) {
+            f7.dialog.create({
+                title: controller.props.t('ContextMenu.notcriticalErrorTitle'),
+                text: error.message,
+                buttons: [{text: controller.props.t('ContextMenu.textOk')}],
+            }).open();
+        }
+        return true;
+    },
+};
+
+EditorUIController.dispose = () => {
+    const api = Common.EditorApi?.get();
+    const registrations = api && apiRegistrations.get(api);
+    if (!registrations) return;
+    registrations.forEach(({eventName, handler}) => api.asc_unregisterCallback(eventName, handler));
+    registrations.clear();
+    apiRegistrations.delete(api);
+};
 
 export default EditorUIController;

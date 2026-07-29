@@ -36,4 +36,5 @@ jobs:
             apps/api/documents/test/appTypeRouting.test.mjs \
             apps/pdfeditor/mobile/test/*.test.mjs \
             apps/spreadsheeteditor/mobile/test/commandProvider.test.mjs \
+            apps/spreadsheeteditor/mobile/test/spreadsheetUiModel.test.mjs \
             apps/presentationeditor/mobile/test/commandProvider.test.mjs

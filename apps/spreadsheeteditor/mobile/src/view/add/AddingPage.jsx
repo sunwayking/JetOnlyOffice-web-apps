@@ -33,7 +33,7 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import { Page, Navbar, NavTitle, NavRight, Link, Icon, Tabs, Tab, f7 } from 'framework7-react';
 import { observer, inject } from "mobx-react";
 import { useTranslation } from 'react-i18next';
@@ -55,6 +55,11 @@ import IconAddFormulaIos from '@ios-icons/icon-add-formula.svg?ios';
 import IconAddFormulaAndroid from '@android-icons/icon-add-formula.svg';
 import IconExpandDownIos from '@common-ios-icons/icon-expand-down.svg?ios';
 import IconExpandDownAndroid from '@common-android-icons/icon-expand-down.svg';
+import {
+    getSpreadsheetTabHighlightWidth,
+    includesSpreadsheetPanel,
+    orderSpreadsheetPanels,
+} from '../../lib/spreadsheetUiModel.mjs';
 
 const AddLayoutNavbar = ({ tabs }) => {
     const isAndroid = Device.android;
@@ -68,7 +73,7 @@ const AddLayoutNavbar = ({ tabs }) => {
                         <Link key={"sse-link-" + item.id} tabLink={"#" + item.id} tabLinkActive={index === 0}>
                             <SvgIcon symbolId={item.icon} className={'icon icon-svg'} />
                         </Link>)}
-                    {isAndroid && <span className='tab-link-highlight' style={{width: 100 / tabs.lenght + '%'}}></span>}
+                    {isAndroid && <span className='tab-link-highlight' style={{width: getSpreadsheetTabHighlightWidth(tabs.length)}}></span>}
                 </div> : <NavTitle>{tabs[0].caption}</NavTitle>
             }
             {Device.phone && <NavRight><Link popupClose=".add-popup">
@@ -106,12 +111,6 @@ const AddingPage = inject("storeApplicationSettings")(observer(props => {
     const showPanels = addingContext.showPanels;
     const tabs = [];
 
-    useEffect(() => {
-        if(directionMode === 'rtl') {
-            tabs.reverse();
-        }
-    }, [directionMode])
-    
     if(!wsProps.Objects) {
         if(!showPanels) {
             tabs.push({
@@ -131,7 +130,7 @@ const AddingPage = inject("storeApplicationSettings")(observer(props => {
             });
         }
 
-        if(!showPanels || showPanels.indexOf('shape') > 0) {
+        if(includesSpreadsheetPanel(showPanels, 'shape')) {
             tabs.push({
                 caption: _t.textShape,
                 id: 'add-shape',
@@ -168,7 +167,9 @@ const AddingPage = inject("storeApplicationSettings")(observer(props => {
     //     });
     // }
 
-    if(!tabs.length) {
+    const orderedTabs = orderSpreadsheetPanels(tabs, directionMode);
+
+    if(!orderedTabs.length) {
         if (Device.phone) {
             f7.popup.close('.add-popup', false);
         } else {
@@ -180,8 +181,8 @@ const AddingPage = inject("storeApplicationSettings")(observer(props => {
 
     return (
         <Page pageContent={false}>
-            <AddLayoutNavbar tabs={tabs} />
-            <AddLayoutContent tabs={tabs} />
+            <AddLayoutNavbar tabs={orderedTabs} />
+            <AddLayoutContent tabs={orderedTabs} />
         </Page>
     )
 }));
