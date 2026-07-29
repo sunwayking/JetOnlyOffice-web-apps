@@ -20,10 +20,28 @@ const runtimePermissions = {
 let pdfRuntime = null;
 let pdfCommandProvider = null;
 
-export function initializePdfEditorRuntime({catalog, getApi, permissions = {}}) {
+const uiCommandError = action => {
+    const error = new Error(`PDF Mobile UI command is unavailable: ${String(action)}`);
+    error.code = 'MOBILE_UI_COMMAND_UNAVAILABLE';
+    error.details = {action};
+    return error;
+};
+
+export function createPdfUiCommandHandler(handlers = {}) {
+    const registeredHandlers = handlers && typeof handlers === 'object' ? {...handlers} : {};
+    return (action, payload, command) => {
+        const handler = Object.prototype.hasOwnProperty.call(registeredHandlers, action)
+            ? registeredHandlers[action]
+            : null;
+        if (typeof handler !== 'function') throw uiCommandError(action);
+        return handler(payload, command);
+    };
+}
+
+export function initializePdfEditorRuntime({catalog, getApi, permissions = {}, executeUiCommand}) {
     disposePdfEditorRuntime();
     updatePdfEditorPermissions(permissions);
-    pdfCommandProvider = createPdfCommandProvider({catalog, getApi});
+    pdfCommandProvider = createPdfCommandProvider({catalog, getApi, executeUiCommand});
     pdfRuntime = createEditorRuntime({
         adapter: pdfCommandProvider,
         permissions: runtimePermissions,

@@ -13,6 +13,7 @@ import {
 } from '../src/lib/pdfCommandProvider.mjs';
 import {
     filterPdfCommandSearchResults,
+    getPdfCommandLabel,
     normalizePdfParticipants,
     resolvePdfCommandInput,
     resolvePdfSelectionContext,
@@ -417,6 +418,17 @@ test('PDF provider applies permanent redaction only after SDK-confirmed marks an
     );
 });
 
+test('PDF Mobile exposes English and Simplified Chinese labels for every catalog command', () => {
+    for (const command of catalog.commands) {
+        const english = getPdfCommandLabel(command.id, false);
+        const chinese = getPdfCommandLabel(command.id, true);
+        assert.notEqual(english, command.id, `${command.id} English label`);
+        assert.notEqual(chinese, command.id, `${command.id} Chinese label`);
+        assert.ok(english.trim(), `${command.id} English label`);
+        assert.ok(chinese.trim(), `${command.id} Chinese label`);
+    }
+});
+
 test('PDF provider fails closed when the SDK cannot remove redacted content', () => {
     const calls = [];
     const api = createExplicitApi(calls);
@@ -811,4 +823,45 @@ test('PDF provider accepts every locked text formatting enum value', () => {
         assert.deepEqual(calls.at(-1), expected, commandId);
     }
     assert.equal(calls.length, validPayloads.length);
+});
+
+test('PDF provider executes audited declarative SDK and Mobile UI bindings', () => {
+    const calls = [];
+    const api = {
+        ApplyObjectProperties: (...args) => calls.push(['sdk', ...args]),
+    };
+    const provider = createPdfCommandProvider({
+        catalog: {commands: [
+            {
+                id: 'pdf.test.sdk',
+                taskSpace: 'edit',
+                permission: 'edit',
+                binding: {
+                    kind: 'sdk',
+                    method: 'ApplyObjectProperties',
+                    arguments: [{payload: 'properties'}, {value: true}],
+                },
+            },
+            {
+                id: 'pdf.test.ui',
+                taskSpace: 'edit',
+                permission: 'view',
+                mutates: false,
+                binding: {kind: 'ui', method: 'openObjectProperties'},
+            },
+        ]},
+        getApi: () => api,
+        executeUiCommand: (method, payload) => calls.push(['ui', method, payload]),
+    });
+
+    provider.execute('pdf.test.sdk', {properties: {fill: '#125e4f'}});
+    provider.execute('pdf.test.ui', {selection: 'shape'});
+    assert.deepEqual(calls, [
+        ['sdk', {fill: '#125e4f'}, true],
+        ['ui', 'openObjectProperties', {selection: 'shape'}],
+    ]);
+    assert.throws(
+        () => provider.execute('pdf.test.sdk', {}),
+        error => error.code === 'MOBILE_COMMAND_PAYLOAD_INVALID',
+    );
 });
