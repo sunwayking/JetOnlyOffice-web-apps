@@ -34,7 +34,7 @@
  */
 
 import React, { useContext, useEffect } from 'react';
-import { View, Popup, Popover } from 'framework7-react';
+import { View, Sheet, Popover } from 'framework7-react';
 import { f7 } from 'framework7-react';
 import { Device } from '../../../../../common/mobile/utils/device';
 import { AddImageController } from "../../controller/add/AddImage";
@@ -103,7 +103,7 @@ const AddView = () => {
 
     useEffect(() => {
         if(Device.phone) {
-            f7.popup.open('.add-popup');
+            f7.sheet.open('#add-sheet');
         } else {
             f7.popover.open('#add-popover', '#btn-add');
         }
@@ -116,11 +116,11 @@ const AddView = () => {
                     <AddingPage />
                 </View>
             </Popover> :
-            <Popup className="add-popup" onPopupClosed={() => mainContext.closeOptions('add')}>
+            <Sheet id="add-sheet" closeByOutsideClick={false} onSheetClosed={() => mainContext.closeOptions('add')}>
                 <View routes={routes} url='/adding-page/'>
                     <AddingPage />
                 </View>
-            </Popup>
+            </Sheet>
     )
 }
 

@@ -41,8 +41,8 @@ import { LocalStorage } from '../../../../common/mobile/utils/LocalStorage.mjs';
 import ContextMenuController from '../../../../common/mobile/lib/controller/ContextMenu';
 import { idContextMenuElement } from '../../../../common/mobile/lib/view/ContextMenu';
 import EditorUIController from '../lib/patch';
-import {COMMON_COMMAND_IDS} from '../../../../common/mobile/lib/runtime/createEditorRuntime.mjs';
 import {executeWordCommand} from '../lib/wordEditorRuntime.mjs';
+import {WORD_COMMAND_IDS} from '../lib/wordCommandCatalog.mjs';
 
 @inject(stores => ({
     isEdit: stores.storeAppOptions.isEdit,
@@ -130,16 +130,36 @@ class ContextMenu extends ContextMenuController {
         const api = Common.EditorApi.get();
         switch (action) {
             case 'cut':
+                executeWordCommand(WORD_COMMAND_IDS.CUT);
                 if ( !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
                     this.showCopyCutPasteModal();
                 break;
             case 'copy':
-                if (!executeWordCommand(COMMON_COMMAND_IDS.COPY_SELECTION) && !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
+                if (!executeWordCommand(WORD_COMMAND_IDS.COPY) && !LocalStorage.getBool("de-hide-copy-cut-paste-warning") && this.props.canCopy )
                     this.showCopyCutPasteModal();
                 break;
             case 'paste':
+                executeWordCommand(WORD_COMMAND_IDS.PASTE);
                 if ( !LocalStorage.getBool("de-hide-copy-cut-paste-warning") )
                     this.showCopyCutPasteModal();
+                break;
+            case 'delete':
+                executeWordCommand(WORD_COMMAND_IDS.DELETE);
+                break;
+            case 'edit':
+            case 'paragraph':
+            case 'image':
+            case 'chart':
+                setTimeout(() => this.props.openOptions('edit'), 200);
+                break;
+            case 'replaceimage':
+                executeWordCommand(WORD_COMMAND_IDS.IMAGE_REPLACE);
+                break;
+            case 'editdata':
+                executeWordCommand(WORD_COMMAND_IDS.CHART_EDIT_DATA);
+                break;
+            case 'addlink':
+                setTimeout(() => this.props.openOptions('add-link'), 200);
                 break;
             case 'viewcomment':
                 Common.Notifications.trigger('viewcomment');

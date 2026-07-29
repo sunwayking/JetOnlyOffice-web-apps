@@ -203,6 +203,11 @@ const SettingsPage = inject("storeAppOptions", "storeReview", "storeDocumentInfo
                             <SvgIcon slot="media" symbolId={IconSearch.id} className={'icon icon-svg'} />
                         </ListItem>
                     }
+                    {Device.phone &&
+                        <ListItem title={_t.textCommandSearch} link="/command-search/">
+                            <SvgIcon slot="media" symbolId={IconSearch.id} className={'icon icon-svg'} />
+                        </ListItem>
+                    }
                     {(_isEdit && canProtect) &&
                         <ListItem title={t('Settings.textProtection')} link="/protection">
                             <SvgIcon slot="media" symbolId={IconProtection.id} className={'icon icon-svg'} />

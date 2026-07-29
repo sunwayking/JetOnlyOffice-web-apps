@@ -10,6 +10,7 @@ import {
     disposeWordEditorRuntime,
     executeWordCommand,
     initializeWordEditorRuntime,
+    subscribeWordEditorRuntime,
     updateWordEditorPermissions
 } from './wordEditorRuntime.mjs';
 
@@ -56,4 +57,26 @@ test('a new Word session starts fail-closed after the previous session is dispos
     );
     assert.deepEqual(secondCalls, []);
     disposeWordEditorRuntime();
+});
+
+test('publishes Runtime creation and disposal to late-bound Word presenters', () => {
+    const values = [];
+    const unsubscribe = subscribeWordEditorRuntime(runtime => values.push(runtime));
+    const runtime = initializeWordEditorRuntime({getApi: () => createApi([])});
+    disposeWordEditorRuntime();
+    unsubscribe();
+
+    assert.deepEqual(values, [null, runtime, null]);
+});
+
+test('publishes permission changes so late-bound command views cannot stay stale', () => {
+    const values = [];
+    const unsubscribe = subscribeWordEditorRuntime(runtime => values.push(runtime));
+    const runtime = initializeWordEditorRuntime({getApi: () => createApi([])});
+
+    updateWordEditorPermissions({edit: true});
+    unsubscribe();
+    disposeWordEditorRuntime();
+
+    assert.deepEqual(values, [null, runtime, runtime]);
 });

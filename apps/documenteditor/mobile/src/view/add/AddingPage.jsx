@@ -33,13 +33,14 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
-import React, { useContext, useEffect } from 'react';
-import { f7, Page, Navbar, NavRight, NavTitle, Link, Icon, Tabs, Tab } from 'framework7-react';
+import React, { useContext } from 'react';
+import { Page, Navbar, NavRight, NavTitle, Link, Tabs, Tab } from 'framework7-react';
 import { useTranslation } from 'react-i18next';
 import { observer, inject } from "mobx-react";
 import { Device } from '../../../../../common/mobile/utils/device';
 import { AddTableController } from "../../controller/add/AddTable";
 import AddShapeController from "../../controller/add/AddShape";
+import { AddImageController } from "../../controller/add/AddImage";
 import { AddOtherController } from "../../controller/add/AddOther";
 import { MainContext } from '../../page/main';
 import SvgIcon from '@common/lib/component/SvgIcon';
@@ -49,6 +50,8 @@ import IconAddOtherIos from '@common-ios-icons/icon-add-other.svg?ios';
 import IconAddOtherAndroid from '@common-android-icons/icon-add-other.svg';
 import IconAddTableIos from '@common-ios-icons/icon-add-table.svg?ios';
 import IconAddTableAndroid from '@common-android-icons/icon-add-table.svg';
+import IconAddImageIos from '@common-ios-icons/icon-add-image.svg?ios';
+import IconAddImageAndroid from '@common-android-icons/icon-add-image.svg';
 import IconExpandDownIos from '@common-ios-icons/icon-expand-down.svg?ios';
 import IconExpandDownAndroid from '@common-android-icons/icon-expand-down.svg';
 
@@ -72,11 +75,11 @@ const AddLayoutNavbar = ({ tabs, storeTableSettings }) => {
                         <Link key={"de-link-" + item.id} onClick={() => getTableStylesPreviews()} tabLink={"#" + item.id} tabLinkActive={index === 0}>
                             <SvgIcon slot="media" symbolId={item.icon} className={'icon icon-svg'} />
                         </Link>)}
-                    {isAndroid && <span className='tab-link-highlight' style={{width: 100 / tabs.lenght + '%'}}></span>}
+                    {isAndroid && <span className='tab-link-highlight' style={{width: 100 / tabs.length + '%'}}></span>}
                 </div> :
                 <NavTitle>{ tabs[0].caption }</NavTitle>
             }
-            {Device.phone && <NavRight><Link popupClose=".add-popup">
+            {Device.phone && <NavRight><Link sheetClose="#add-sheet">
             {Device.ios ? 
                 <SvgIcon symbolId={IconExpandDownIos.id} className={'icon icon-svg'} /> :
                 <SvgIcon symbolId={IconExpandDownAndroid.id} className={'icon icon-svg white'} />
@@ -110,16 +113,6 @@ const AddingPage = inject("storeFocusObjects", "storeTableSettings", "storeAppli
     const tabs = [];
     const options = storeFocusObjects.settings;
     const paragraphObj = storeFocusObjects.paragraphObject;
-
-    useEffect(() => {
-        f7.tab.show('#add-other', false);
-    }, []);
-
-    useEffect(() => {
-        if(directionMode === 'rtl') {
-            tabs.reverse();
-        }
-    }, [directionMode])
 
     let needDisable = false,
         canAddTable = true,
@@ -180,6 +173,15 @@ const AddingPage = inject("storeFocusObjects", "storeTableSettings", "storeAppli
         }
     }
 
+    if(!showPanels && canAddImage && !paragraphLocked && !contentLocked) {
+        tabs.push({
+            caption: _t.textImage,
+            id: 'add-image-tab',
+            icon: Device.ios ? IconAddImageIos.id : IconAddImageAndroid.id,
+            component: <AddImageController embedded />
+        });
+    }
+
     if(!showPanels) {
         tabs.push({
             caption: _t.textOther,
@@ -197,6 +199,10 @@ const AddingPage = inject("storeFocusObjects", "storeTableSettings", "storeAppli
                     plainEditLock={plainEditLock}
                 />
         });
+    }
+
+    if(directionMode === 'rtl') {
+        tabs.reverse();
     }
 
     return (

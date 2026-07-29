@@ -49,7 +49,7 @@ class AddImageController extends Component {
 
     closeModal () {
         if ( Device.phone ) {
-            f7.sheet.close('.add-popup', true);
+            f7.sheet.close('#add-sheet', true);
         } else {
             f7.popover.close('#add-popover');
         }
@@ -84,6 +84,7 @@ class AddImageController extends Component {
         return (
             <AddImage onInsertByFile={this.onInsertByFile}
                       onInsertByUrl={this.onInsertByUrl}
+                      embedded={this.props.embedded}
             />
         )
     }

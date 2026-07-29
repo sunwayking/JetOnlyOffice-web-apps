@@ -55,6 +55,8 @@ import VersionHistoryController from '../../../../common/mobile/lib/controller/V
 import {DrawController} from "../../../../common/mobile/lib/controller/Draw";
 import SvgIcon from '@common/lib/component/SvgIcon';
 import IconEditMode from '@icons/icon-edit-mode.svg';
+import QuickToolbar from '../view/QuickToolbar';
+import WordSessionStatus from '../view/WordSessionStatus';
 
 
 export const MainContext = createContext();
@@ -321,6 +323,8 @@ const MainPage = inject('storeDocumentInfo', 'users', 'storeAppOptions', 'storeV
                         }
                     </Navbar>
                     <View id="editor_sdk"></View>
+                    <WordSessionStatus openOptions={handleClickToOpenOptions} />
+                    <QuickToolbar isOpenModal={state.isOpenModal} openOptions={handleClickToOpenOptions} />
                     <Navbar id='drawbar' style={{ display: !appOptions.isDrawMode && 'none' }}>
                         <DrawController />
                     </Navbar>

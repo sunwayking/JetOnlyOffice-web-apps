@@ -74,25 +74,31 @@ const PageLinkSettings = props => {
 const AddImage = props => {
     const { t } = useTranslation();
     const _t = t('Add', {returnObjects: true});
+    const content = (
+        <List>
+            <ListItem title={_t.textPictureFromLibrary} onClick={() => {props.onInsertByFile()}}>
+                {Device.ios ?
+                    <SvgIcon slot="media" symbolId={IconImageLibraryIos.id} className={'icon icon-svg'} /> :
+                    <SvgIcon slot="media" symbolId={IconImageLibraryAndroid.id} className={'icon icon-svg'} />
+                }
+            </ListItem>
+            <ListItem title={_t.textPictureFromURL} link={'/add-image-from-url/'} routeProps={{
+                onInsertByUrl: props.onInsertByUrl
+            }}>
+                {Device.ios ?
+                    <SvgIcon slot="media" symbolId={IconLinkIos.id} className={'icon icon-svg'} /> :
+                    <SvgIcon slot="media" symbolId={IconLinkAndroid.id} className={'icon icon-svg'} />
+                }
+            </ListItem>
+        </List>
+    );
+    if (props.embedded) {
+        return content;
+    }
     return (
         <Page>
             <Navbar title={_t.textInsertImage} backLink={_t.textBack}></Navbar>
-            <List>
-                <ListItem title={_t.textPictureFromLibrary} onClick={() => {props.onInsertByFile()}}>
-                    {Device.ios ? 
-                        <SvgIcon slot="media" symbolId={IconImageLibraryIos.id} className={'icon icon-svg'} /> :
-                        <SvgIcon slot="media" symbolId={IconImageLibraryAndroid.id} className={'icon icon-svg'} />
-                    }
-                </ListItem>
-                <ListItem title={_t.textPictureFromURL} link={'/add-image-from-url/'} routeProps={{
-                    onInsertByUrl: props.onInsertByUrl
-                }}>
-                    {Device.ios ? 
-                        <SvgIcon slot="media" symbolId={IconLinkIos.id} className={'icon icon-svg'} /> :
-                        <SvgIcon slot="media" symbolId={IconLinkAndroid.id} className={'icon icon-svg'} />
-                    }
-                </ListItem>
-            </List>
+            {content}
         </Page>
     )
 };

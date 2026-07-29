@@ -207,6 +207,11 @@
     "menuDelete": "Delete",
     "menuDeleteTable": "Delete Table",
     "menuEdit": "Edit",
+    "menuParagraph": "Paragraph",
+    "menuImage": "Image",
+    "menuReplaceImage": "Replace image",
+    "menuChart": "Chart",
+    "menuEditData": "Edit data",
     "menuEditLink": "Edit Link",
     "menuJoinList": "Join to previous list",
     "menuMerge": "Merge",
@@ -711,6 +716,9 @@
     "textClearAllFields": "Clear All Fields",
     "textClose": "Close",
     "textCollaboration": "Collaboration",
+    "textCommandSearch": "Command search",
+    "textCommandSearchPlaceholder": "Find a command",
+    "textNoCommands": "No available commands",
     "textColorSchemes": "Color Themes",
     "textComment": "Comment",
     "textComments": "Comments",
@@ -833,6 +841,21 @@
     "txtOk": "Ok",
     "txtProtected": "Once you enter the password and open the file, the current password will be reset"
   },
+  "Session": {
+    "textBlockingSave": "Saving was rejected. Editing is paused to protect your changes.",
+    "textConflict": "The server version changed. Export a copy before choosing how to continue.",
+    "textDiscardConfirm": "Reopening may discard changes that have not reached the server. Reopen anyway?",
+    "textFatal": "The editor cannot continue safely. Export a copy if available, then reopen the file.",
+    "textOpenSettings": "Open file options",
+    "textOpening": "Opening document",
+    "textReconnecting": "Connection lost. Editing will resume after the server state is reconciled.",
+    "textRecoveryTitle": "Protect your changes",
+    "textReopen": "Reopen",
+    "textRetry": "Retry",
+    "textRetryableSave": "Changes are not saved. Retry or export a copy.",
+    "textReturn": "Return",
+    "textSaving": "Waiting for server save confirmation"
+  },
   "Toolbar": {
     "btnRestartNow": "Restart now",
     "btnSend": "Send",
@@ -851,6 +874,7 @@
     "textRenameFile": "Rename File",
     "textSwitchedMobileView": "Switched to Mobile view",
     "textSwitchedStandardView": "Switched to Standard view",
+    "textHideKeyboard": "Hide keyboard",
     "textSwitchToDesktop": "Switch to Desktop",
     "warnEmptyRequiredField": "Fill all required fields to send form."
   }
