@@ -152,6 +152,11 @@ const SettingsPage = inject('storeAppOptions', 'storeToolbarSettings', 'storePre
                     }
                 </List>
                 <List>
+                    {Device.phone &&
+                        <ListItem title={_t.textCommandSearch} link='/command-search/'>
+                            <SvgIcon slot='media' symbolId={IconSearch.id} className='icon icon-svg' />
+                        </ListItem>
+                    }
                     {!props.inPopover &&
                         <ListItem disabled={appOptions.readerMode || disabledPreview ? true : false} title={!_isEdit ? _t.textFind : _t.textFindAndReplace} link="#" searchbarEnable='.searchbar' onClick={settingsContext.closeModal} className='no-indicator'>
                             <SvgIcon slot="media" symbolId={IconSearch.id} className={'icon icon-svg'} />

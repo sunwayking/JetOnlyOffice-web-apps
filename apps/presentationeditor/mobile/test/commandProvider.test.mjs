@@ -8,8 +8,11 @@ import {
 } from '../src/lib/commandProvider.mjs';
 import {createPresentationCommandInventory} from '../src/lib/presentationCommandCatalog.mjs';
 import {
+    capturePresentationEditorViewState,
     disposePresentationEditorRuntime,
     initializePresentationEditorRuntime,
+    restorePresentationEditorViewState,
+    subscribePresentationEditorRuntime,
     updatePresentationEditorPermissions,
 } from '../src/lib/presentationEditorRuntime.mjs';
 
@@ -226,4 +229,46 @@ test('presentation Runtime owns lifecycle callbacks, permissions, and disposal',
         () => runtime.getSession(),
         error => error.code === 'MOBILE_RUNTIME_DISPOSED',
     );
+});
+
+test('presentation Runtime delegates view-state capture and restore to its adapter', () => {
+    const selection = {CurPage: 6, slideSelection: {selectedObjects: ['image-2']}};
+    const state = {
+        slide: 6,
+        selection,
+        ui: {panel: 'edit', route: '/edit-replace-image/', scroll: {x: 0, y: 180}},
+    };
+    const restored = [];
+    const api = {
+        asc_registerCallback() {},
+        asc_unregisterCallback() {},
+    };
+
+    initializePresentationEditorRuntime({
+        inventory,
+        getApi: () => api,
+        captureViewState: () => state,
+        restoreViewState: value => restored.push(value),
+    });
+
+    assert.equal(capturePresentationEditorViewState(), state);
+    restorePresentationEditorViewState(state);
+    assert.deepEqual(restored, [state]);
+    disposePresentationEditorRuntime();
+});
+
+test('presentation Runtime publishes creation, permission changes, and disposal to command search', () => {
+    const published = [];
+    const detach = subscribePresentationEditorRuntime(runtime => published.push(runtime));
+    const api = {
+        asc_registerCallback() {},
+        asc_unregisterCallback() {},
+    };
+
+    const runtime = initializePresentationEditorRuntime({inventory, getApi: () => api});
+    updatePresentationEditorPermissions({edit: true});
+    disposePresentationEditorRuntime();
+    detach();
+
+    assert.deepEqual(published, [null, runtime, runtime, null]);
 });

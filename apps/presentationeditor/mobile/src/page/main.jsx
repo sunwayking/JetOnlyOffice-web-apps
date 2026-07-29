@@ -50,8 +50,34 @@ import AddView from '../view/add/Add';
 import EditView from '../view/edit/Edit';
 import VersionHistoryController from '../../../../common/mobile/lib/controller/VersionHistory';
 import { DrawController } from "../../../../common/mobile/lib/controller/Draw";
+import {
+    capturePresentationEditorViewState,
+    restorePresentationEditorViewState,
+} from '../lib/presentationEditorRuntime.mjs';
+import {
+    createPresentationUiStateAdapter,
+    createPresentationViewportController,
+    registerPresentationUiStateAdapter,
+} from '../lib/presentationViewState.mjs';
 
 export const MainContext = createContext();
+
+const panelStateKeys = Object.freeze({
+    edit: 'editOptionsVisible',
+    add: 'addOptionsVisible',
+    settings: 'settingsVisible',
+    coauth: 'collaborationVisible',
+    preview: 'previewVisible',
+    'add-link': 'addLinkSettingsVisible',
+    'edit-link': 'editLinkSettingsVisible',
+    history: 'historyVisible',
+});
+
+const panelViewSelectors = Object.freeze({
+    edit: '#presentation-edit-view',
+    add: '#presentation-add-view',
+    settings: '#presentation-settings-view',
+});
 
 class MainPage extends Component {
     constructor(props) {
@@ -161,10 +187,44 @@ class MainPage extends Component {
         e.preventDefault();
     }
 
+    getActivePanel = () => Object.entries(panelStateKeys)
+        .find(([, stateKey]) => this.state[stateKey])?.[0] ?? null;
+
+    getPanelRouter = panel => {
+        const selector = panelViewSelectors[panel];
+        return selector ? f7.views.get(selector)?.router ?? null : null;
+    };
+
+    getPanelScrollElement = panel => {
+        const selector = panelViewSelectors[panel];
+        const root = selector ? document.querySelector(selector) : null;
+        return root?.querySelector('.page-current .page-content') ?? root?.querySelector('.page-content') ?? null;
+    };
+
+    handleViewportChange = () => {
+        this.viewportController?.handleViewportChange();
+    };
+
     componentDidMount () {
-          
+        this.uiStateAdapter = createPresentationUiStateAdapter({
+            getActivePanel: this.getActivePanel,
+            openPanel: this.handleClickToOpenOptions,
+            getRouter: this.getPanelRouter,
+            getScrollElement: this.getPanelScrollElement,
+        });
+        this.unregisterUiStateAdapter = registerPresentationUiStateAdapter(this.uiStateAdapter);
+        this.viewportController = createPresentationViewportController({
+            captureViewState: capturePresentationEditorViewState,
+            closeTransientUi: () => {
+                document.activeElement?.blur();
+                f7.popover.close('.document-menu.modal-in', false);
+            },
+            resizeEditor: () => Common.EditorApi?.get()?.Resize(),
+            restoreViewState: restorePresentationEditorViewState,
+        });
 
         document.addEventListener('touchmove', this.touchMoveHandler);
+        window.addEventListener('orientationchange', this.handleViewportChange);
 
         if (Device.ios) {
             document.addEventListener('gesturestart', this.gesturePreventHandler);
@@ -175,6 +235,8 @@ class MainPage extends Component {
 
     componentWillUnmount() {
         document.removeEventListener('touchmove', this.touchMoveHandler);
+        window.removeEventListener('orientationchange', this.handleViewportChange);
+        this.unregisterUiStateAdapter?.();
 
         if (Device.ios) {
             document.removeEventListener('gesturestart', this.gesturePreventHandler);

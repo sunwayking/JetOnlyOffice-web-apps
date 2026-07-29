@@ -48,6 +48,7 @@ export const createPresentationCommandProvider = ({
                 ? {permission: command.permissions[0]}
                 : {permissionsAny: Object.freeze(command.permissions.slice())}),
             contexts: Object.freeze(command.contexts.slice()),
+            ...(command.formats?.length ? {formats: Object.freeze(command.formats.slice())} : {}),
             mobilePath: command.mobilePath,
             mutates: command.mutates !== false,
         }))

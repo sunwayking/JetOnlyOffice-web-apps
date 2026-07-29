@@ -41,6 +41,7 @@ export class storeAppOptions {
         makeObservable(this, {
             isEdit: observable,
             canViewComments: observable,
+            fileType: observable,
             setConfigOptions: action,
             setPermissionOptions: action,
 
@@ -73,6 +74,7 @@ export class storeAppOptions {
     canBrandingExt = true;
     canBranding = true;
     config = {};
+    fileType = '';
     customization;
 
     isDrawMode = false;
@@ -164,6 +166,7 @@ export class storeAppOptions {
     }
 
     setPermissionOptions (document, licType, params, permissions, isSupportEditFeature) {
+        this.fileType = String(document?.fileType || '').toLowerCase();
         if (params.asc_getRights() !== Asc.c_oRights.Edit)
             permissions.edit = false;
         this.review = (permissions.review === undefined) ? (permissions.edit !== false) : permissions.review;

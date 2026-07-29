@@ -20,14 +20,32 @@ const runtimePermissions = {
 const mutablePermissionKeys = Object.freeze(['edit', 'review', 'comment', 'fillForms']);
 
 let presentationRuntime = null;
+let presentationAdapter = null;
+const runtimeSubscribers = new Set();
 
-export function initializePresentationEditorRuntime({ inventory, getApi }) {
+const publishRuntime = () => {
+    runtimeSubscribers.forEach(subscriber => subscriber(presentationRuntime));
+};
+
+export function initializePresentationEditorRuntime({
+    inventory,
+    getApi,
+    captureViewState,
+    restoreViewState,
+}) {
     disposePresentationEditorRuntime();
+    presentationAdapter = createPresentationCommandProvider({
+        inventory,
+        getApi,
+        captureViewState,
+        restoreViewState,
+    });
     presentationRuntime = createEditorRuntime({
-        adapter: createPresentationCommandProvider({ inventory, getApi }),
+        adapter: presentationAdapter,
         permissions: runtimePermissions,
     });
     setActiveEditorRuntime(presentationRuntime);
+    publishRuntime();
     return presentationRuntime;
 }
 
@@ -35,10 +53,28 @@ export function updatePresentationEditorPermissions(permissions) {
     mutablePermissionKeys.forEach(key => {
         runtimePermissions[key] = permissions?.[key] === true;
     });
+    if (presentationRuntime) publishRuntime();
 }
 
 export function getPresentationEditorRuntime() {
     return presentationRuntime;
+}
+
+export function subscribePresentationEditorRuntime(subscriber) {
+    if (typeof subscriber !== 'function') {
+        throw new TypeError('Presentation Runtime subscriber must be a function');
+    }
+    runtimeSubscribers.add(subscriber);
+    subscriber(presentationRuntime);
+    return () => runtimeSubscribers.delete(subscriber);
+}
+
+export function capturePresentationEditorViewState() {
+    return presentationAdapter?.captureViewState() ?? null;
+}
+
+export function restorePresentationEditorViewState(state) {
+    presentationAdapter?.restoreViewState(state);
 }
 
 export function executePresentationCommand(commandId, payload) {
@@ -58,7 +94,9 @@ export function disposePresentationEditorRuntime() {
         }
         presentationRuntime.dispose();
         presentationRuntime = null;
+        publishRuntime();
     }
+    presentationAdapter = null;
     mutablePermissionKeys.forEach(key => {
         runtimePermissions[key] = false;
     });

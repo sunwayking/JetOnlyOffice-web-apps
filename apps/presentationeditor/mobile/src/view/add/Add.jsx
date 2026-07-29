@@ -116,12 +116,12 @@ const AddView = () => {
     return (
         !Device.phone ?
             <Popover id="add-popover" className="popover__titled" closeByOutsideClick={false} onPopoverClosed={() => mainContext.closeOptions('add')}>
-                <View routes={routes} url='/adding-page/' style={{ height: '410px' }}>
+                <View id='presentation-add-view' routes={routes} url='/adding-page/' style={{ height: '410px' }}>
                     <AddingPage />
                 </View>
             </Popover> :
             <Popup className="add-popup" onPopupClosed={() => mainContext.closeOptions('add')}>
-                <View routes={routes} url='/adding-page/'>
+                <View id='presentation-add-view' routes={routes} url='/adding-page/'>
                     <AddingPage />
                 </View>
             </Popup>

@@ -46,12 +46,17 @@ import About from '../../../../../common/mobile/lib/view/About';
 import SettingsPage from './SettingsPage';
 import { MainContext } from '../../page/main';
 import VersionHistoryController from '../../../../../common/mobile/lib/controller/VersionHistory';
+import CommandSearch from './CommandSearch';
 
 const routes = [
     {
         path: '/settings-page/',
         component: SettingsPage,
         keepAlive: true
+    },
+    {
+        path: '/command-search/',
+        component: CommandSearch,
     },
     {
         path: '/application-settings/',
@@ -118,12 +123,12 @@ const SettingsView = () => {
     return (
         !Device.phone ?
             <Popover id="settings-popover" closeByOutsideClick={false} className="popover__titled" onPopoverClosed={() => mainContext.closeOptions('settings')}>
-                <View style={{ height: '410px' }} routes={routes} url='/settings-page/'>
+                <View id='presentation-settings-view' style={{ height: '410px' }} routes={routes} url='/settings-page/'>
                     <SettingsPage />
                 </View>
             </Popover> :
             <Popup className="settings-popup" onPopupClosed={() => mainContext.closeOptions('settings')}>
-                <View routes={routes} url='/settings-page/'>
+                <View id='presentation-settings-view' routes={routes} url='/settings-page/'>
                     <SettingsPage />
                 </View>
             </Popup>
