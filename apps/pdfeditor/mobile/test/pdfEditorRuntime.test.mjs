@@ -68,3 +68,31 @@ test('PDF Runtime enforces permission and real session facts', () => {
     assert.equal(fixture.callbacks.size, 0);
     assert.equal(getPdfCommandProvider(), null);
 });
+
+test('PDF Runtime allows the fill-forms profile to navigate, clear and submit fields', () => {
+    const fixture = createRuntimeApi();
+    fixture.api.asc_MoveToFillingForm = value => fixture.calls.push(['move', value]);
+    fixture.api.asc_ClearAllSpecialForms = () => fixture.calls.push(['clear']);
+    fixture.api.asc_SendForm = () => fixture.calls.push(['submit']);
+    const runtime = initializePdfEditorRuntime({
+        catalog,
+        getApi: () => fixture.api,
+        permissions: {fillForms: true},
+    });
+
+    fixture.callbacks.get('asc_onDocumentOpenStateChanged')({phase: 'ready'});
+    fixture.callbacks.get('asc_onTransportStateChanged')({state: 'connected'});
+    runtime.execute('pdf.forms.previous');
+    runtime.execute('pdf.forms.next');
+    runtime.execute('pdf.forms.clear');
+    runtime.execute('pdf.forms.submit');
+
+    assert.deepEqual(fixture.calls, [
+        ['move', false],
+        ['move', true],
+        ['clear'],
+        ['submit'],
+    ]);
+    assert.equal(runtime.resolve('pdf.forms.text').reason, 'permission-denied');
+    disposePdfEditorRuntime();
+});
