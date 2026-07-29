@@ -21,10 +21,10 @@ const mutablePermissionKeys = Object.freeze(['edit', 'review', 'comment', 'fillF
 
 let presentationRuntime = null;
 
-export function initializePresentationEditorRuntime({ inventory, getApi, executeUiCommand }) {
+export function initializePresentationEditorRuntime({ inventory, getApi }) {
     disposePresentationEditorRuntime();
     presentationRuntime = createEditorRuntime({
-        adapter: createPresentationCommandProvider({ inventory, getApi, executeUiCommand }),
+        adapter: createPresentationCommandProvider({ inventory, getApi }),
         permissions: runtimePermissions,
     });
     setActiveEditorRuntime(presentationRuntime);
