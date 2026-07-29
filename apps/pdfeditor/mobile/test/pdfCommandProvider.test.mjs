@@ -277,7 +277,6 @@ test('PDF Mobile selection, participants and command search derive from live SDK
             'pdf.redaction.selection',
             'pdf.comment.add',
             'pdf.annotation.marker',
-            'pdf.annotation.remove-selected',
         ],
     });
 
@@ -578,6 +577,7 @@ test('PDF provider exposes form filling navigation, clearing and submission thro
 test('PDF provider binds core editing, page, object and view commands to the real SDK API', () => {
     const calls = [];
     const api = createExplicitApi(calls);
+    api.getSelectedElements = () => [{get_ObjectType: () => 'annotation'}];
     api.getCurrentPage = () => 2;
     api.getCountPages = () => 5;
     api.goToPage = page => calls.push(['goToPage', page]);
@@ -652,6 +652,30 @@ test('PDF provider binds core editing, page, object and view commands to the rea
     ]);
 });
 
+test('PDF provider removes selected content only for an explicit annotation selection', () => {
+    const calls = [];
+    const api = createExplicitApi(calls);
+    let selection = [{}];
+    api.getSelectedElements = () => selection;
+    const provider = createPdfCommandProvider({catalog, getApi: () => api});
+
+    assert.deepEqual(provider.resolveCapability('pdf.annotation.remove-selected'), {
+        available: false,
+        reason: 'annotation-selection-required',
+    });
+    assert.throws(
+        () => provider.execute('pdf.annotation.remove-selected'),
+        error => error.code === 'MOBILE_COMMAND_CAPABILITY_UNAVAILABLE' &&
+            error.details.reason === 'annotation-selection-required',
+    );
+    assert.deepEqual(calls, []);
+
+    selection = [{get_ObjectType: () => 'annotation'}];
+    assert.deepEqual(provider.resolveCapability('pdf.annotation.remove-selected'), {available: true});
+    provider.execute('pdf.annotation.remove-selected');
+    assert.deepEqual(calls, [['asc_remove']]);
+});
+
 test('PDF provider exposes Desktop text formatting and specialized form presets', () => {
     const calls = [];
     const provider = createPdfCommandProvider({catalog, getApi: () => createExplicitApi(calls)});
@@ -685,4 +709,63 @@ test('PDF provider exposes Desktop text formatting and specialized form presets'
         ['AddTextField', {mask: '9999-9999-9999-9999', placeholder: '9999-9999-9999-9999'}],
         ['AddTextField', {mask: '99999-9999', placeholder: '99999-9999'}],
     ]);
+});
+
+test('PDF provider rejects malformed text formatting payloads before calling the SDK', () => {
+    const calls = [];
+    const provider = createPdfCommandProvider({catalog, getApi: () => createExplicitApi(calls)});
+    const invalidPayloads = [
+        ['pdf.edit.bold', undefined],
+        ['pdf.edit.bold', {}],
+        ['pdf.edit.bold', []],
+        ['pdf.edit.bold', {enabled: 'false'}],
+        ['pdf.edit.italic', {enabled: 1}],
+        ['pdf.edit.underline', {enabled: null}],
+        ['pdf.edit.strikeout', {enabled: 'true'}],
+        ['pdf.edit.superscript', {baseline: 1}],
+        ['pdf.edit.superscript', {baseline: 3}],
+        ['pdf.edit.subscript', {baseline: 2}],
+        ['pdf.edit.subscript', {baseline: -1}],
+        ['pdf.edit.change-case', {}],
+        ['pdf.edit.change-case', {value: -1}],
+        ['pdf.edit.change-case', {value: 5}],
+        ['pdf.edit.change-case', {value: '0'}],
+        ['pdf.edit.horizontal-align', {}],
+        ['pdf.edit.horizontal-align', {value: 4}],
+        ['pdf.edit.horizontal-align', {value: 1.5}],
+        ['pdf.edit.text-direction', {}],
+        ['pdf.edit.text-direction', {rtl: 'true'}],
+    ];
+
+    for (const [commandId, payload] of invalidPayloads) {
+        assert.throws(
+            () => provider.execute(commandId, payload),
+            error => error.code === 'MOBILE_COMMAND_PAYLOAD_INVALID' &&
+                error.details.commandId === commandId,
+            commandId,
+        );
+    }
+    assert.deepEqual(calls, []);
+});
+
+test('PDF provider accepts every locked text formatting enum value', () => {
+    const calls = [];
+    const provider = createPdfCommandProvider({catalog, getApi: () => createExplicitApi(calls)});
+    const validPayloads = [
+        ['pdf.edit.bold', {enabled: false}, ['put_TextPrBold', false]],
+        ['pdf.edit.italic', {enabled: true}, ['put_TextPrItalic', true]],
+        ['pdf.edit.underline', {enabled: false}, ['put_TextPrUnderline', false]],
+        ['pdf.edit.strikeout', {enabled: true}, ['put_TextPrStrikeout', true]],
+        ...[0, 2].map(baseline => ['pdf.edit.superscript', {baseline}, ['put_TextPrBaseline', baseline]]),
+        ...[0, 1].map(baseline => ['pdf.edit.subscript', {baseline}, ['put_TextPrBaseline', baseline]]),
+        ...[0, 1, 2, 3, 4].map(value => ['pdf.edit.change-case', {value}, ['asc_ChangeTextCase', value]]),
+        ...[0, 1, 2, 3].map(value => ['pdf.edit.horizontal-align', {value}, ['put_PrAlign', value]]),
+        ...[false, true].map(rtl => ['pdf.edit.text-direction', {rtl}, ['asc_setRtlTextDirection', rtl]]),
+    ];
+
+    for (const [commandId, payload, expected] of validPayloads) {
+        provider.execute(commandId, payload);
+        assert.deepEqual(calls.at(-1), expected, commandId);
+    }
+    assert.equal(calls.length, validPayloads.length);
 });

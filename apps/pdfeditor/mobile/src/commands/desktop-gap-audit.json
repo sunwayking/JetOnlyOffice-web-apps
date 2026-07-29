@@ -2,6 +2,9 @@
   "schemaVersion": 1,
   "editor": "pdf",
   "releaseGateStatus": "incomplete",
+  "controlDiscovery": "simple-receiver-common-ui-direct-assignments",
+  "controlUnit": "control-identifier",
+  "controllerDiscovery": "source-hash-only",
   "source": {
     "repository": "sunwayking/JetOnlyOffice-web-apps",
     "commit": "9c0ca538c3b211052347df09d2a4d6781f023403",
@@ -196,7 +199,7 @@
     },
     "apps/pdfeditor/main/app/view/TableSettings.js": {
       "sha256": "47f11012274adac0b1631d2330f3ced76b164acfeba4564d090539929eb04d40",
-      "planned": ["btnBackColor", "btnBorderColor", "btnDistributeCols", "btnDistributeRows", "btnEdit", "btnTableTemplate"]
+      "planned": ["btnBackColor", "btnBorderColor", "btnDistributeCols", "btnDistributeRows", "btnEdit", "btnTableTemplate", "mnuTableTemplatePicker"]
     },
     "apps/pdfeditor/main/app/view/TextArtSettings.js": {
       "sha256": "f160360435e32c754f031fc7229b2aa0bfc5320293ab6bc39f3429a678bf0b6e",
@@ -217,23 +220,20 @@
     "apps/pdfeditor/main/app/view/PageThumbnails.js": {
       "sha256": "c07f8297639f01de2ae5aa15c3598e22bf225a37a93b3b78f99e304d57f73b87",
       "planned": ["mnuSizeSetting"]
-    },
-    "apps/pdfeditor/main/app/view/LeftMenu.js": {
-      "sha256": "6dabb27243fe429a3356f3389f592202cbf675922b31c3f34483bb9f0ef2ef6e",
-      "planned": ["btnAbout", "btnChat", "btnComments", "btnNavigation", "btnSearchBar", "btnSupport", "btnThumbnails"]
     }
   },
   "controllerSources": [
-    {"path": "apps/pdfeditor/main/app/controller/LeftMenu.js", "sha256": "b3b72eeea49ac66a87ff523011c8ca4fd6514a96d6e739db866076d0c5ce4139"},
-    {"path": "apps/pdfeditor/main/app/controller/DocumentHolder.js", "sha256": "71592c78856f019da27c27581088c5d705d213c4cfdaaec0dd36b7def5e8814b"},
-    {"path": "apps/pdfeditor/main/app/controller/DocumentHolderExt.js", "sha256": "96edaba11c28c7ebd13a1301f4250669e454c5058d217eaaad8f1e043d592af3"},
-    {"path": "apps/pdfeditor/main/app/controller/Main.js", "sha256": "436bd743815c3239ff6952347e374ae39806402e64e0c648dca5f6c2e760f9b5"},
-    {"path": "apps/pdfeditor/main/app/controller/FormsTab.js", "sha256": "518514e4b3c940320d21f9211c2ca44bd2f369b2813c13cd0b9c25cbcd37c1f7"},
-    {"path": "apps/pdfeditor/main/app/controller/InsTab.js", "sha256": "d20c4b58e600be93f3a0d5a2631f85b42f29c14f896a91d41d0876ac34e98d52"},
-    {"path": "apps/pdfeditor/main/app/controller/Toolbar.js", "sha256": "197c9dcb2f23b0485eab3fb45584bffb567bcd1db2f465e130cfbc08fc5e5c2a"}
+    {"path": "apps/pdfeditor/main/app/controller/LeftMenu.js", "sha256": "b3b72eeea49ac66a87ff523011c8ca4fd6514a96d6e739db866076d0c5ce4139", "classification": "unclassified"},
+    {"path": "apps/pdfeditor/main/app/controller/DocumentHolder.js", "sha256": "71592c78856f019da27c27581088c5d705d213c4cfdaaec0dd36b7def5e8814b", "classification": "unclassified"},
+    {"path": "apps/pdfeditor/main/app/controller/DocumentHolderExt.js", "sha256": "96edaba11c28c7ebd13a1301f4250669e454c5058d217eaaad8f1e043d592af3", "classification": "unclassified"},
+    {"path": "apps/pdfeditor/main/app/controller/Main.js", "sha256": "436bd743815c3239ff6952347e374ae39806402e64e0c648dca5f6c2e760f9b5", "classification": "unclassified"},
+    {"path": "apps/pdfeditor/main/app/controller/FormsTab.js", "sha256": "518514e4b3c940320d21f9211c2ca44bd2f369b2813c13cd0b9c25cbcd37c1f7", "classification": "unclassified"},
+    {"path": "apps/pdfeditor/main/app/controller/InsTab.js", "sha256": "d20c4b58e600be93f3a0d5a2631f85b42f29c14f896a91d41d0876ac34e98d52", "classification": "unclassified"},
+    {"path": "apps/pdfeditor/main/app/controller/Toolbar.js", "sha256": "197c9dcb2f23b0485eab3fb45584bffb567bcd1db2f465e130cfbc08fc5e5c2a", "classification": "unclassified"}
   ],
   "blockers": [
     "planned-desktop-controls-remain-unbound",
+    "dynamic-and-controller-control-classification-incomplete",
     "locked-core-cannot-persist-signature-appearance-streams",
     "server-confirmed-save-and-reopen-evidence-is-missing",
     "permanent-redaction-reopen-and-content-stream-proof-is-missing"

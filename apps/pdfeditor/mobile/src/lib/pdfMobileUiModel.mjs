@@ -39,7 +39,6 @@ const CONTEXT_COMMANDS = Object.freeze({
         'pdf.redaction.selection',
         'pdf.comment.add',
         'pdf.annotation.marker',
-        'pdf.annotation.remove-selected',
     ]),
 });
 

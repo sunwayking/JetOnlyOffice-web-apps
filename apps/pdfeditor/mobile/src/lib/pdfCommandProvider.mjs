@@ -3,6 +3,8 @@
  * SPDX-License-Identifier: AGPL-3.0-only
  */
 
+import {resolvePdfSelectionContext} from './pdfMobileUiModel.mjs';
+
 export const PDF_TASK_SPACE_IDS = Object.freeze([
     'edit',
     'insert',
@@ -78,6 +80,21 @@ const requireInteger = (commandId, value, label) => {
     return value;
 };
 
+const requireBoolean = (commandId, value, label) => {
+    if (typeof value !== 'boolean') {
+        throw payloadError(commandId, `${label} must be a boolean`, value);
+    }
+    return value;
+};
+
+const requireEnum = (commandId, value, label, allowed) => {
+    requireInteger(commandId, value, label);
+    if (!allowed.includes(value)) {
+        throw payloadError(commandId, `${label} must be one of ${allowed.join(', ')}`, value);
+    }
+    return value;
+};
+
 const requireZoom = value => {
     if (!Number.isFinite(value) || value < 25 || value > 500) {
         throw payloadError('pdf.view.zoom', 'value must be between 25 and 500 percent', value);
@@ -135,32 +152,48 @@ const commandExecutors = Object.freeze({
     'pdf.clipboard.paste': api => api.Paste(),
     'pdf.edit.undo': api => api.Undo(),
     'pdf.edit.redo': api => api.Redo(),
-    'pdf.edit.bold': (api, payload = {}) => api.put_TextPrBold(requireObject('pdf.edit.bold', payload).enabled !== false),
-    'pdf.edit.italic': (api, payload = {}) => api.put_TextPrItalic(requireObject('pdf.edit.italic', payload).enabled !== false),
-    'pdf.edit.underline': (api, payload = {}) => api.put_TextPrUnderline(requireObject('pdf.edit.underline', payload).enabled !== false),
-    'pdf.edit.strikeout': (api, payload = {}) => api.put_TextPrStrikeout(requireObject('pdf.edit.strikeout', payload).enabled !== false),
-    'pdf.edit.superscript': (api, payload = {}) => api.put_TextPrBaseline(requireInteger(
+    'pdf.edit.bold': (api, payload = {}) => api.put_TextPrBold(requireBoolean(
+        'pdf.edit.bold', requireObject('pdf.edit.bold', payload).enabled, 'enabled',
+    )),
+    'pdf.edit.italic': (api, payload = {}) => api.put_TextPrItalic(requireBoolean(
+        'pdf.edit.italic', requireObject('pdf.edit.italic', payload).enabled, 'enabled',
+    )),
+    'pdf.edit.underline': (api, payload = {}) => api.put_TextPrUnderline(requireBoolean(
+        'pdf.edit.underline', requireObject('pdf.edit.underline', payload).enabled, 'enabled',
+    )),
+    'pdf.edit.strikeout': (api, payload = {}) => api.put_TextPrStrikeout(requireBoolean(
+        'pdf.edit.strikeout', requireObject('pdf.edit.strikeout', payload).enabled, 'enabled',
+    )),
+    'pdf.edit.superscript': (api, payload = {}) => api.put_TextPrBaseline(requireEnum(
         'pdf.edit.superscript',
         requireObject('pdf.edit.superscript', payload).baseline,
         'baseline',
+        [0, 2],
     )),
-    'pdf.edit.subscript': (api, payload = {}) => api.put_TextPrBaseline(requireInteger(
+    'pdf.edit.subscript': (api, payload = {}) => api.put_TextPrBaseline(requireEnum(
         'pdf.edit.subscript',
         requireObject('pdf.edit.subscript', payload).baseline,
         'baseline',
+        [0, 1],
     )),
-    'pdf.edit.change-case': (api, payload = {}) => api.asc_ChangeTextCase(requireInteger(
+    'pdf.edit.change-case': (api, payload = {}) => api.asc_ChangeTextCase(requireEnum(
         'pdf.edit.change-case',
         requireObject('pdf.edit.change-case', payload).value,
         'value',
+        [0, 1, 2, 3, 4],
     )),
-    'pdf.edit.horizontal-align': (api, payload = {}) => api.put_PrAlign(requireInteger(
+    'pdf.edit.horizontal-align': (api, payload = {}) => api.put_PrAlign(requireEnum(
         'pdf.edit.horizontal-align',
         requireObject('pdf.edit.horizontal-align', payload).value,
         'value',
+        [0, 1, 2, 3],
     )),
     'pdf.edit.text-direction': (api, payload = {}) => api.asc_setRtlTextDirection(
-        requireObject('pdf.edit.text-direction', payload).rtl === true,
+        requireBoolean(
+            'pdf.edit.text-direction',
+            requireObject('pdf.edit.text-direction', payload).rtl,
+            'rtl',
+        ),
     ),
     'pdf.edit.select-all': api => api.asc_EditSelectAll(),
     'pdf.edit.clear-formatting': api => api.ClearFormating(),
@@ -380,6 +413,14 @@ export function createPdfCommandProvider({
         const missingMethods = methods.filter(name => typeof api[name] !== 'function');
         if (missingMethods.length) {
             return {available: false, reason: 'sdk-binding-unavailable', missingMethods};
+        }
+        if (command.id === 'pdf.annotation.remove-selected') {
+            const selection = typeof getSelectionSnapshot === 'function'
+                ? getSelectionSnapshot()
+                : api.getSelectedElements?.();
+            if (resolvePdfSelectionContext(selection, globalThis.Asc).kind !== 'annotation') {
+                return {available: false, reason: 'annotation-selection-required'};
+            }
         }
         const check = capabilityChecks[command.id];
         if (check && check(api) !== true) {
