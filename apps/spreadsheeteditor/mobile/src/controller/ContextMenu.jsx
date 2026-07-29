@@ -41,6 +41,7 @@ import { LocalStorage } from '../../../../common/mobile/utils/LocalStorage.mjs';
 import ContextMenuController from '../../../../common/mobile/lib/controller/ContextMenu';
 import { idContextMenuElement } from '../../../../common/mobile/lib/view/ContextMenu';
 import EditorUIController from '../lib/patch';
+import {executeSpreadsheetCommand} from '../lib/spreadsheetEditorRuntime.mjs';
 
 @inject(stores => ({
     isEdit: stores.storeAppOptions.isEdit,
@@ -48,6 +49,7 @@ import EditorUIController from '../lib/patch';
     canViewComments: stores.storeAppOptions.canViewComments,
     canCoAuthoring: stores.storeAppOptions.canCoAuthoring,
     canCopy: stores.storeAppOptions.canCopy,
+    canDeleteComments: stores.storeAppOptions.canDeleteComments,
     isRestrictedEdit: stores.storeAppOptions.isRestrictedEdit,
     users: stores.users,
     isDisconnected: stores.users.isDisconnected,
@@ -192,6 +194,19 @@ class ContextMenu extends ContextMenuController {
     onMergeCells() {
         const { t } = this.props;
         const api = Common.EditorApi.get();
+        const executeMerge = () => {
+            try {
+                executeSpreadsheetCommand('spreadsheet.cell.merge', {
+                    value: Asc.c_oAscMergeOptions.Merge,
+                });
+            } catch (error) {
+                f7.dialog.create({
+                    title: t('ContextMenu.notcriticalErrorTitle'),
+                    text: error.message,
+                    buttons: [{text: t('ContextMenu.textOk')}],
+                }).open();
+            }
+        };
         if (api.asc_mergeCellsDataLost(Asc.c_oAscMergeOptions.Merge)) {
             setTimeout(() => {
                 f7.dialog.create({
@@ -203,15 +218,13 @@ class ContextMenu extends ContextMenuController {
                         },
                         {
                             text: t('ContextMenu.textOk'),
-                            onClick: () => {
-                                api.asc_mergeCells(Asc.c_oAscMergeOptions.Merge);
-                            }
+                            onClick: executeMerge,
                         }
                 ]   
                 }).open();
             }, 0);
         } else {
-            api.asc_mergeCells(Asc.c_oAscMergeOptions.Merge);
+            executeMerge();
         }
     }
 

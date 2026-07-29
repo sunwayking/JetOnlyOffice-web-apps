@@ -21,6 +21,25 @@ const providerError = (code, message, details) => {
 
 const getDefaultSelection = api => api.asc_getCellInfo();
 
+const createCommandDescriptor = command => {
+    const descriptor = {
+        id: command.id,
+        contexts: Object.freeze(command.contexts.slice()),
+        mobilePath: command.mobilePath,
+        mutates: command.mutates !== false,
+    };
+
+    if (command.permissions.includes('view')) {
+        descriptor.permission = 'view';
+    } else if (command.permissions.length > 1) {
+        descriptor.permissionsAny = Object.freeze(command.permissions.slice());
+    } else {
+        descriptor.permission = command.permissions[0];
+    }
+
+    return Object.freeze(descriptor);
+};
+
 export const createSpreadsheetCommandProvider = ({
     inventory,
     getApi,
@@ -41,15 +60,11 @@ export const createSpreadsheetCommandProvider = ({
     const handlers = new Map();
     const descriptors = Object.freeze(inventory.commands
         .filter(command => command.implementation === 'implemented')
-        .map(command => Object.freeze({
-            id: command.id,
-            permission: command.permissions.includes('view') ? 'view' : command.permissions[0],
-            contexts: Object.freeze(command.contexts.slice()),
-            mobilePath: command.mobilePath,
-        }))
+        .map(createCommandDescriptor)
         .concat(Object.freeze({
             id: COMMON_COMMAND_IDS.ADD_COMMENT,
             permission: 'comment',
+            mutates: true,
         })));
     const detachSubscriptions = new Set();
     let disposed = false;

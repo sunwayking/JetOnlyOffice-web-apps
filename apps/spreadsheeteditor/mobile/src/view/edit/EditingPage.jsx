@@ -42,6 +42,7 @@ import EditShapeController from "../../controller/edit/EditShape";
 import EditImageController from "../../controller/edit/EditImage";
 import EditTextController from "../../controller/edit/EditText";
 import EditChartController from "../../controller/edit/EditChart";
+import { EditLinkController } from "../../controller/edit/EditLink";
 import { Device } from "../../../../../common/mobile/utils/device";
 import { MainContext } from '../../page/main';
 import SvgIcon from '@common/lib/component/SvgIcon';
@@ -165,16 +166,13 @@ const EditingPage = inject('storeFocusObjects')(observer(props => {
                 component: <EditTextController />
             })
         }
-
-        // if(!wsProps.Objects) {
-        //     if (settings.indexOf('hyperlink') > -1 || (props.hyperinfo && props.isAddShapeHyperlink)) {
-        //         editors.push({
-        //             caption: _t.textHyperlink,
-        //             id: 'edit-link',
-        //             component: <EditLinkController />
-        //         })
-        //     }
-        // }    
+        if (!wsProps.InsertHyperlinks && settings.indexOf('hyperlink') > -1) {
+            editors.push({
+                caption: _t.textHyperlink,
+                id: 'edit-link',
+                component: <EditLinkController isNavigate />
+            })
+        }
     }
 
     if(!editors.length) {

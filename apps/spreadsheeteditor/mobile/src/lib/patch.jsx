@@ -34,7 +34,7 @@
  */
 
 import React from 'react';
-import {Link} from 'framework7-react';
+import {f7, Link} from 'framework7-react';
 import {Device} from '../../../../common/mobile/utils/device';
 import SvgIcon from '../../../../common/mobile/lib/component/SvgIcon';
 import IconEditIos from '@common-ios-icons/icon-edit.svg?ios';
@@ -45,13 +45,16 @@ import IconUndoIos from '@common-ios-icons/icon-undo.svg?ios';
 import IconUndoAndroid from '@common-android-icons/icon-undo.svg';
 import IconRedoIos from '@common-ios-icons/icon-redo.svg?ios';
 import IconRedoAndroid from '@common-android-icons/icon-redo.svg';
+import {LocalStorage} from '../../../../common/mobile/utils/LocalStorage.mjs';
 import inventory from '../commands/desktop-command-inventory.json';
 import {createSpreadsheetCommandProvider} from './commandProvider.mjs';
 import {
     buildSpreadsheetContextMenuItems,
     createSpreadsheetFocusInterface,
     isSpreadsheetObjectSelection,
+    resolveSpreadsheetContextMenuAction,
 } from './spreadsheetUiModel.mjs';
+import {executeSpreadsheetCommand} from './spreadsheetEditorRuntime.mjs';
 
 const provider = createSpreadsheetCommandProvider({
     inventory,
@@ -142,7 +145,21 @@ EditorUIController.ContextMenu = {
     mapMenuItems(controller) {
         const api = Common.EditorApi.get();
         const cellInfo = api.asc_getCellInfo();
-        const labels = controller.props.t('ContextMenu', {returnObjects: true});
+        const labels = {...controller.props.t('ContextMenu', {returnObjects: true})};
+        [
+            'menuChart',
+            'menuClear',
+            'menuCopy',
+            'menuCut',
+            'menuImage',
+            'menuInsertAbove',
+            'menuInsertLeft',
+            'menuPaste',
+            'menuReplaceImage',
+            'menuShape',
+        ].forEach(key => {
+            labels[key] = controller.props.t(`ContextMenu.${key}`);
+        });
         const locked = cellInfo.asc_getLocked?.() === true || controller.props.wsLock === true;
 
         return buildSpreadsheetContextMenuItems({
@@ -151,6 +168,7 @@ EditorUIController.ContextMenu = {
             labels,
             canCopy: controller.props.canCopy !== false && api.can_CopyCut?.() !== false,
             canCutPaste: controller.props.canCopy !== false && api.can_CopyCut?.() !== false,
+            canMutate: controller.props.isEdit === true,
             canViewComments: controller.props.canViewComments === true,
             canAddComments: controller.props.canCoAuthoring === true && controller.props.canComments === true,
             isResolvedComments: controller.props.isResolvedComments === true,
@@ -167,7 +185,52 @@ EditorUIController.ContextMenu = {
             Common.Notifications.trigger('addcomment');
             return true;
         }
-        return false;
+
+        const api = Common.EditorApi.get();
+        const resolved = resolveSpreadsheetContextMenuAction({
+            action,
+            cellInfo: api.asc_getCellInfo(),
+            selectionTypes: Asc.c_oAscSelectionType,
+            canDeleteComments: controller.props.canDeleteComments === true,
+            constants: {
+                cleanAll: Asc.c_oAscCleanOptions.All,
+                deleteCellsLeft: Asc.c_oAscDeleteOptions.DeleteCellsAndShiftLeft,
+                deleteColumns: Asc.c_oAscDeleteOptions.DeleteColumns,
+                deleteRows: Asc.c_oAscDeleteOptions.DeleteRows,
+                insertColumns: Asc.c_oAscInsertOptions.InsertColumns,
+                insertRows: Asc.c_oAscInsertOptions.InsertRows,
+                merge: Asc.c_oAscMergeOptions.Merge,
+            },
+        });
+        if (!resolved) return false;
+
+        if (resolved.kind === 'route') {
+            controller.props.openOptions(resolved.target);
+            return true;
+        }
+        if (action === 'merge') {
+            controller.onMergeCells();
+            return true;
+        }
+
+        try {
+            const result = executeSpreadsheetCommand(resolved.commandId, resolved.payload);
+            if (action === 'copy' && result === false &&
+                !LocalStorage.getBool('sse-hide-copy-cut-paste-warning') && controller.props.canCopy) {
+                controller.showCopyCutPasteModal();
+            }
+            if ((action === 'cut' || action === 'paste') &&
+                !LocalStorage.getBool('sse-hide-copy-cut-paste-warning') && controller.props.canCopy) {
+                controller.showCopyCutPasteModal();
+            }
+        } catch (error) {
+            f7.dialog.create({
+                title: controller.props.t('ContextMenu.notcriticalErrorTitle'),
+                text: error.message,
+                buttons: [{text: controller.props.t('ContextMenu.textOk')}],
+            }).open();
+        }
+        return true;
     },
 };
 

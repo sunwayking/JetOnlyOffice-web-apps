@@ -1,5 +1,5 @@
 {
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "editor": "spreadsheet",
   "source": {
     "repository": "sunwayking/JetOnlyOffice-web-apps",
@@ -77,9 +77,10 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_Copy"
       },
+      "mutates": false,
       "mobilePath": "context.copy",
       "testIds": [
         "sse-provider-clipboard-copy"
@@ -97,7 +98,7 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_Cut"
       },
       "mobilePath": "context.cut",
@@ -117,12 +118,202 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_Paste"
       },
       "mobilePath": "context.paste",
       "testIds": [
         "sse-provider-clipboard-paste"
+      ]
+    },
+    {
+      "id": "spreadsheet.cell.autofill",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_fillHandleDone"
+      },
+      "mutates": true,
+      "mobilePath": "context.autofill",
+      "testIds": [
+        "sse-issue-8-context-cell-autofill"
+      ]
+    },
+    {
+      "id": "spreadsheet.cell.clear",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_emptyCells"
+      },
+      "mutates": true,
+      "mobilePath": "context.clear",
+      "testIds": [
+        "sse-issue-8-context-cell-clear"
+      ]
+    },
+    {
+      "id": "spreadsheet.cell.delete",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_deleteCells"
+      },
+      "mutates": true,
+      "mobilePath": "context.delete",
+      "testIds": [
+        "sse-issue-8-context-cell-delete"
+      ]
+    },
+    {
+      "id": "spreadsheet.cell.insert",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_insertCells"
+      },
+      "mutates": true,
+      "mobilePath": "context.insert",
+      "testIds": [
+        "sse-issue-8-context-cell-insert"
+      ]
+    },
+    {
+      "id": "spreadsheet.cell.merge",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_mergeCells"
+      },
+      "mutates": true,
+      "mobilePath": "context.merge",
+      "testIds": [
+        "sse-issue-8-context-cell-merge"
+      ]
+    },
+    {
+      "id": "spreadsheet.column.hide",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_hideColumns"
+      },
+      "mutates": true,
+      "mobilePath": "context.hide",
+      "testIds": [
+        "sse-issue-8-context-column-hide"
+      ]
+    },
+    {
+      "id": "spreadsheet.column.show",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_showColumns"
+      },
+      "mutates": true,
+      "mobilePath": "context.show",
+      "testIds": [
+        "sse-issue-8-context-column-show"
+      ]
+    },
+    {
+      "id": "spreadsheet.object.delete",
+      "contexts": [
+        "object"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_Remove"
+      },
+      "mutates": true,
+      "mobilePath": "context.delete",
+      "testIds": [
+        "sse-issue-8-context-object-delete"
+      ]
+    },
+    {
+      "id": "spreadsheet.row.hide",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_hideRows"
+      },
+      "mutates": true,
+      "mobilePath": "context.hide",
+      "testIds": [
+        "sse-issue-8-context-row-hide"
+      ]
+    },
+    {
+      "id": "spreadsheet.row.show",
+      "contexts": [
+        "cell"
+      ],
+      "permissions": [
+        "edit"
+      ],
+      "implementation": "implemented",
+      "binding": {
+        "kind": "sdk",
+        "method": "asc_showRows"
+      },
+      "mutates": true,
+      "mobilePath": "context.show",
+      "testIds": [
+        "sse-issue-8-context-row-show"
       ]
     },
     {
@@ -576,6 +767,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_decreaseFontSize"
       },
       "mobilePath": "edit.format",
@@ -896,6 +1088,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_setCellAlign"
       },
       "mobilePath": "edit.format",
@@ -1049,6 +1242,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_increaseFontSize"
       },
       "mobilePath": "edit.format",
@@ -1262,6 +1456,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.insert-smartart",
       "mobilePath": "add.insertsmartart",
       "testIds": [
         "sse-issue-8-desktop-insertsmartart"
@@ -1277,6 +1472,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.insert-symbol",
       "mobilePath": "add.insertsymbol",
       "testIds": [
         "sse-issue-8-desktop-insertsymbol"
@@ -1502,6 +1698,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.page-break",
       "mobilePath": "settings.layout",
       "testIds": [
         "sse-issue-8-desktop-pagebreak"
@@ -1517,6 +1714,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.page-margins",
       "mobilePath": "settings.layout",
       "testIds": [
         "sse-issue-8-desktop-pagemargins"
@@ -1532,6 +1730,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.page-orient",
       "mobilePath": "settings.layout",
       "testIds": [
         "sse-issue-8-desktop-pageorient"
@@ -1547,6 +1746,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.page-size",
       "mobilePath": "settings.layout",
       "testIds": [
         "sse-issue-8-desktop-pagesize"
@@ -1701,6 +1901,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.print-area",
       "mobilePath": "more.command-search",
       "testIds": [
         "sse-issue-8-desktop-printarea"
@@ -1776,6 +1977,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.insert.chart",
       "mobilePath": "add.insert-chart",
       "testIds": [
         "sse-issue-8-desktop-recommended-chart"
@@ -1866,6 +2068,7 @@
       ],
       "implementation": "planned",
       "binding": null,
+      "aliasOf": "spreadsheet.desktop.save",
       "mobilePath": "more.command-search",
       "testIds": [
         "sse-issue-8-desktop-save"
@@ -2055,6 +2258,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_setCellStrikeout"
       },
       "mobilePath": "edit.format",
@@ -2073,6 +2277,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_setCellSubscript"
       },
       "mobilePath": "edit.format",
@@ -2197,6 +2402,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_setCellUnderline"
       },
       "mobilePath": "edit.format",
@@ -2214,6 +2420,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_setCellVertAlign"
       },
       "mobilePath": "edit.format",
@@ -2277,6 +2484,7 @@
       ],
       "implementation": "implemented",
       "binding": {
+        "kind": "sdk",
         "method": "asc_setCellTextWrap"
       },
       "mobilePath": "edit.format",
@@ -2294,7 +2502,7 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_Redo"
       },
       "mobilePath": "toolbar.redo",
@@ -2312,7 +2520,7 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_Undo"
       },
       "mobilePath": "toolbar.undo",
@@ -2346,7 +2554,7 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_setCellBold"
       },
       "mobilePath": "edit.text.bold",
@@ -2365,7 +2573,7 @@
       ],
       "implementation": "implemented",
       "binding": {
-        "kind": "sdkjs",
+        "kind": "sdk",
         "method": "asc_setCellItalic"
       },
       "mobilePath": "edit.text.italic",

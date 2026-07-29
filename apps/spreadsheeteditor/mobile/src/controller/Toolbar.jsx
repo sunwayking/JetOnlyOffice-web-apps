@@ -40,6 +40,7 @@ import { useTranslation } from 'react-i18next';
 import ToolbarView from "../view/Toolbar";
 import { Device } from '../../../../common/mobile/utils/device';
 import {LocalStorage} from "../../../../common/mobile/utils/LocalStorage.mjs";
+import {executeSpreadsheetCommand} from '../lib/spreadsheetEditorRuntime.mjs';
 
 const ToolbarController = inject('storeAppOptions', 'users', 'storeSpreadsheetInfo', 'storeFocusObjects', 'storeToolbarSettings', 'storeWorksheets', 'storeVersionHistory')(observer(props => {
     const {t} = useTranslation();
@@ -193,18 +194,24 @@ const ToolbarController = inject('storeAppOptions', 'users', 'storeSpreadsheetIn
         onRequestClose();
     }
 
-    const onUndo = () => {
-        const api = Common.EditorApi.get();
-        if (api) {
-            api.asc_Undo();
+    const executeToolbarCommand = commandId => {
+        try {
+            executeSpreadsheetCommand(commandId);
+        } catch (error) {
+            f7.dialog.create({
+                title: t('ContextMenu.notcriticalErrorTitle'),
+                text: error.message,
+                buttons: [{text: t('ContextMenu.textOk')}],
+            }).open();
         }
     };
 
+    const onUndo = () => {
+        executeToolbarCommand('spreadsheet.history.undo');
+    };
+
     const onRedo = () => {
-        const api = Common.EditorApi.get();
-        if (api) {
-            api.asc_Redo();
-        }
+        executeToolbarCommand('spreadsheet.history.redo');
     }
 
     const onApiActiveSheetChanged = (index) => {
