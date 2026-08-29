@@ -590,7 +590,6 @@ define([
                     }
                 }
             }
-            delete oFontsByName['ASCW3'];
             var i = 0;
             for(var key in oFontsByName){
                 if(oFontsByName.hasOwnProperty(key)){
